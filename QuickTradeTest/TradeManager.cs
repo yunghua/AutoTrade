@@ -196,7 +196,7 @@ namespace QuickTradeTest
             return -1;
         }
 
-       
+
 
         private void dealStrategyCount(int count)//依照獲利 或是 賠錢次數，來定停損停利範圍
         {
@@ -392,9 +392,7 @@ namespace QuickTradeTest
 
                     recordList.Add(record);
 
-                    if (isStartOrder == false
-
-                        && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed)))
+                    if (isStartOrder == false && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed)))
                     {
 
                         tradeTime = record.TradeTime;
@@ -428,7 +426,7 @@ namespace QuickTradeTest
                             continue;
                         }
 
-                                
+
                         secondAfterTradeToActiveCheck = tradeDateTime.AddSeconds(ActiveProfitStartPeriod);//5秒內利潤擴大50點
 
                         minuteAfterStartActiveProfit = tradeDateTime.AddMinutes(1);//開始動態停利檢查，每一分鐘一次
@@ -458,7 +456,7 @@ namespace QuickTradeTest
 
                     else if (isStartOrder == true)//已經開始下單
                     {
-                        
+
                         if (nowTradeType == TradeType.BUY.GetHashCode())
                         {
 
@@ -472,7 +470,7 @@ namespace QuickTradeTest
                         }
 
 
-                        
+
                         if ((isActiveCheckProfit == false) && (record.TradeMoment > secondAfterTradeToActiveCheck))//還沒開始【動態停利】，檢查時間到了，看看是否要啟動動態停利機制
                         {
 
@@ -707,7 +705,7 @@ namespace QuickTradeTest
             }//end of while
 
             //if (record.TradeHour >= 13 && record.TradeMinute >= 44)//交易時間截止
-            if(isStartOrder == true)
+            if (isStartOrder == true)
             {
 
                 evenPrice = record.TradePrice;

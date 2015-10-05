@@ -20,7 +20,7 @@ namespace AutoTrade
 
         const Boolean NEXT_TRADE = false;
 
-        const int Random_Seed = 5000;//隨機參數種子
+        const int Random_Seed = 888;//隨機參數種子
 
         const int SELL = 2;//交易方式:賣
 
@@ -34,7 +34,7 @@ namespace AutoTrade
 
         const String strategyFilePath = "C:/Trader/Strategy.txt";
 
-        const int SellOrBuyCheckPeriod = 60;//交易買賣方向的檢查時間間隔,60秒前
+        //const int SellOrBuyCheckPeriod = 60;//交易買賣方向的檢查時間間隔,60秒前
 
         const int ActiveProfitStartPeriod = 5;//檢查動態停利啟動條件的時間基準，5秒前
 
@@ -52,6 +52,8 @@ namespace AutoTrade
         Boolean isStartOrder = false;//是否開始下單
 
         Boolean isPrevWin = false;
+
+        Boolean isPrevLose = false;
 
         Boolean isActiveCheckProfit = false;//是否動態停利
 
@@ -82,13 +84,13 @@ namespace AutoTrade
 
         double orderPrice = 0;//下單交易價格
 
-        double evenPrice = 0;//平倉交易價格
-
-        int nowTradeType = 0;//交易方式賣或是買
+        double evenPrice = 0;//平倉交易價格        
 
         DateTime tradeDateTime;//交易時間點
 
-        DateTime secondsBeforeTradeTime;//交易前X秒，判斷買或賣
+        //DateTime secondsBeforeTradeTime;//交易前X秒，判斷買或賣
+
+        DateTime[] minuteBeforeTradeTime;//交易前X秒，判斷買或賣
 
         DateTime secondAfterTradeToActiveCheck;//交易後X秒，例如五秒鐘內利潤擴大30點開始動態停利
 
@@ -109,6 +111,12 @@ namespace AutoTrade
         int loseCount = 0;//賠錢次數
 
         DateTime isStopTradeTime;//今日交易結束時間
+
+        int[] SellOrBuyCheckPeriod;//交易買賣方向的檢查時間間隔
+
+        int nowTradeType = 0;//交易方式賣或是買
+
+        int prevTradeType = 0;//上一次交易方式賣或是買
 
         //-------------------------------------------------------------------------------------------------------------
         //-------------------------------------------------------------------------------------------------------------
@@ -151,6 +159,8 @@ namespace AutoTrade
 
         public void prepareReady()
         {
+
+            SellOrBuyCheckPeriod = new int[5];
 
             isStopTrade = false;//是否停止今日交易
 
@@ -346,7 +356,7 @@ namespace AutoTrade
 
 
         public Boolean startTrade(String matchTime, String matchPrice, String matchQuantity)//回傳値表示是否結束本日交易
-        { 
+        {
 
             try
             {
@@ -375,61 +385,64 @@ namespace AutoTrade
 
 
 
-        private Boolean coreLogic()
+        private Boolean coreLogic()//回傳値表示是否結束本日交易
         {
 
-            if (isStartOrder == false && (isPrevWin == true || Dice.run(Random_Seed)))
+            if (isStartOrder == false && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed)))
             {
 
                 tradeTime = record.TradeTime;
 
                 tradeDateTime = record.TradeMoment;
 
-                secondsBeforeTradeTime = tradeDateTime.AddSeconds(0 - SellOrBuyCheckPeriod);
+                if (isPrevLose == true)
+                {
+                    if (prevTradeType == TradeType.BUY.GetHashCode())
+                    {
+                        nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                    }
+                    else
+                    {
+                        nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                    }
+                }
+                else if (isPrevWin == true)
+                {
+                    if (prevTradeType == TradeType.BUY.GetHashCode())
+                    {
+                        nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                    }
+                    else
+                    {
+                        nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                    }
+                }
+                else if (!dealSellOrBuy(record, tradeDateTime))
+                {
+                    return false;
+                }
 
-                secondAfterTradeToActiveCheck = tradeDateTime.AddSeconds(ActiveProfitStartPeriod);//一分鐘內利潤擴大50點
+                secondAfterTradeToActiveCheck = tradeDateTime.AddSeconds(ActiveProfitStartPeriod);//5秒內利潤擴大50點
 
                 minuteAfterStartActiveProfit = tradeDateTime.AddMinutes(1);//開始動態停利檢查，每一分鐘一次
 
-                try
+                orderPrice = record.TradePrice;
+
+                if (nowTradeType == TradeType.BUY.GetHashCode())
                 {
-                    befofeRecord = RecordScanner.getRecordMinuteBeforeOrAfter(secondsBeforeTradeTime);//XX鐘前的交易紀錄
-
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("掃描失敗:" + e.Message);
-                }
-
-                if (befofeRecord == null)
-                {
-                    return NEXT_TRADE;
-                }
-
-                dealStrategyCount(winCount);//取得停損停利範圍
-                //dealStrategyCount(totalProfit);//取得停損停利範圍                    
-
-                double basePrice = befofeRecord.TradePrice;//交易基準                  
-
-                if ((record.TradePrice - basePrice) > 0)//目前交易金額大於XX分鐘前的交易金額
-                {
-                    nowTradeType = TradeType.BUY.GetHashCode();//買進
-
                     debugMsg("交易方式---->" + TradeType.BUY);
                 }
-                else
+                else if (nowTradeType == TradeType.SELL.GetHashCode())
                 {
-                    nowTradeType = TradeType.SELL.GetHashCode();//賣出
-
                     debugMsg("交易方式---->" + TradeType.SELL);
-
                 }
-
-                orderPrice = record.TradePrice;
 
                 debugMsg("交易金額---->" + orderPrice);
 
                 debugMsg("交易時間---->" + tradeDateTime);
+
+                dealStrategyCount(winCount);//取得停損停利範圍
+                //dealStrategyCount(totalProfit);//取得停損停利範圍     
 
                 isStartOrder = true;//下單啦
 
@@ -700,6 +713,8 @@ namespace AutoTrade
 
             isPrevWin = true;
 
+            isPrevLose = false;
+
             return tradeOut();
         }
 
@@ -709,6 +724,8 @@ namespace AutoTrade
 
             isPrevWin = false;
 
+            isPrevLose = true;
+
             return tradeOut();
         }
 
@@ -716,7 +733,7 @@ namespace AutoTrade
         {
 
             isStartOrder = false;
-          
+
             tradeCount++;
 
             isActiveCheckProfit = false;//停止動態停利檢查
@@ -756,6 +773,90 @@ namespace AutoTrade
 
                 tradeRecordFile.writeLine(msg);
             }
+        }
+
+        private Boolean dealSellOrBuy(OriginalRecord record, DateTime tradeDateTime)//決定買或賣的方向，回傳値代表計算成功或是失敗
+        {
+            try
+            {
+
+                int checkCount = 5;//檢查5個時間點
+
+                double basePrice;
+
+                minuteBeforeTradeTime = new DateTime[checkCount];
+
+                int[] direction = new int[checkCount];
+
+
+                for (int i = 0; i < checkCount; i++)
+                {
+                    minuteBeforeTradeTime[i] = tradeDateTime.AddSeconds(0 - SellOrBuyCheckPeriod[i]);
+
+                    debugMsg("minuteBeforeTradeTime[" + i + "]:" + minuteBeforeTradeTime[i]);
+                }
+
+                for (int i = 0; i < checkCount; i++)
+                {
+
+                    try
+                    {
+                        befofeRecord = RecordScanner.getRecordMinuteBeforeOrAfter(minuteBeforeTradeTime[i]);//XX鐘前的交易紀錄
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("掃描失敗:" + e.Message + "---" + e.StackTrace + "---" + e.Source);
+                    }
+
+                    if (befofeRecord == null)
+                    {
+                        return false;
+                    }
+
+                    basePrice = befofeRecord.TradePrice;//交易基準                  
+
+                    debugMsg("basePrice:" + basePrice);
+
+                    if ((record.TradePrice - basePrice) > 0)//目前交易金額大於XX分鐘前的交易金額
+                    {
+                        direction[i] = TradeType.SELL.GetHashCode();
+                    }
+                    else
+                    {
+                        direction[i] = TradeType.BUY.GetHashCode();
+                    }
+
+                }//end for
+
+                for (int i = checkCount - 1; i > 0; i--)
+                {
+                    if (direction[i] != direction[i - 1]) { return false; }
+                }
+
+                nowTradeType = direction[0];
+
+                for (int i = 0; i < checkCount; i++)
+                {
+                    debugMsg("direction[" + i + "]:" + direction[i]);
+                }
+
+                debugMsg("nowTradeType : " + nowTradeType);
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Source);
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+
+            }
+
+            return false;
+
         }
 
 
