@@ -12,7 +12,7 @@ namespace AutoTrade
 
         //Const 常數區
         //-------------------------------------------------------------------------------------------------------------
-        //
+        //        
 
         const Boolean DEBUG = true;
 
@@ -152,6 +152,8 @@ namespace AutoTrade
         OriginalRecord befofeRecord;
 
 
+        
+
         public TradeMaster()
         {
         }
@@ -159,6 +161,7 @@ namespace AutoTrade
 
         public void prepareReady()
         {
+            
 
             SellOrBuyCheckPeriod = new int[5];
 
@@ -365,6 +368,10 @@ namespace AutoTrade
                 record.TradeTime = matchTime;
 
                 record.TradeMoment = Convert.ToDateTime(matchTime);
+
+                record.TradeHour = record.TradeMoment.Hour;
+
+                record.TradeMinute = record.TradeMoment.Minute;
 
                 record.TradePrice = Convert.ToDouble(matchPrice);
 

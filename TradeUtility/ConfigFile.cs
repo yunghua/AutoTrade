@@ -11,7 +11,6 @@ namespace TradeUtility
         public ConfigFile(String fileName)
             : base(fileName)
         {
-
         }
 
         public string readConfig(string headerText)
@@ -46,14 +45,14 @@ namespace TradeUtility
                     }
 
                 }
-                catch (Exception )
+                catch (Exception)
                 {
                     //Console.WriteLine(e.Message);
                     //Console.WriteLine(e.Source);
                     //Console.WriteLine(e.StackTrace);
                     continue;
                 }
-                
+
             }
             return null;
         }//end of readConfig

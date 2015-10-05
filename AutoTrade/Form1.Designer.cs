@@ -300,8 +300,11 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V0.02  # # # # # ";
+            this.Text = " # # # # # 自動下單機V0.03  # # # # # ";
             this.Load += new System.EventHandler(this.Form1_Load);
+            
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_Close);
+
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -309,7 +312,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).EndInit();
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
-            this.ResumeLayout(false);
+            this.ResumeLayout(false);            
+            
 
         }
 

@@ -6,18 +6,53 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using TradeUtility;
+
 
 namespace AutoTrade
 {
     public partial class Form1 : Form
     {
-        String tradeCode = "MXFJ5";
+        const String configFilePath = "C:/Trader/TradeConfig.txt";
+
+        ConfigFile configFile;
 
         TradeMaster master;
+
+        string ip="";//IP
+        string port = "";//port=80,數字
+
+        string id = "";
+        string password = "";
+
+        string tradeCode = "";//市場別代碼，小台指=MXF，大台指=TXF
 
         public Form1()
         {
             InitializeComponent();
+
+            try
+            {
+                configFile = new ConfigFile(configFilePath);
+
+                configFile.prepareReader();
+
+                tradeCode = configFile.readConfig("Trade_Code");
+
+                tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeCode);
+
+                id = configFile.readConfig("ID");
+
+                password = configFile.readConfig("Password");
+
+                ip = configFile.readConfig("IP");
+
+                port = configFile.readConfig("Port");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("讀取設定檔案失敗：" + configFilePath + "。原因:" + e.Message);
+            }
 
             master = new TradeMaster();
 
@@ -44,30 +79,32 @@ namespace AutoTrade
                 textBox_status.Text = DateTime.Now.ToString("HH:mm:ss.fff ") + "行情連線失敗，隔5秒重新連線";
                 timer1.Enabled = true;
             }
-            else {
+            else
+            {
 
                 register();
-            
+
             }
         }
 
         private void axYuantaQuote1_OnGetMktAll(object sender, AxYuantaQuoteLib._DYuantaQuoteEvents_OnGetMktAllEvent e)
-        {            
+        {
             master.process(e);
         }
 
-        
+
 
         private void LoginFn()
         {
             try
             {
-                axYuantaQuote1.SetMktLogon("H121204051", "aliens0928", "quote.yuantafutures.com.tw", "80");
+                axYuantaQuote1.SetMktLogon(id, password, ip, port);
                 //axYuantaQuote1.SetMktLogon(textBox_id.Text.Trim(), textBox_pass.Text.Trim(), textBox_ip.Text.Trim(), textBox_port.Text.Trim());
             }
             catch (Exception ex)
             {
                 MessageBox.Show("SetMktConnection失敗：" + ex.Message);
+
             }
         }
 
@@ -88,7 +125,7 @@ namespace AutoTrade
             }
         }
 
-        
+
 
         private void axYuantaQuote1_OnRegError(object sender, AxYuantaQuoteLib._DYuantaQuoteEvents_OnRegErrorEvent e)
         {
@@ -99,16 +136,24 @@ namespace AutoTrade
         {
             timer1.Enabled = false;
             LoginFn();
-            
+
+        }
+
+        private void Form1_Close(object sender, EventArgs e)
+        {
+            if (configFile != null)
+            {
+                configFile.close();
+            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
-            LoginFn();            
+            LoginFn();
         }
 
-        
+
 
 
         private void textBox_sym_Click(object sender, EventArgs e)
@@ -116,7 +161,7 @@ namespace AutoTrade
             textBox_sym.SelectAll();
         }
 
-        
+
 
     }
 }
