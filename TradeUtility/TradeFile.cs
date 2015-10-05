@@ -37,9 +37,20 @@ namespace TradeUtility
 
         }
 
+        public TradeFile()
+        {
+
+        }
+
         public TradeFile(String fileName)
         {
             sFileName = fileName;
+        }
+
+        public Boolean isExist()
+        {
+            isFileExist = File.Exists(sFileName);
+            return isFileExist;
         }
 
         public void prepareReader()
@@ -72,7 +83,7 @@ namespace TradeUtility
                 }
 
                 writer = new StreamWriter(fs);
-                writer.AutoFlush = true;                
+                writer.AutoFlush = true;
             }
             catch (IOException e)
             {
@@ -134,7 +145,20 @@ namespace TradeUtility
         public void close()
         {
 
-           
+            try
+            {
+
+                if (fs != null)
+                {
+                    fs.Close();
+                    fs.Dispose();
+                }
+
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
 
             try
@@ -167,23 +191,6 @@ namespace TradeUtility
             {
                 Console.WriteLine(e.Message);
             }
-
-
-            try
-            {
-
-                if (fs != null)
-                {
-                    fs.Close();
-                    fs.Dispose();
-                }
-
-            }
-            catch (IOException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
         }
 
     }
