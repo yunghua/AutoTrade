@@ -55,6 +55,15 @@ namespace TradeUtility
 
         public void prepareReader()
         {
+            isFileExist = File.Exists(sFileName);
+
+            if (!isFileExist)
+            {
+                throw new Exception(sFileName +
+                    "不存在!");
+            }
+
+
             try
             {
                 reader = new StreamReader(sFileName);
@@ -148,22 +157,6 @@ namespace TradeUtility
             try
             {
 
-                if (fs != null)
-                {
-                    fs.Close();
-                    fs.Dispose();
-                }
-
-            }
-            catch (IOException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
-
-            try
-            {
-
                 if (reader != null)
                 {
                     reader.Close();
@@ -184,6 +177,21 @@ namespace TradeUtility
                 {
                     writer.Close();
                     writer.Dispose();
+                }
+
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            try
+            {
+
+                if (fs != null)
+                {
+                    fs.Close();
+                    fs.Dispose();
                 }
 
             }

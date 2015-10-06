@@ -520,7 +520,16 @@ namespace QuickTradeTest
 
                                     debugMsg("----------------------------------------------------------------------------------------------");
 
-                                    winOut();//獲利出場   
+                                    winOut();//獲利出場 
+
+                                    if (nowTradeType == TradeType.BUY.GetHashCode())
+                                    {
+                                        prevTradeType = TradeType.BUY.GetHashCode();
+                                    }
+                                    else
+                                    {
+                                        prevTradeType = TradeType.SELL.GetHashCode();
+                                    }
 
                                     continue;//
 

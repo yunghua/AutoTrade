@@ -13,7 +13,7 @@ namespace QuickTradeTest
 
         const int Rule_Count_Lose = 1;//停損跑幾種規則
 
-        const int Run_Count = 1000;//每種規則跑幾次測試
+        const int Run_Count = 100;//每種規則跑幾次測試
 
         const int Rule_Period = 0;//每次規則增加幅度
         
@@ -404,7 +404,7 @@ namespace QuickTradeTest
 
             reportMsg("平均手續費 : " + ((totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * 50) / (Run_Count * testDayCount));
 
-            double pureProfit = ((totalProfit * 50 - (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * 50)) / (Run_Count * testDayCount);
+            double pureProfit = ((totalProfit * 50 - (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * 66)) / (Run_Count * testDayCount);
 
             reportMsg(Run_Count * oFileList.Count + "次，總利潤 : " + totalProfit * 50);
 

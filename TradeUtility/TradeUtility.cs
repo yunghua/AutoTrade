@@ -9,7 +9,9 @@ namespace TradeUtility
     {
         private static TradeUtility utility = null;
 
-        const string monthFilePath = "C:/Trader/TradeMonthCode.txt";
+        public static string version = "TradeUtility.TradeUtility Version 0.0.0.3";
+
+        const string monthFilePath = "./TradeMonthCode.txt";
 
         static ConfigFile monthFile;//月份代碼設定檔
 
@@ -24,14 +26,7 @@ namespace TradeUtility
                 throw e;
             }
 
-            if (monthFile.isExist())
-            {
-                monthFile.prepareReader();
-            }
-            else
-            {
-                throw new Exception(monthFilePath + "不存在！");
-            }
+            
         }
 
         ~TradeUtility()
@@ -95,7 +90,7 @@ namespace TradeUtility
         {
             try
             {
-                DateTime now = System.DateTime.Now;                
+                DateTime now = System.DateTime.Now;
 
                 string tradeMonth = "";
 

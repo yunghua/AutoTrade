@@ -15,8 +15,7 @@
         {
             if (disposing && (components != null))
             {
-                components.Dispose();
-                master.stop();
+                components.Dispose();                
             }
             base.Dispose(disposing);
         }
@@ -64,6 +63,7 @@
             this.TolMatchQty = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.label_Version = new System.Windows.Forms.Label();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
@@ -73,6 +73,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label_Version);
             this.groupBox3.Controls.Add(this.textBox_status);
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Left;
@@ -289,6 +290,14 @@
             this.timer1.Interval = 5000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // label_Version
+            // 
+            this.label_Version.AutoSize = true;
+            this.label_Version.Location = new System.Drawing.Point(56, 76);
+            this.label_Version.Name = "label_Version";
+            this.label_Version.Size = new System.Drawing.Size(20, 20);
+            this.label_Version.TabIndex = 20;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
@@ -302,9 +311,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = " # # # # # 自動下單機V0.03  # # # # # ";
             this.Load += new System.EventHandler(this.Form1_Load);
-            
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_Close);
-
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -312,8 +318,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).EndInit();
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
-            this.ResumeLayout(false);            
-            
+            this.ResumeLayout(false);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_Close);
 
         }
 
@@ -343,6 +349,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn MatchQty;
         private System.Windows.Forms.DataGridViewTextBoxColumn TolMatchQty;
         private AxYuantaQuoteLib.AxYuantaQuote axYuantaQuote1;
+        private System.Windows.Forms.Label label_Version;
     }
 }
 

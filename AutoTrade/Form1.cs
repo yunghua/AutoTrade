@@ -13,13 +13,13 @@ namespace AutoTrade
 {
     public partial class Form1 : Form
     {
-        const String configFilePath = "C:/Trader/TradeConfig.txt";
+        const String configFilePath = "./Config/TradeConfig.txt";
 
         ConfigFile configFile;
 
         TradeMaster master;
 
-        string ip="";//IP
+        string ip = "";//IP
         string port = "";//port=80,數字
 
         string id = "";
@@ -31,32 +31,7 @@ namespace AutoTrade
         {
             InitializeComponent();
 
-            try
-            {
-                configFile = new ConfigFile(configFilePath);
 
-                configFile.prepareReader();
-
-                tradeCode = configFile.readConfig("Trade_Code");
-
-                tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeCode);
-
-                id = configFile.readConfig("ID");
-
-                password = configFile.readConfig("Password");
-
-                ip = configFile.readConfig("IP");
-
-                port = configFile.readConfig("Port");
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("讀取設定檔案失敗：" + configFilePath + "。原因:" + e.Message);
-            }
-
-            master = new TradeMaster();
-
-            master.prepareReady();
         }
 
 
@@ -135,7 +110,51 @@ namespace AutoTrade
         private void Form1_Load(object sender, EventArgs e)
         {
             timer1.Enabled = false;
+
+            label_Version.Text = TradeUtility.TradeUtility.version;
+
+
+            configFile = new ConfigFile(configFilePath);
+            try
+            {
+                configFile.prepareReader();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("讀取  設定檔  失敗。原因 : " + ex.Message);
+            }
+
+            tradeCode = configFile.readConfig("Trade_Code");
+
+            tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeCode);
+
+            id = configFile.readConfig("ID");
+
+            password = configFile.readConfig("Password");
+
+            ip = configFile.readConfig("IP");
+
+            port = configFile.readConfig("Port");
+
+            master = new TradeMaster();
+           
+            try
+            {
+
+                master.prepareReady();
+
+            }
+            catch (Exception ez)
+            {
+                MessageBox.Show(ez.Message+"--"+ez.StackTrace);
+
+                return;
+            }
+
+
             LoginFn();
+
+            
 
         }
 
@@ -144,6 +163,10 @@ namespace AutoTrade
             if (configFile != null)
             {
                 configFile.close();
+            }
+            if (master != null)
+            {
+                master.stop();
             }
         }
 

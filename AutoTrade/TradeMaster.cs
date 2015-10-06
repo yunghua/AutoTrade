@@ -14,6 +14,12 @@ namespace AutoTrade
         //-------------------------------------------------------------------------------------------------------------
         //        
 
+        const String Config_Dir = "./Config/";
+
+        const String Output_Dir = "./Output/";
+
+        const String strategyFilePath = Config_Dir + "Strategy.txt";
+
         const Boolean DEBUG = true;
 
         const Boolean END_TRADE = true;
@@ -32,7 +38,7 @@ namespace AutoTrade
 
         enum TradeType : int { SELL, BUY };
 
-        const String strategyFilePath = "C:/Trader/Strategy.txt";
+
 
         //const int SellOrBuyCheckPeriod = 60;//交易買賣方向的檢查時間間隔,60秒前
 
@@ -124,7 +130,7 @@ namespace AutoTrade
 
         String fileName = "";
 
-        String dir = "C:/Trader/";
+
 
         TradeFile allTradeOutputFile;          //當天所有交易紀錄
         TradeFile strategyFile;                        //策略檔
@@ -152,7 +158,7 @@ namespace AutoTrade
         OriginalRecord befofeRecord;
 
 
-        
+
 
         public TradeMaster()
         {
@@ -161,9 +167,38 @@ namespace AutoTrade
 
         public void prepareReady()
         {
-            
+
+            loseLine = new Dictionary<int, int>();
+
+            winLine = new Dictionary<int, int>();
+
+            strategyFile = new TradeFile(strategyFilePath);
+
+            try
+            {
+
+                strategyFile.prepareReader();
+
+            }
+            catch (Exception ee)
+            {
+                throw ee;                
+            }
+
+            dealStrategyLine();
+
 
             SellOrBuyCheckPeriod = new int[5];
+
+            SellOrBuyCheckPeriod[4] = 25;//交易買賣方向的檢查時間間隔,25秒前
+
+            SellOrBuyCheckPeriod[3] = 20;//交易買賣方向的檢查時間間隔,20秒前     
+
+            SellOrBuyCheckPeriod[2] = 15;//交易買賣方向的檢查時間間隔,15秒前
+
+            SellOrBuyCheckPeriod[1] = 10;//交易買賣方向的檢查時間間隔,10秒前
+
+            SellOrBuyCheckPeriod[0] = 5;//交易買賣方向的檢查時間間隔,5秒前
 
             isStopTrade = false;//是否停止今日交易
 
@@ -175,28 +210,18 @@ namespace AutoTrade
 
             isStopTradeTime = new DateTime(now.Year, now.Month, now.Day, 13, 44, 0);
 
-            fileName = dir + "AllOutput_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
+            fileName = Output_Dir + "AllOutput_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
 
             allTradeOutputFile = new TradeFile(fileName);
 
             allTradeOutputFile.prepareWriter();
 
-            tradeRecordFileName = dir + "TradeRecord_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
+            tradeRecordFileName = Output_Dir + "TradeRecord_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
 
             tradeRecordFile = new TradeFile(tradeRecordFileName);
 
             tradeRecordFile.prepareWriter();
-
-            loseLine = new Dictionary<int, int>();
-
-            winLine = new Dictionary<int, int>();
-
-            strategyFile = new TradeFile(strategyFilePath);
-
-            strategyFile.prepareReader();
-
-            getStrategyLine();
-
+           
             recordList = new List<OriginalRecord>();
 
             befofeRecord = new OriginalRecord();
@@ -209,11 +234,24 @@ namespace AutoTrade
 
         public void stop()
         {
-            allTradeOutputFile.close();
-
-            strategyFile.close();
-
-            tradeRecordFile.close();
+            try
+            {
+                if (allTradeOutputFile != null)
+                {
+                    allTradeOutputFile.close();
+                }
+                if (tradeRecordFile != null)
+                {
+                    tradeRecordFile.close();
+                }
+                if (strategyFile != null)
+                {
+                    strategyFile.close();
+                }
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public void process(AxYuantaQuoteLib._DYuantaQuoteEvents_OnGetMktAllEvent marketEvent)
@@ -256,7 +294,7 @@ namespace AutoTrade
         }
 
 
-        private void getStrategyLine()//讀取停損停利規則檔
+        private void dealStrategyLine()//讀取停損停利規則檔
         {
 
             int strategyCount = 1;//讀取停損停利規則檔案的行數
@@ -498,7 +536,9 @@ namespace AutoTrade
 
                     debugMsg("利潤:" + oneProfit * 50);
 
-                    debugMsg("策略:" + loseLine[nowStrategyCount]);
+                    debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+
+                    debugMsg("停利策略:" + winLine[nowStrategyCount]);
 
                     debugMsg("----------------------------------------------------------------------------------------------");
 
@@ -527,8 +567,6 @@ namespace AutoTrade
                         tempOneProfit = oneProfit;
                     }
 
-
-
                 }// end 檢查是否開始動態停利
 
                 else if ((isActiveCheckProfit == true))//開始動態停利
@@ -553,6 +591,15 @@ namespace AutoTrade
                             debugMsg("動態停利範圍:" + reverseLitmit);
 
                             debugMsg("----------------------------------------------------------------------------------------------");
+
+                            if (nowTradeType == TradeType.BUY.GetHashCode())
+                            {
+                                prevTradeType = TradeType.BUY.GetHashCode();
+                            }
+                            else
+                            {
+                                prevTradeType = TradeType.SELL.GetHashCode();
+                            }
 
                             return winOut();//獲利出場                               
 
@@ -612,9 +659,13 @@ namespace AutoTrade
 
                     debugMsg("利潤:" + oneProfit * 50);
 
-                    debugMsg("策略:" + loseLine[nowStrategyCount]);
+                    debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+
+                    debugMsg("停利策略:" + winLine[nowStrategyCount]);
 
                     debugMsg("----------------------------------------------------------------------------------------------");
+
+                    prevTradeType = TradeType.BUY.GetHashCode();
 
                     return loseOut();
 
@@ -638,9 +689,13 @@ namespace AutoTrade
 
                     debugMsg("利潤:" + oneProfit * 50);
 
-                    debugMsg("策略:" + loseLine[nowStrategyCount]);
+                    debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+
+                    debugMsg("停利策略:" + winLine[nowStrategyCount]);
 
                     debugMsg("----------------------------------------------------------------------------------------------");
+
+                    prevTradeType = TradeType.SELL.GetHashCode();
 
                     return loseOut();
 
@@ -664,9 +719,13 @@ namespace AutoTrade
 
                     debugMsg("利潤:" + oneProfit * 50);
 
-                    debugMsg("策略:" + winLine[nowStrategyCount]);
+                    debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+
+                    debugMsg("停利策略:" + winLine[nowStrategyCount]);
 
                     debugMsg("----------------------------------------------------------------------------------------------");
+
+                    prevTradeType = TradeType.BUY.GetHashCode();
 
                     return winOut();
 
@@ -691,9 +750,13 @@ namespace AutoTrade
 
                     debugMsg("利潤:" + oneProfit * 50);
 
-                    debugMsg("策略:" + winLine[nowStrategyCount]);
+                    debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+
+                    debugMsg("停利策略:" + winLine[nowStrategyCount]);
 
                     debugMsg("----------------------------------------------------------------------------------------------");
+
+                    prevTradeType = TradeType.SELL.GetHashCode();
 
                     return winOut();
 
@@ -778,7 +841,14 @@ namespace AutoTrade
             {
                 Console.WriteLine(msg);
 
-                tradeRecordFile.writeLine(msg);
+                try
+                {
+                    tradeRecordFile.writeLine(msg);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("寫入交易紀錄檔失敗，請檢查是否有Output這個目錄。"+e.StackTrace);
+                }
             }
         }
 
