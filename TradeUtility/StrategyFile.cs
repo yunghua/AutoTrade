@@ -71,7 +71,7 @@ namespace TradeUtility
 
                 strategyFileName = fileName;                     
 
-                strategyFilePath = appDir + "\\" + Config_Dir + "\\" + Strategy_File_Name;
+                strategyFilePath = appDir + "\\" + Config_Dir + "\\" + fileName;
 
                 strategyFile = new TradeFile(strategyFilePath);
 
