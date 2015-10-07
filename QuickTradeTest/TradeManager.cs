@@ -16,11 +16,13 @@ namespace QuickTradeTest
         //-------------------------------------------------------------------------------------------------------------
         //
 
+        const int Array_Begin_Index = 0;
+
         const Boolean DEBUG = false;
 
         const int MaxTradeCount = 100;//最大交易次數        
 
-        const double MaxProfitLoss = -5000;//最大虧損水平線
+        const double MaxProfitLoss = -50000;//最大虧損水平線
 
         const int Random_Seed = 888;//隨機參數種子
 
@@ -65,7 +67,7 @@ namespace QuickTradeTest
         /// </summary>
         ///         
 
-        int lots = 1;//交易口數
+        int lotIndex = 0;//交易口數陣列的第幾個
 
         int[] SellOrBuyCheckPeriod;//交易買賣方向的檢查時間間隔
 
@@ -127,12 +129,19 @@ namespace QuickTradeTest
 
         OriginalRecord befofeRecord;
 
+
+        string[] lotArray;//獲利加碼的設定
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 程式區。
         /// </summary>
         /// 
 
+        public void setLots(string[] lots)
+        {
+            lotArray = lots;
+        }
 
         public void setLoseLine(Dictionary<int, int> lose)
         {
@@ -581,9 +590,9 @@ namespace QuickTradeTest
 
                             oneProfit = evenPrice - orderPrice;
 
-                            oneProfit *= lots;
+                            oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
 
-                            lots = 1;
+                            lotIndex = Array_Begin_Index;
 
                             totalProfit += oneProfit;
 
@@ -615,9 +624,9 @@ namespace QuickTradeTest
 
                             oneProfit = orderPrice - evenPrice;
 
-                            oneProfit *= lots;
+                            oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
 
-                            lots = 1;
+                            lotIndex = Array_Begin_Index;
 
                             totalProfit += oneProfit;
 
@@ -649,9 +658,14 @@ namespace QuickTradeTest
 
                             oneProfit = evenPrice - orderPrice;
 
-                            oneProfit *= lots;
+                            oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
 
-                            lots  ++;
+                            lotIndex++;
+
+                            if (lotIndex >= lotArray.Length)
+                            {
+                                lotIndex = lotArray.Length-1;
+                            }
 
                             totalProfit += oneProfit;
 
@@ -684,9 +698,14 @@ namespace QuickTradeTest
 
                             oneProfit = orderPrice - evenPrice;
 
-                            oneProfit *= lots;
+                            oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
 
-                            lots++;
+                            lotIndex++;
+
+                            if (lotIndex >= lotArray.Length)
+                            {
+                                lotIndex = lotArray.Length-1;
+                            }
 
                             totalProfit += oneProfit;
 

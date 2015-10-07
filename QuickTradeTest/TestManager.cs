@@ -9,11 +9,15 @@ namespace QuickTradeTest
     class TestManager
     {
 
+        const string Config_Dir = "Config";//設定檔目錄
+
+        const string Config_File_Name = "TradeConfig.txt";//設定檔案名
+
         const int Rule_Count_Win = 1;//停利跑幾種規則
 
         const int Rule_Count_Lose = 1;//停損跑幾種規則
 
-        const int Run_Count = 10;//每種規則跑幾次測試
+        const int Run_Count = 100;//每種規則跑幾次測試
 
         const int Rule_Period = 0;//每次規則增加幅度
 
@@ -41,6 +45,8 @@ namespace QuickTradeTest
 
         DateTime now = System.DateTime.Now;
 
+        string[] lotArray;//獲利加碼的設定
+
         //Boolean isPrepared = false;
 
         public TestManager()
@@ -62,6 +68,26 @@ namespace QuickTradeTest
             {
                 return false;
             }
+
+            appDir = System.Windows.Forms.Application.StartupPath;
+
+            string configFilePath = appDir + "\\" + Config_Dir + "\\" + Config_File_Name;
+
+            ConfigFile configFile = new ConfigFile(configFilePath);
+            try
+            {
+                configFile.prepareReader();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            List<int> lotList = new List<int>();
+
+            string lots = configFile.readConfig("Lots");
+
+            lotArray = lots.Split(',');
 
             this.winLine = strategyInstance.getWinLine();
 
@@ -171,8 +197,6 @@ namespace QuickTradeTest
             try
             {
 
-
-
                 testReportFileName = testReportFilePath + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_" + loseLine[1] + "_" + winLine[1] + "_" + guid + ".rpt";
 
                 testReportFile = new TradeFile(testReportFileName);
@@ -238,6 +262,8 @@ namespace QuickTradeTest
                 {
 
                     TradeManager manager = new TradeManager();
+
+                    manager.setLots(lotArray);
 
                     manager.setWinLine(winLine);
 
@@ -376,7 +402,7 @@ namespace QuickTradeTest
 
                 totalLoseCountRunManyTimes += loseCountInOneDayTradeRunManyTimes;
 
-                reportMsg(oFileList[j].getFileName() + "交易結束，單日交易平均利潤 : " + oneDayRunManyTimesTotalProfit * 50 / Run_Count);
+                reportMsg(oFileList[j].getFileName() + "交易結束，單日交易平均利潤 : " + ((oneDayRunManyTimesTotalProfit * 50) - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * 66) / Run_Count);
 
                 reportMsg(oFileList[j].getFileName() + "交易結束，單日獲利次數 : " + winCountInOneDayTradeRunManyTimes);
 
