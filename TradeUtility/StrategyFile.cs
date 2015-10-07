@@ -8,9 +8,17 @@ namespace TradeUtility
     public class StrategyFile
     {
 
-        static  StrategyFile  strategyInstance = null;
+        const string Strategy_File_Name = "Strategy.txt";
 
-        const String strategyFilePath = "C:/Trader/TestStrategy.txt";
+        const string Config_Dir = "Config";//設定檔目錄
+
+        static StrategyFile strategyInstance = null;
+
+        string strategyFilePath = "";
+
+        string strategyFileName = "";
+
+        TradeFile strategyFile ;
 
         Dictionary<int, int> loseLine;  //認賠的底線
 
@@ -18,16 +26,21 @@ namespace TradeUtility
 
         int maxStrategyCount = 0; //停損停利規則最大有幾種
 
+        public void close()
+        {
+            strategyFile.close();
+        }
+
         public int getMaxStrategyCount()
         {
             return maxStrategyCount;
         }
 
-        static TradeFile  strategyFile = new TradeFile(strategyFilePath);         
 
-        public static StrategyFile getInstance(){
+        public static StrategyFile getInstance()
+        {
 
-            if(strategyInstance==null)
+            if (strategyInstance == null)
             {
                 strategyInstance = new StrategyFile();
             }
@@ -45,17 +58,28 @@ namespace TradeUtility
             return winLine;
         }
 
+        public Boolean dealStrategyRule(string appDir)
+        {
+            return dealStrategyRule(appDir,Strategy_File_Name);
+        }
 
-        public Boolean dealStrategyRule()//讀取停損停利規則檔
+
+        public Boolean dealStrategyRule(string appDir ,string fileName)//讀取停損停利規則檔
         {
             try
             {
 
+                strategyFileName = fileName;                     
+
+                strategyFilePath = appDir + "\\" + Config_Dir + "\\" + Strategy_File_Name;
+
+                strategyFile = new TradeFile(strategyFilePath);
+
+                strategyFile.prepareReader();
+
                 loseLine = new Dictionary<int, int>();
 
                 winLine = new Dictionary<int, int>();
-
-                strategyFile.prepareReader();
 
                 int strategyCount = 1;//讀取停損停利規則檔案的行數
 

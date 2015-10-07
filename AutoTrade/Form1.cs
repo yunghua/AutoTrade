@@ -13,7 +13,15 @@ namespace AutoTrade
 {
     public partial class Form1 : Form
     {
-        const String configFilePath = "./Config/TradeConfig.txt";
+        string appDir = "";//應用程式所在目錄
+
+        const string Config_Dir = "Config";//設定檔目錄
+
+        const string Config_File_Name = "TradeConfig.txt";//設定檔案名
+
+        const string Month_File_Name = "TradeMonthCode.txt";//交易月份代碼對照表
+
+        string configFilePath = "";//完整的設定檔案目錄
 
         ConfigFile configFile;
 
@@ -113,6 +121,9 @@ namespace AutoTrade
 
             label_Version.Text = TradeUtility.TradeUtility.version;
 
+            appDir = System.Windows.Forms.Application.StartupPath;
+
+            configFilePath = appDir + "\\" + Config_Dir + "\\" + Config_File_Name;
 
             configFile = new ConfigFile(configFilePath);
             try
@@ -126,7 +137,9 @@ namespace AutoTrade
 
             tradeCode = configFile.readConfig("Trade_Code");
 
-            tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeCode);
+            string tradeMonthFilePath = appDir + "\\" + Config_Dir + "\\" + Month_File_Name;
+
+            tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeMonthFilePath, tradeCode);
 
             id = configFile.readConfig("ID");
 
@@ -137,7 +150,7 @@ namespace AutoTrade
             port = configFile.readConfig("Port");
 
             master = new TradeMaster();
-           
+
             try
             {
 
@@ -146,15 +159,19 @@ namespace AutoTrade
             }
             catch (Exception ez)
             {
-                MessageBox.Show(ez.Message+"--"+ez.StackTrace);
+                MessageBox.Show(ez.Message + "--" + ez.StackTrace);
 
                 return;
             }
 
+            textBox_loseLine.Text = Convert.ToString(master.getLoseLine()[1]);
+
+            textBox1_winLine.Text = Convert.ToString(master.getWinLine()[1]);
+
 
             LoginFn();
 
-            
+
 
         }
 

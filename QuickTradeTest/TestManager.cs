@@ -16,12 +16,12 @@ namespace QuickTradeTest
         const int Run_Count = 10;//每種規則跑幾次測試
 
         const int Rule_Period = 0;//每次規則增加幅度
-        
+
         const Boolean isReport = true;
 
         const String testReportFilePath = "C:/Trader/TestReport/";
 
-        const String testSourceFilePath = "C:/Trader/Test";        
+        const String testSourceFilePath = "C:/Trader/Test";
 
         TradeFile testReportFile;
 
@@ -54,7 +54,9 @@ namespace QuickTradeTest
 
             StrategyFile strategyInstance = StrategyFile.getInstance();
 
-            Boolean isRuleReady = strategyInstance.dealStrategyRule();
+            string appDir = System.IO.Directory.GetCurrentDirectory(); //主程式所在目錄
+
+            Boolean isRuleReady = strategyInstance.dealStrategyRule(appDir, "TestStrategy.txt");
 
             if (!isRuleReady)
             {
@@ -268,7 +270,7 @@ namespace QuickTradeTest
                     if (oneDayProfit < maxLoseProfit)
                     {
                         maxLoseProfit = oneDayProfit;
-                    }                   
+                    }
 
                     if (oneDayProfit * 50 > 0 && oneDayProfit * 50 < 2000)
                     {

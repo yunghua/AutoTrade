@@ -41,6 +41,11 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.textBox_loseLine = new System.Windows.Forms.TextBox();
+            this.textBox1_winLine = new System.Windows.Forms.TextBox();
+            this.label_loseLine = new System.Windows.Forms.Label();
+            this.label_winLine = new System.Windows.Forms.Label();
+            this.label_Version = new System.Windows.Forms.Label();
             this.textBox_status = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -63,7 +68,6 @@
             this.TolMatchQty = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.label_Version = new System.Windows.Forms.Label();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
@@ -73,6 +77,10 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.textBox_loseLine);
+            this.groupBox3.Controls.Add(this.textBox1_winLine);
+            this.groupBox3.Controls.Add(this.label_loseLine);
+            this.groupBox3.Controls.Add(this.label_winLine);
             this.groupBox3.Controls.Add(this.label_Version);
             this.groupBox3.Controls.Add(this.textBox_status);
             this.groupBox3.Controls.Add(this.label4);
@@ -85,6 +93,48 @@
             this.groupBox3.TabIndex = 15;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Yuanta Quote API 連線資訊";
+            // 
+            // textBox_loseLine
+            // 
+            this.textBox_loseLine.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.textBox_loseLine.Location = new System.Drawing.Point(152, 126);
+            this.textBox_loseLine.Name = "textBox_loseLine";
+            this.textBox_loseLine.Size = new System.Drawing.Size(82, 29);
+            this.textBox_loseLine.TabIndex = 24;
+            // 
+            // textBox1_winLine
+            // 
+            this.textBox1_winLine.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.textBox1_winLine.Location = new System.Drawing.Point(152, 91);
+            this.textBox1_winLine.Name = "textBox1_winLine";
+            this.textBox1_winLine.Size = new System.Drawing.Size(82, 29);
+            this.textBox1_winLine.TabIndex = 23;
+            // 
+            // label_loseLine
+            // 
+            this.label_loseLine.AutoSize = true;
+            this.label_loseLine.Location = new System.Drawing.Point(77, 126);
+            this.label_loseLine.Name = "label_loseLine";
+            this.label_loseLine.Size = new System.Drawing.Size(73, 20);
+            this.label_loseLine.TabIndex = 22;
+            this.label_loseLine.Text = "停損點：";
+            // 
+            // label_winLine
+            // 
+            this.label_winLine.AutoSize = true;
+            this.label_winLine.Location = new System.Drawing.Point(77, 91);
+            this.label_winLine.Name = "label_winLine";
+            this.label_winLine.Size = new System.Drawing.Size(73, 20);
+            this.label_winLine.TabIndex = 21;
+            this.label_winLine.Text = "停利點：";
+            // 
+            // label_Version
+            // 
+            this.label_Version.AutoSize = true;
+            this.label_Version.Location = new System.Drawing.Point(56, 70);
+            this.label_Version.Name = "label_Version";
+            this.label_Version.Size = new System.Drawing.Size(0, 20);
+            this.label_Version.TabIndex = 20;
             // 
             // textBox_status
             // 
@@ -290,14 +340,6 @@
             this.timer1.Interval = 5000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // label_Version
-            // 
-            this.label_Version.AutoSize = true;
-            this.label_Version.Location = new System.Drawing.Point(56, 76);
-            this.label_Version.Name = "label_Version";
-            this.label_Version.Size = new System.Drawing.Size(20, 20);
-            this.label_Version.TabIndex = 20;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
@@ -309,7 +351,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V0.03  # # # # # ";
+            this.Text = " # # # # # 自動下單機V0.05  # # # # # ";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -319,7 +361,6 @@
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.ResumeLayout(false);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_Close);
 
         }
 
@@ -350,6 +391,10 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn TolMatchQty;
         private AxYuantaQuoteLib.AxYuantaQuote axYuantaQuote1;
         private System.Windows.Forms.Label label_Version;
+        private System.Windows.Forms.TextBox textBox_loseLine;
+        private System.Windows.Forms.TextBox textBox1_winLine;
+        private System.Windows.Forms.Label label_loseLine;
+        private System.Windows.Forms.Label label_winLine;
     }
 }
 

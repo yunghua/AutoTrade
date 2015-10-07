@@ -9,24 +9,13 @@ namespace TradeUtility
     {
         private static TradeUtility utility = null;
 
-        public static string version = "TradeUtility.TradeUtility Version 0.0.0.3";
-
-        const string monthFilePath = "./TradeMonthCode.txt";
+        public static string version = "TradeUtility.TradeUtility Version 0.0.0.4";        
 
         static ConfigFile monthFile;//月份代碼設定檔
 
         private TradeUtility()
         {
-            try
-            {
-                monthFile = new ConfigFile(monthFilePath);
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-
-            
+                        
         }
 
         ~TradeUtility()
@@ -86,8 +75,25 @@ namespace TradeUtility
             return monthFile.readConfig(tradeMonth);
         }
 
-        public string dealTradeCode(string code)//自動計算當天的商品代碼
+        public string dealTradeCode(string monthFilePath,string code)//自動計算當天的商品代碼
         {
+            try
+            {
+                monthFile = new ConfigFile(monthFilePath);
+
+                monthFile.prepareReader();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return dealTradeCode(code);
+        }
+
+        private string dealTradeCode(string code)//自動計算當天的商品代碼
+        {
+            
             try
             {
                 DateTime now = System.DateTime.Now;

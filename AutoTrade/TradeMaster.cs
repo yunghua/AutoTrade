@@ -14,11 +14,12 @@ namespace AutoTrade
         //-------------------------------------------------------------------------------------------------------------
         //        
 
-        const String Config_Dir = "./Config/";
 
-        const String Output_Dir = "./Output/";
+        const String Config_Dir = "Config";
 
-        const String strategyFilePath = Config_Dir + "Strategy.txt";
+        const String Output_Dir = "Output";
+
+        const String Strategy_File_Name = "Strategy.txt";
 
         const Boolean DEBUG = true;
 
@@ -124,6 +125,8 @@ namespace AutoTrade
 
         int prevTradeType = 0;//上一次交易方式賣或是買
 
+        string strategyFilePath = "";//完整的策略檔案路徑
+
         //-------------------------------------------------------------------------------------------------------------
         //-------------------------------------------------------------------------------------------------------------
         //-------------------------------------------------------------------------------------------------------------
@@ -133,7 +136,7 @@ namespace AutoTrade
 
 
         TradeFile allTradeOutputFile;          //當天所有交易紀錄
-        TradeFile strategyFile;                        //策略檔
+        StrategyFile strategyFile;                        //策略檔
         TradeFile tradeRecordFile;                //自動交易紀錄檔
 
 
@@ -164,6 +167,15 @@ namespace AutoTrade
         {
         }
 
+        public Dictionary<int, int> getWinLine()
+        {
+            return winLine;
+        }
+
+        public Dictionary<int, int> getLoseLine()
+        {
+            return loseLine;
+        }
 
         public void prepareReady()
         {
@@ -172,21 +184,16 @@ namespace AutoTrade
 
             winLine = new Dictionary<int, int>();
 
-            strategyFile = new TradeFile(strategyFilePath);
 
-            try
-            {
+            strategyFile = StrategyFile.getInstance();
 
-                strategyFile.prepareReader();
+            string appDir = System.Windows.Forms.Application.StartupPath;
 
-            }
-            catch (Exception ee)
-            {
-                throw ee;                
-            }
+            strategyFile.dealStrategyRule(appDir);
 
-            dealStrategyLine();
+            this.winLine = strategyFile.getWinLine();
 
+            this.loseLine = strategyFile.getLoseLine();
 
             SellOrBuyCheckPeriod = new int[5];
 
@@ -221,7 +228,7 @@ namespace AutoTrade
             tradeRecordFile = new TradeFile(tradeRecordFileName);
 
             tradeRecordFile.prepareWriter();
-           
+
             recordList = new List<OriginalRecord>();
 
             befofeRecord = new OriginalRecord();
@@ -294,40 +301,7 @@ namespace AutoTrade
         }
 
 
-        private void dealStrategyLine()//讀取停損停利規則檔
-        {
 
-            int strategyCount = 1;//讀取停損停利規則檔案的行數
-
-            int losePoint;//停損點範圍
-
-            int winPoint;//停利點範圍
-
-            String tmpLine = "";
-
-            String[] tmpData = new String[2];
-
-
-            while (strategyFile.hasNext())
-            {
-
-                tmpLine = strategyFile.getLine();
-
-                tmpData = tmpLine.Split(',');
-
-                losePoint = int.Parse(tmpData[0]);
-
-                winPoint = int.Parse(tmpData[1]);
-
-                loseLine.Add(strategyCount, losePoint);
-
-                winLine.Add(strategyCount, winPoint);
-
-                strategyCount++;
-            }
-
-            maxStrategyCount = --strategyCount;
-        }
 
         private double getOffsetPoint()//取得最大最小指數之差額
         {
@@ -847,7 +821,7 @@ namespace AutoTrade
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("寫入交易紀錄檔失敗，請檢查是否有Output這個目錄。"+e.StackTrace);
+                    throw new Exception("寫入交易紀錄檔失敗，請檢查是否有Output這個目錄。" + e.StackTrace);
                 }
             }
         }
