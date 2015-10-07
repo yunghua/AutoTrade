@@ -13,7 +13,7 @@ namespace QuickTradeTest
 
         const int Rule_Count_Lose = 1;//停損跑幾種規則
 
-        const int Run_Count = 100;//每種規則跑幾次測試
+        const int Run_Count = 10;//每種規則跑幾次測試
 
         const int Rule_Period = 0;//每次規則增加幅度
         

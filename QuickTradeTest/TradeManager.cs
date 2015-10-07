@@ -65,6 +65,8 @@ namespace QuickTradeTest
         /// </summary>
         ///         
 
+        int lots = 1;//交易口數
+
         int[] SellOrBuyCheckPeriod;//交易買賣方向的檢查時間間隔
 
         int number = 0;//超過檢查時間的次數
@@ -579,6 +581,10 @@ namespace QuickTradeTest
 
                             oneProfit = evenPrice - orderPrice;
 
+                            oneProfit *= lots;
+
+                            lots = 1;
+
                             totalProfit += oneProfit;
 
                             debugMsg("認賠殺出");
@@ -608,6 +614,10 @@ namespace QuickTradeTest
                             evenPrice = record.TradePrice;
 
                             oneProfit = orderPrice - evenPrice;
+
+                            oneProfit *= lots;
+
+                            lots = 1;
 
                             totalProfit += oneProfit;
 
@@ -639,6 +649,10 @@ namespace QuickTradeTest
 
                             oneProfit = evenPrice - orderPrice;
 
+                            oneProfit *= lots;
+
+                            lots  ++;
+
                             totalProfit += oneProfit;
 
                             debugMsg("停利出場");
@@ -669,6 +683,10 @@ namespace QuickTradeTest
                             evenPrice = record.TradePrice;
 
                             oneProfit = orderPrice - evenPrice;
+
+                            oneProfit *= lots;
+
+                            lots++;
 
                             totalProfit += oneProfit;
 
