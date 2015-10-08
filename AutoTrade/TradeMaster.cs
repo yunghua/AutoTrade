@@ -217,13 +217,15 @@ namespace AutoTrade
 
             isStopTradeTime = new DateTime(now.Year, now.Month, now.Day, 13, 44, 0);
 
-            fileName = Output_Dir + "AllOutput_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
+            appDir = System.Windows.Forms.Application.StartupPath;
+
+            fileName = appDir + "\\" + Output_Dir +"\\"+ "AllOutput_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
 
             allTradeOutputFile = new TradeFile(fileName);
 
             allTradeOutputFile.prepareWriter();
 
-            tradeRecordFileName = Output_Dir + "TradeRecord_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
+            tradeRecordFileName = appDir + "\\" + Output_Dir + "\\" + "TradeRecord_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
 
             tradeRecordFile = new TradeFile(tradeRecordFileName);
 
