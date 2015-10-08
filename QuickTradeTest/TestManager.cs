@@ -17,7 +17,7 @@ namespace QuickTradeTest
 
         const int Rule_Count_Lose = 1;//停損跑幾種規則
 
-        const int Run_Count = 100;//每種規則跑幾次測試
+        const int Run_Count = 10;//每種規則跑幾次測試
 
         const int Rule_Period = 0;//每次規則增加幅度
 
@@ -424,8 +424,10 @@ namespace QuickTradeTest
             reportMsg("賠錢日數" + loseDayCount);
             reportMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
 
-            reportMsg("最大獲利 : " + maxWinProfit * 50);
-            reportMsg("最大賠錢 : " + maxLoseProfit * 50);
+            reportMsg("單日最大獲利 : " + maxWinProfit * 50);
+            reportMsg("單日最大賠錢 : " + maxLoseProfit * 50);
+
+            reportMsg("最大交易口數 : " + lotArray[lotArray.Length - 1]);
 
 
             reportMsg("總手續費 : " + (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * 50);

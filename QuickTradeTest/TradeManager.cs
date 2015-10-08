@@ -22,7 +22,7 @@ namespace QuickTradeTest
 
         const int MaxTradeCount = 100;//最大交易次數        
 
-        const double MaxProfitLoss = -50000;//最大虧損水平線
+        const double MaxProfitLoss = -30000;//最大虧損水平線
 
         const int Random_Seed = 888;//隨機參數種子
 
@@ -66,6 +66,10 @@ namespace QuickTradeTest
         /// 變數。
         /// </summary>
         ///         
+
+        List<double> orderPointList = new List<double>();//動態停利機制中，每達到停利階段就下一次單時，下單的點數
+
+        int activeOrderIndex = 0;//第幾次動態停利下單
 
         int lotIndex = 0;//交易口數陣列的第幾個
 
@@ -299,7 +303,7 @@ namespace QuickTradeTest
 
             RecordScanner.setRecordList(recordList);
 
-            return coreLogic();
+            return coreLogic2();
 
         }
 
@@ -349,11 +353,11 @@ namespace QuickTradeTest
 
                     if ((record.TradePrice - basePrice) > 0)//目前交易金額大於XX分鐘前的交易金額
                     {
-                        direction[i] = TradeType.SELL.GetHashCode();
+                        direction[i] = TradeType.BUY.GetHashCode();
                     }
                     else
                     {
-                        direction[i] = TradeType.BUY.GetHashCode();
+                        direction[i] = TradeType.SELL.GetHashCode();
                     }
 
                 }//end for
@@ -385,6 +389,374 @@ namespace QuickTradeTest
             }
 
             return false;
+
+        }
+
+        private double calOneProfit(double orderPrice)
+        {
+            if (nowTradeType == TradeType.BUY.GetHashCode())
+            {
+
+                oneProfit = record.TradePrice - orderPrice;
+
+            }
+            else if (nowTradeType == TradeType.SELL.GetHashCode())
+            {
+
+                oneProfit = orderPrice - record.TradePrice;
+            }
+
+            return oneProfit;
+        }
+
+        private double coreLogic2()
+        {
+            while (sourceFile.hasNext())
+            {
+
+                try
+                {
+
+                    nowLine = sourceFile.getLine();
+
+                    record = OriginalRecordConverter.getOriginalRecord(nowLine);
+
+
+                    recordList.Add(record);
+                    //
+                    if (isStartOrder == false && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed)))
+                    {
+
+                        tradeTime = record.TradeTime;
+
+                        tradeDateTime = record.TradeMoment;
+
+                        if (isPrevLose == true)
+                        {
+                            if (prevTradeType == TradeType.BUY.GetHashCode())
+                            {
+                                nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                            }
+                            else
+                            {
+                                nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                            }
+                        }
+                        else if (isPrevWin == true)
+                        {
+                            if (prevTradeType == TradeType.BUY.GetHashCode())
+                            {
+                                nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                            }
+                            else
+                            {
+                                nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                            }
+                        }
+                        else if (!dealSellOrBuy(record, tradeDateTime))
+                        {
+                            continue;
+                        }
+
+
+                        //secondAfterTradeToActiveCheck = tradeDateTime.AddSeconds(ActiveProfitStartPeriod);//5秒內利潤擴大50點
+
+                        //minuteAfterStartActiveProfit = tradeDateTime.AddMinutes(1);//開始動態停利檢查，每一分鐘一次
+
+                        orderPrice = record.TradePrice;
+
+                        //orderPointList.Add(orderPrice);
+
+                        if (nowTradeType == TradeType.BUY.GetHashCode())
+                        {
+                            debugMsg("交易方式---->" + TradeType.BUY);
+                        }
+                        else if (nowTradeType == TradeType.SELL.GetHashCode())
+                        {
+                            debugMsg("交易方式---->" + TradeType.SELL);
+                        }
+
+                        debugMsg("交易金額---->" + orderPrice);
+
+                        debugMsg("交易時間---->" + tradeDateTime);
+
+                        dealStrategyCount(winCount);//取得停損停利範圍
+                        //dealStrategyCount(totalProfit);//取得停損停利範圍     
+
+                        isStartOrder = true;//下單啦
+
+                    }
+
+
+                    else if (isStartOrder == true)//已經開始下單
+                    {
+
+                        calOneProfit(this.orderPrice);
+
+                        if (nowTradeType == TradeType.BUY.GetHashCode() && (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])
+                        {//賠了XX點，認賠殺出
+
+                            evenPrice = record.TradePrice;
+
+                            oneProfit = evenPrice - orderPrice;
+
+                            //oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
+
+                            lotIndex = Array_Begin_Index;
+
+                            totalProfit += oneProfit;
+
+                            debugMsg("認賠殺出");
+
+                            debugMsg("平倉點數001---->" + evenPrice);
+
+                            debugMsg("平倉時間---->" + record.TradeMoment);
+
+                            debugMsg("利潤:" + oneProfit * 50);
+
+                            debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+
+                            debugMsg("停利策略:" + winLine[nowStrategyCount]);
+
+                            debugMsg("----------------------------------------------------------------------------------------------");
+
+                            loseOut();
+
+                            prevTradeType = TradeType.BUY.GetHashCode();
+
+                        }
+                        else if (nowTradeType == TradeType.SELL.GetHashCode() && (record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
+                        {
+                            //賠了XX點，認賠殺出
+
+
+                            evenPrice = record.TradePrice;
+
+                            oneProfit = orderPrice - evenPrice;
+
+                            //oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
+
+                            lotIndex = Array_Begin_Index;
+
+                            totalProfit += oneProfit;
+
+                            debugMsg("認賠殺出");
+
+                            debugMsg("平倉點數002---->" + evenPrice);
+
+                            debugMsg("平倉時間---->" + record.TradeMoment);
+
+                            debugMsg("利潤:" + oneProfit * 50);
+
+                            debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+
+                            debugMsg("停利策略:" + winLine[nowStrategyCount]);
+
+                            debugMsg("----------------------------------------------------------------------------------------------");
+
+                            loseOut();
+
+                            prevTradeType = TradeType.SELL.GetHashCode();
+
+                        }
+
+                        else if ((isActiveCheckProfit == false) && oneProfit > winLine[1] * 2)//還沒開始【動態停利】
+                        {
+                            //if (record.TradeMoment > secondAfterTradeToActiveCheck)//檢查時間到了，看看是否要啟動動態停利機制
+                            {
+                                //if (oneProfit - tempOneProfit > ActiveProfitPoint)
+
+                                isActiveCheckProfit = true;//開始動態停利
+
+                                debugMsg("開始動態停利---->" + record.TradeMoment + " ---------->Profit:" + oneProfit + "-----------tempOneProfit:" + tempOneProfit);
+
+                                tempOneProfit = oneProfit;
+
+                                isStartOrder = true;//下單啦
+
+                                continue;
+
+                            }
+
+
+                        }// end 檢查是否開始動態停利
+
+                        else if ((isActiveCheckProfit == true))//開始動態停利
+                        {
+                            //if ((record.TradeMoment > minuteAfterStartActiveProfit))//到了規定的檢查時間
+                            {
+                                //double reverseLitmit = getReverseLitmit(ActiveProfitPoint, number);//動態停利的停利條件
+
+                                double reverseLitmit = getReverseLitmit(winLine[1], activeOrderIndex);//動態停利的停利條件
+
+                                if (oneProfit < tempOneProfit - reverseLitmit)//這短時間內增加的獲利少於規定的點數，預測趨勢將反轉，獲利了結
+                                {
+
+                                    double activeProfit = 0;
+
+                                    activeProfit += oneProfit;
+
+                                    foreach (double point in orderPointList)
+                                    {
+                                        totalProfit += calOneProfit(point);
+
+                                        activeProfit += calOneProfit(point);
+
+                                    }
+
+                                    totalProfit += activeProfit;
+
+                                    orderPointList = new List<double>();
+
+                                    activeOrderIndex = 0;
+
+                                    evenPrice = record.TradePrice;
+
+                                    debugMsg("******平倉點數009---->" + evenPrice);
+
+                                    debugMsg("******平倉時間---->" + record.TradeMoment);
+
+                                    debugMsg("本次動態利潤:" + activeProfit * 50);
+
+                                    debugMsg("動態停利範圍:" + reverseLitmit);
+
+                                    debugMsg("----------------------------------------------------------------------------------------------");
+
+                                    winOut();//獲利出場 
+
+                                    if (nowTradeType == TradeType.BUY.GetHashCode())
+                                    {
+                                        prevTradeType = TradeType.BUY.GetHashCode();
+                                    }
+                                    else
+                                    {
+                                        prevTradeType = TradeType.SELL.GetHashCode();
+                                    }
+
+                                    continue;//
+
+                                }
+                                else
+                                {
+
+                                    if (oneProfit > 0 && oneProfit / winLine[1] > 2)//獲利大於停利點兩倍以上
+                                    {
+                                        if (activeOrderIndex < Convert.ToInt32(oneProfit) / winLine[1] - 1)
+                                        {
+                                            activeOrderIndex = Convert.ToInt32(oneProfit / winLine[1] - 1);//第幾階段下單
+
+                                            orderPointList.Add(record.TradePrice);//下單點數
+
+                                        }
+                                    }
+
+                                    number++;//再跑一個間隔
+
+                                    if (number <= 1)//第一次檢查
+                                    {
+                                        tempOneProfit = oneProfit;
+                                    }
+                                    else
+                                    {
+                                        if (tempOneProfit < oneProfit)
+                                        {
+                                            tempOneProfit = oneProfit;
+                                        }
+
+                                    }
+
+                                    //debugMsg("----------------------------------------------------------------------------------------------");
+
+                                    //debugMsg("RUN!!" + minuteAfterStartActiveProfit);
+
+                                    //debugMsg("----------------------------------------------------------------------------------------------");
+
+                                    //minuteAfterStartActiveProfit = minuteAfterStartActiveProfit.AddMinutes(ActiveProfitCheckPeriod);//繼續跑XX秒
+
+                                    continue;
+                                }
+                            }//開始動態停利，但是還不到檢查的時間
+                            //else
+                            //{
+
+                            //    continue;
+
+                            //}
+
+                        }//end 執行動態停利檢查
+
+
+
+
+
+
+                    }//下單結束
+
+                    if (totalProfit * 50 < MaxProfitLoss)  //已達最大虧損水平線
+                    {
+
+                        break;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex.Source);
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+
+                }
+
+            }//end of while
+
+            //if (record.TradeHour >= 13 && record.TradeMinute >= 44)//交易時間截止
+            if (isStartOrder == true)
+            {
+
+                evenPrice = record.TradePrice;
+
+                totalProfit += oneProfit;
+
+                isStartOrder = false;
+
+                tradeCount++;
+
+                if (nowTradeType == TradeType.BUY.GetHashCode())
+                {
+                    debugMsg("時間到買入平倉");
+                }
+                else if (nowTradeType == TradeType.SELL.GetHashCode())
+                {
+                    debugMsg("時間到賣出平倉");
+                }
+
+                debugMsg("平倉點數---->" + evenPrice);
+
+                debugMsg("平倉時間---->" + record.TradeMoment);
+
+                debugMsg("利潤:" + oneProfit * 50);
+
+                debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+
+                debugMsg("停利策略:" + winLine[nowStrategyCount]);
+
+                debugMsg("----------------------------------------------------------------------------------------------");
+
+                if (oneProfit > 0)
+                {
+                    winCount++;
+                }
+                else
+                {
+                    loseCount++;
+                }
+
+                return totalProfit;
+
+            }//end 交易時間截止
+
+            return totalProfit;
 
         }
 
@@ -664,7 +1036,7 @@ namespace QuickTradeTest
 
                             if (lotIndex >= lotArray.Length)
                             {
-                                lotIndex = lotArray.Length-1;
+                                lotIndex = lotArray.Length - 1;
                             }
 
                             totalProfit += oneProfit;
@@ -704,7 +1076,7 @@ namespace QuickTradeTest
 
                             if (lotIndex >= lotArray.Length)
                             {
-                                lotIndex = lotArray.Length-1;
+                                lotIndex = lotArray.Length - 1;
                             }
 
                             totalProfit += oneProfit;
