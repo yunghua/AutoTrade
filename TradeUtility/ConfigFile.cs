@@ -21,6 +21,8 @@ namespace TradeUtility
             string context = string.Empty;
             string[] rows;
 
+            this.prepareReader();
+
             while (this.hasNext())
             {
                 try
@@ -34,8 +36,12 @@ namespace TradeUtility
                     else
                     {
                         rows = config.Split('=');
-                        header = rows[0].Trim();
-                        context = rows[1].Trim();
+
+                        if (rows.Length >= 2)
+                        {
+                            header = rows[0].Trim();
+                            context = rows[1].Trim();
+                        }
 
                         if (header.Equals(headerText))
                         {

@@ -8,7 +8,9 @@ namespace TradeUtility
 {
     public class TradeFile
     {
-        String sFileName;
+        String fullPath;//完整路徑
+
+        String fileName;//檔案名稱
 
         StreamReader reader;
 
@@ -28,12 +30,28 @@ namespace TradeUtility
 
         public String getFileName()
         {
-            return sFileName;
+            if (fileName == null || fileName.Length == 0)
+            {
+                fileName = Path.GetFileName(fullPath);
+            }
+
+            return this.fileName;
+
         }
 
-        public void setFileName(String fileName)
+        public void setFileName(String name)
         {
-            sFileName = fileName;
+            fileName = name;
+        }
+
+        public String getFullPath()
+        {
+            return fullPath;
+        }
+
+        public void setFullPath(String fullPath)
+        {
+            this.fullPath = fullPath;
 
         }
 
@@ -42,53 +60,70 @@ namespace TradeUtility
 
         }
 
-        public TradeFile(String fileName)
+        public TradeFile(String fullPath)
         {
-            sFileName = fileName;
+            this.fullPath = fullPath;
         }
 
         public Boolean isExist()
         {
-            isFileExist = File.Exists(sFileName);
+            isFileExist = File.Exists(fullPath);
             return isFileExist;
         }
 
         public void prepareReader()
         {
-            isFileExist = File.Exists(sFileName);
+            isFileExist = File.Exists(fullPath);
 
             if (!isFileExist)
             {
-                throw new Exception(sFileName +
+                throw new Exception(fullPath +
                     "不存在!");
             }
 
 
             try
             {
-                reader = new StreamReader(sFileName);
+                reader = new StreamReader(fullPath);
             }
             catch (IOException e)
             {
-                Console.WriteLine(e.Message);
+                throw e;
             }
         }
 
+
+        public void prepareWriter(FileMode mode)
+        {
+            try
+            {
+                fs = new FileStream(fullPath, mode);
+
+                writer = new StreamWriter(fs);
+                writer.AutoFlush = true;
+
+            }
+            catch (IOException e)
+            {
+                throw e;
+            }
+
+        }
 
         public void prepareWriter()
         {
             try
             {
 
-                isFileExist = File.Exists(sFileName);
+                isFileExist = File.Exists(fullPath);
 
                 if (isFileExist)
                 {
-                    fs = new FileStream(sFileName, FileMode.Append);
+                    fs = new FileStream(fullPath, FileMode.Append);
                 }
                 else
                 {
-                    fs = new FileStream(sFileName, FileMode.CreateNew);
+                    fs = new FileStream(fullPath, FileMode.CreateNew);
                 }
 
                 writer = new StreamWriter(fs);
@@ -96,11 +131,11 @@ namespace TradeUtility
             }
             catch (IOException e)
             {
-                Console.WriteLine(e.Message);
+                throw e;
             }
         }
 
-
+        
 
         public Boolean hasNext()
         {
