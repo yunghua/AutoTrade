@@ -9,23 +9,27 @@ namespace QuickTradeTest
     class TestManager
     {
 
+        //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
+
+        const double cost = 66;//手續費成本
+
+        const double valuePerPoint = 50;//每點價值，小台50元/點，大台200元/點        
+
         const string Config_Dir = "Config";//設定檔目錄
+
+        const string Report_Dir = "Report";//報告檔目錄
+
+        const string Conclusion_Dir = "Conclusion";//總結檔目錄
+
+        const string Source_Dir = "History";//來源檔檔目錄
 
         const string Config_File_Name = "TradeConfig.txt";//設定檔案名
 
-        const int Rule_Count_Win = 1;//停利跑幾種規則
-
-        const int Rule_Count_Lose = 1;//停損跑幾種規則
-
-        const int Run_Count = 10;//每種規則跑幾次測試
-
-        const int Rule_Period = 0;//每次規則增加幅度
-
         const Boolean isReport = true;
 
-        const String testReportFilePath = "C:/Trader/TestReport/";
+        const String testReportFilePath = "";
 
-        const String testSourceFilePath = "C:/Trader/Test";
+        string sourceFileDir = "";//來源RPT檔案所在目錄
 
         TradeFile testReportFile;
 
@@ -46,6 +50,23 @@ namespace QuickTradeTest
         DateTime now = System.DateTime.Now;
 
         string[] lotArray;//獲利加碼的設定
+
+        string conclusionDir;//
+
+        string reportDir;//
+
+        string coreMethod;//核心方法
+
+        int ruleCountWin;//停利跑幾種規則
+        int ruleCountLose;//停損跑幾種規則
+        int runCount;//每種規則跑幾次測試
+        int rulePeriod;//每次規則增加幅度
+
+        string sourceDir = "";//來源檔子目錄名，通常是History
+
+        double oneDayPureProfit;//;當日純利
+
+        string maxLoss = "";//單日最大停損
 
         //Boolean isPrepared = false;
 
@@ -77,6 +98,20 @@ namespace QuickTradeTest
             try
             {
                 configFile.prepareReader();
+
+                coreMethod = configFile.readConfig("Core_Method");
+                ruleCountWin = Convert.ToInt32(configFile.readConfig("Rule_Count_Win"));
+                ruleCountLose = Convert.ToInt32(configFile.readConfig("Rule_Count_Lose"));
+                runCount = Convert.ToInt32(configFile.readConfig("Run_Count"));
+                rulePeriod = Convert.ToInt32(configFile.readConfig("Rule_Period"));
+                maxLoss = configFile.readConfig("Max_Loss");
+                sourceDir = configFile.readConfig("Source_Dir");
+
+                if (null == sourceDir)
+                {
+                    sourceDir = Source_Dir;
+                }
+
             }
             catch (Exception)
             {
@@ -85,22 +120,42 @@ namespace QuickTradeTest
 
             List<int> lotList = new List<int>();
 
-            string lots = configFile.readConfig("Lots");
+            try
+            {
 
-            lotArray = lots.Split(',');
+                string lots = configFile.readConfig("Lots");
+
+                lotArray = lots.Split(',');
+
+            }
+            catch (Exception ee)
+            {
+                Console.WriteLine(ee.StackTrace);
+            }
 
             this.winLine = strategyInstance.getWinLine();
 
             this.loseLine = strategyInstance.getLoseLine();
 
+            reportDir = appDir + "\\" + Report_Dir + "\\";
+
+            conclusionDir = appDir + "\\" + Conclusion_Dir + "\\";
+
+            sourceFileDir = appDir + "\\" + sourceDir + "\\";
+
+
             if (winLine != null && loseLine != null)
             {
 
-                conclusionReportFileName = testReportFilePath + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_Conclusion.rpt";
+                conclusionReportFileName = conclusionDir + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_Conclusion.rpt";
 
                 conclusionReport = new TradeFile(conclusionReportFileName);
 
                 conclusionReport.prepareWriter();
+
+                conclusionMsg("使用核心:" + coreMethod);
+
+                conclusionMsg("單日設定最大停損" + maxLoss);
 
                 return true;
             }
@@ -138,7 +193,7 @@ namespace QuickTradeTest
 
 
 
-                for (int k = 1; k <= Rule_Count_Win; k++)
+                for (int k = 1; k <= ruleCountWin; k++)
                 {
                     j = 0;
 
@@ -146,7 +201,7 @@ namespace QuickTradeTest
 
                     for (j = 1; j <= winLine.Count; j++)
                     {
-                        tmpWin = winLine[j] + j * Rule_Period;
+                        tmpWin = winLine[j] + j * rulePeriod;
 
                         winLine[j] = tmpWin;
                     }    // end winLine
@@ -154,7 +209,7 @@ namespace QuickTradeTest
 
 
 
-                    for (int i = 1; i <= Rule_Count_Lose; i++)
+                    for (int i = 1; i <= ruleCountLose; i++)
                     {
 
                         j = 0;
@@ -163,7 +218,7 @@ namespace QuickTradeTest
 
                         for (j = 1; j <= loseLine.Count; j++)
                         {
-                            tmpLose = loseLine[j] + j * Rule_Period;
+                            tmpLose = loseLine[j] + j * rulePeriod;
 
                             loseLine[j] = tmpLose;
                         }
@@ -197,7 +252,8 @@ namespace QuickTradeTest
             try
             {
 
-                testReportFileName = testReportFilePath + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_" + loseLine[1] + "_" + winLine[1] + "_" + guid + ".rpt";
+
+                testReportFileName = reportDir + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_" + loseLine[1] + "_" + winLine[1] + "_" + guid + ".rpt";
 
                 testReportFile = new TradeFile(testReportFileName);
 
@@ -228,9 +284,9 @@ namespace QuickTradeTest
 
             int[] profitRange = new int[31];//獲利的範圍
 
-            double maxWinProfit = 0;
+            double maxWinPureProfit = 0;
 
-            double maxLoseProfit = 0;
+            double maxLosePureProfit = 0;
 
             for (int i = 0; i < 31; i++)
             {
@@ -239,7 +295,7 @@ namespace QuickTradeTest
 
             FileManager fm = new FileManager();
 
-            List<TradeFile> oFileList = fm.getTradeFileList(testSourceFilePath);
+            List<TradeFile> oFileList = fm.getTradeFileList(sourceFileDir);
 
             testDayCount = oFileList.Count;
 
@@ -258,10 +314,19 @@ namespace QuickTradeTest
 
                 loseCountInOneDayTradeRunManyTimes = 0;//一日交易中有幾次賠錢               
 
-                for (int i = 0; i < Run_Count; i++)
+                double oneDayMaxLossSetting = -9999999;//單日最大停損設定
+
+                for (int i = 0; i < runCount; i++)
                 {
 
                     TradeManager manager = new TradeManager();
+
+                    if (maxLoss != null && !maxLoss.Equals(""))
+                    {
+                        manager.setMaxProfitLoss(Convert.ToDouble(maxLoss));
+                    }
+
+                    manager.setCore(coreMethod);
 
                     manager.setLots(lotArray);
 
@@ -277,8 +342,9 @@ namespace QuickTradeTest
 
                     loseCountInOneDayTradeRunManyTimes += manager.getLoseCount();
 
+                    oneDayPureProfit = oneDayProfit * valuePerPoint - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * cost;
 
-                    if (oneDayProfit > 0)
+                    if (oneDayPureProfit > 0)
                     {
                         winDayCount++;
                     }
@@ -288,102 +354,102 @@ namespace QuickTradeTest
                     }
 
 
-                    if (oneDayProfit > maxWinProfit)
+                    if (oneDayPureProfit > maxWinPureProfit)
                     {
-                        maxWinProfit = oneDayProfit;
+                        maxWinPureProfit = oneDayPureProfit;
                     }
 
-                    if (oneDayProfit < maxLoseProfit)
+                    if (oneDayPureProfit < maxLosePureProfit)
                     {
-                        maxLoseProfit = oneDayProfit;
+                        maxLosePureProfit = oneDayPureProfit;
                     }
 
-                    if (oneDayProfit * 50 > 0 && oneDayProfit * 50 < 2000)
+                    if (oneDayPureProfit > 0 && oneDayPureProfit < 2000)
                     {
 
                         profitRange[0]++;
                     }
-                    else if (oneDayProfit * 50 > 20000)
+                    else if (oneDayPureProfit > 20000)
                     {
                         profitRange[10]++;
                     }
-                    else if (oneDayProfit * 50 > 10000)
+                    else if (oneDayPureProfit > 10000)
                     {
                         profitRange[9]++;
                     }
-                    else if (oneDayProfit * 50 > 9000)
+                    else if (oneDayPureProfit > 9000)
                     {
                         profitRange[8]++;
                     }
-                    else if (oneDayProfit * 50 > 8000)
+                    else if (oneDayPureProfit > 8000)
                     {
                         profitRange[7]++;
                     }
-                    else if (oneDayProfit * 50 > 7000)
+                    else if (oneDayPureProfit > 7000)
                     {
                         profitRange[6]++;
                     }
-                    else if (oneDayProfit * 50 > 6000)
+                    else if (oneDayPureProfit > 6000)
                     {
                         profitRange[5]++;
                     }
-                    else if (oneDayProfit * 50 > 5000)
+                    else if (oneDayPureProfit > 5000)
                     {
                         profitRange[4]++;
                     }
-                    else if (oneDayProfit * 50 > 4000)
+                    else if (oneDayPureProfit > 4000)
                     {
                         profitRange[3]++;
                     }
-                    else if (oneDayProfit * 50 > 3000)
+                    else if (oneDayPureProfit > 3000)
                     {
                         profitRange[2]++;
                     }
-                    else if (oneDayProfit * 50 > 2000)
+                    else if (oneDayPureProfit > 2000)
                     {
                         profitRange[1]++;
                     }
-                    else if (oneDayProfit * 50 < -20000)
+                    else if (oneDayPureProfit < -20000)
                     {
                         profitRange[30]++;
                     }
-                    else if (oneDayProfit * 50 < -10000)
+                    else if (oneDayPureProfit < -10000)
                     {
                         profitRange[29]++;
                     }
-                    else if (oneDayProfit * 50 < -9000)
+                    else if (oneDayPureProfit < -9000)
                     {
                         profitRange[28]++;
                     }
-                    else if (oneDayProfit * 50 < -8000)
+                    else if (oneDayPureProfit < -8000)
                     {
                         profitRange[27]++;
                     }
-                    else if (oneDayProfit * 50 < -7000)
+                    else if (oneDayPureProfit < -7000)
                     {
                         profitRange[26]++;
                     }
-                    else if (oneDayProfit * 50 < -6000)
+                    else if (oneDayPureProfit < -6000)
                     {
                         profitRange[25]++;
                     }
-                    else if (oneDayProfit * 50 < -5000)
+                    else if (oneDayPureProfit < -5000)
                     {
                         profitRange[24]++;
                     }
-                    else if (oneDayProfit * 50 < -4000)
+                    else if (oneDayPureProfit < -4000)
                     {
                         profitRange[23]++;
                     }
-                    else if (oneDayProfit * 50 < -3000)
+                    else if (oneDayPureProfit < -3000)
                     {
                         profitRange[22]++;
                     }
-                    else if (oneDayProfit * 50 < -2000)
+                    else if (oneDayPureProfit < -2000)
                     {
                         profitRange[21]++;
                     }
-                    if (oneDayProfit * 50 < 0 && oneDayProfit * 50 > -2000)
+                    if (oneDayPureProfit < 0 && oneDayPureProfit > -2000)
                     {
                         profitRange[20]++;
                     }
@@ -394,7 +460,9 @@ namespace QuickTradeTest
 
                     oneDayRunManyTimesTotalProfit += oneDayProfit;
 
-                    //Console.WriteLine("交易結束，單日交易總利潤 : " + oneTimeProfit * 50);
+                    oneDayMaxLossSetting = manager.getMaxProfitLoss();
+
+                    //Console.WriteLine("交易結束，單日交易總利潤 : " + oneTimeProfit * valuePerPoint);
 
                 }
 
@@ -402,19 +470,21 @@ namespace QuickTradeTest
 
                 totalLoseCountRunManyTimes += loseCountInOneDayTradeRunManyTimes;
 
-                reportMsg(oFileList[j].getFileName() + "交易結束，單日交易平均利潤 : " + ((oneDayRunManyTimesTotalProfit * 50) - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * 66) / Run_Count);
+                reportMsg("單日設定最大停損" + Convert.ToString(oneDayMaxLossSetting));
 
-                reportMsg(oFileList[j].getFileName() + "交易結束，單日獲利次數 : " + winCountInOneDayTradeRunManyTimes);
+                reportMsg(oFileList[j].getFullPath() + "交易結束，單日交易平均利潤 : " + ((oneDayRunManyTimesTotalProfit * valuePerPoint) - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * cost) / runCount);
 
-                reportMsg(oFileList[j].getFileName() + "交易結束，單日賠錢次數 : " + loseCountInOneDayTradeRunManyTimes);
+                reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利次數 : " + winCountInOneDayTradeRunManyTimes);
 
-                reportMsg(oFileList[j].getFileName() + "交易結束，單日獲利次數的總比率 : " + Convert.ToDouble(winCountInOneDayTradeRunManyTimes) / ((Convert.ToDouble(winCountInOneDayTradeRunManyTimes) + Convert.ToDouble(loseCountInOneDayTradeRunManyTimes))) * 100 + " %");
+                reportMsg(oFileList[j].getFullPath() + "交易結束，單日賠錢次數 : " + loseCountInOneDayTradeRunManyTimes);
+
+                reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利次數的總比率 : " + Convert.ToDouble(winCountInOneDayTradeRunManyTimes) / ((Convert.ToDouble(winCountInOneDayTradeRunManyTimes) + Convert.ToDouble(loseCountInOneDayTradeRunManyTimes))) * 100 + " %");
 
             }
 
 
             reportMsg(" 測試編號 : " + guid);
-            reportMsg(" 每個交易日的測試次數 : " + Run_Count);
+            reportMsg(" 每個交易日的測試次數 : " + runCount);
 
             reportMsg("獲利次數 : " + totalWinCountRumManyTimes);
             reportMsg("賠錢次數 : " + totalLoseCountRunManyTimes);
@@ -424,26 +494,28 @@ namespace QuickTradeTest
             reportMsg("賠錢日數" + loseDayCount);
             reportMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
 
-            reportMsg("單日最大獲利 : " + maxWinProfit * 50);
-            reportMsg("單日最大賠錢 : " + maxLoseProfit * 50);
+            reportMsg("單日最大獲利 : " + maxWinPureProfit);
+            reportMsg("單日最大賠錢 : " + maxLosePureProfit);
+            reportMsg("單日設定最大停損" + maxLoss);
+
 
             reportMsg("最大交易口數 : " + lotArray[lotArray.Length - 1]);
 
+            reportMsg("總獲利口數 : " + totalWinCountRumManyTimes);
 
-            reportMsg("總手續費 : " + (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * 50);
+            reportMsg("總賠錢口數 : " + totalLoseCountRunManyTimes);
 
-            reportMsg("平均手續費 : " + ((totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * 50) / (Run_Count * testDayCount));
+            reportMsg("總手續費 : " + (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * cost);
 
-            double pureProfit = ((totalProfit * 50 - (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * 66)) / (Run_Count * testDayCount);
+            reportMsg("平均手續費 : " + ((totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * cost) / (runCount * testDayCount));
 
-            reportMsg(Run_Count * oFileList.Count + "次，總利潤 : " + totalProfit * 50);
+            double pureProfit = ((totalProfit * valuePerPoint - (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * cost)) / (runCount * testDayCount);
 
-            reportMsg(Run_Count * oFileList.Count + "次，扣除手續費後，總平均利潤 : " + pureProfit);
+            reportMsg(runCount * oFileList.Count + "次，總利潤 : " + totalProfit * valuePerPoint);
 
-            if (pureProfit > 0)
-            {
-                conclusionReport.writeLine("------------loseLine : " + loseLine[1] + "----------------winLine : " + winLine[1] + "-------------PureProfit : " + pureProfit);
-            }
+            reportMsg(runCount * oFileList.Count + "次，扣除手續費後，總平均利潤 : " + pureProfit);
+
+
 
             reportMsg("獲利兩千以下次數 : " + profitRange[0]);
             reportMsg("獲利兩千以上次數 : " + profitRange[1]);
@@ -485,11 +557,20 @@ namespace QuickTradeTest
             reportMsg("----------------------------------------------------------------------------------------------");
             reportMsg("----------------------------------------------------------------------------------------------");
             reportMsg("----------------------------------------------------------------------------------------------");
+
+            
+
+            if (pureProfit > 0)
+            {
+                conclusionMsg("------------loseLine : " + loseLine[1] + "----------------winLine : " + winLine[1] + "-------------PureProfit : " + pureProfit);
+            }
+
+
         }
 
 
 
-        private void reportMsg(String msg)
+        private void showMsg(TradeFile file, string msg)
         {
             try
             {
@@ -498,7 +579,7 @@ namespace QuickTradeTest
 
                 if (isReport)
                 {
-                    this.testReportFile.writeLine(msg);
+                    file.writeLine(msg);
                 }
             }
             catch (Exception e)
@@ -508,6 +589,17 @@ namespace QuickTradeTest
                 Console.WriteLine(e.Message);
             }
 
+
+        }
+
+        private void conclusionMsg(string msg)
+        {
+            showMsg(conclusionReport, msg);
+        }
+
+        private void reportMsg(string msg)
+        {
+            showMsg(testReportFile, msg);
         }
 
         public void stop()
