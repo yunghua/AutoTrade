@@ -68,6 +68,8 @@ namespace QuickTradeTest
 
         string maxLoss = "";//單日最大停損
 
+        double ratio;//動態停利的反轉比率，小於1，越接近1表示要回檔接近停利設定，才會執行停利，也就是越不敏感。
+
         //Boolean isPrepared = false;
 
         public TestManager()
@@ -106,6 +108,7 @@ namespace QuickTradeTest
                 rulePeriod = Convert.ToInt32(configFile.readConfig("Rule_Period"));
                 maxLoss = configFile.readConfig("Max_Loss");
                 sourceDir = configFile.readConfig("Source_Dir");
+                ratio = Convert.ToDouble(configFile.readConfig("Ratio"));
 
                 if (null == sourceDir)
                 {
@@ -156,6 +159,8 @@ namespace QuickTradeTest
                 conclusionMsg("使用核心:" + coreMethod);
 
                 conclusionMsg("單日設定最大停損" + maxLoss);
+
+                conclusionMsg("動態停利反轉比率:" + ratio);
 
                 return true;
             }
@@ -326,6 +331,8 @@ namespace QuickTradeTest
                         manager.setMaxProfitLoss(Convert.ToDouble(maxLoss));
                     }
 
+                    manager.setRatio(ratio);
+
                     manager.setCore(coreMethod);
 
                     manager.setLots(lotArray);
@@ -342,7 +349,7 @@ namespace QuickTradeTest
 
                     loseCountInOneDayTradeRunManyTimes += manager.getLoseCount();
 
-                    oneDayPureProfit = oneDayProfit * valuePerPoint - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * cost;
+                    oneDayPureProfit = oneDayProfit * valuePerPoint - (manager.getWinCount() + manager.getLoseCount()) * cost;
 
                     if (oneDayPureProfit > 0)
                     {
@@ -480,7 +487,7 @@ namespace QuickTradeTest
 
                 reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利次數的總比率 : " + Convert.ToDouble(winCountInOneDayTradeRunManyTimes) / ((Convert.ToDouble(winCountInOneDayTradeRunManyTimes) + Convert.ToDouble(loseCountInOneDayTradeRunManyTimes))) * 100 + " %");
 
-            }
+            }//end for fileList
 
 
             reportMsg(" 測試編號 : " + guid);
@@ -558,7 +565,7 @@ namespace QuickTradeTest
             reportMsg("----------------------------------------------------------------------------------------------");
             reportMsg("----------------------------------------------------------------------------------------------");
 
-            
+
 
             if (pureProfit > 0)
             {
