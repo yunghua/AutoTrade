@@ -19,7 +19,7 @@ namespace AutoTrade
 
         const string Config_File_Name = "TradeConfig.txt";//設定檔案名
 
-        const string Month_File_Name = "TradeMonthCode.txt";//交易月份代碼對照表
+        const string Month_File_Name = "TradeMonth.txt";//交易月份代碼對照表
 
         string configFilePath = "";//完整的設定檔案目錄
 
@@ -34,6 +34,14 @@ namespace AutoTrade
         string password = "";
 
         string tradeCode = "";//市場別代碼，小台指=MXF，大台指=TXF
+
+        string maxLoss = "";//單日最大停損
+
+        string lots = "";//交易筆數
+
+        string branchCode = "";//分公司代碼
+
+        string account = "";//帳號
 
         public Form1()
         {
@@ -133,13 +141,27 @@ namespace AutoTrade
             catch (Exception ex)
             {
                 MessageBox.Show("讀取  設定檔  失敗。原因 : " + ex.Message);
+
+                return ;
             }
 
             tradeCode = configFile.readConfig("Trade_Code");
 
             string tradeMonthFilePath = appDir + "\\" + Config_Dir + "\\" + Month_File_Name;
 
-            tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeMonthFilePath, tradeCode);
+            try
+            {
+
+                tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeMonthFilePath, tradeCode);
+
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show("讀取  月份代碼檔  失敗。原因 : " + ex.Message);
+
+                return;
+            }
 
             id = configFile.readConfig("ID");
 
@@ -149,7 +171,27 @@ namespace AutoTrade
 
             port = configFile.readConfig("Port");
 
+            lots = configFile.readConfig("Lots");
+
+            maxLoss = configFile.readConfig("Max_Loss");
+
+            branchCode = configFile.readConfig("Branch_Code");
+
+            account = configFile.readConfig("Account_Code");
+
             master = new TradeMaster();
+
+            master.setMaxLoss(maxLoss);
+
+            master.setID(id);
+
+            master.setPassword(password);
+
+            master.setBranchCode(branchCode);
+
+            master.setAccount(account);
+
+            master.setLots(lots);
 
             try
             {
