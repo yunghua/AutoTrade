@@ -29,7 +29,9 @@ namespace AutoTrade
 
         TradeMaster master;
 
-        string ip = "";//IP
+        string ipAPI = "api.yuantafutures.com.tw";//下單伺服器的網址
+        string ipQuote = "quote.yuantafutures.com.tw";//行情伺服器的網址
+
         string port = "";//port=80,數字
 
         string id = "";
@@ -103,7 +105,7 @@ namespace AutoTrade
         {
             try
             {
-                axYuantaQuote1.SetMktLogon(id, password, ip, port);
+                axYuantaQuote1.SetMktLogon(id, password, ipQuote, port);
                 //axYuantaQuote1.SetMktLogon(textBox_id.Text.Trim(), textBox_pass.Text.Trim(), textBox_ip.Text.Trim(), textBox_port.Text.Trim());
             }
             catch (Exception ex)
@@ -177,11 +179,13 @@ namespace AutoTrade
                 return;
             }
 
+            ipQuote = configFile.readConfig("IP_Quote");
+
             id = configFile.readConfig("ID");
 
             password = configFile.readConfig("Password");
 
-            ip = configFile.readConfig("IP");
+            ipAPI = configFile.readConfig("IP_API");
 
             port = configFile.readConfig("Port");
 
@@ -210,7 +214,11 @@ namespace AutoTrade
 
                 master.setLots(lots);
 
+                master.setIpAPI(ipAPI);
+
                 master.prepareReady();
+
+                
 
             }
             catch (Exception ez)

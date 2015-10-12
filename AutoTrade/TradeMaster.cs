@@ -23,12 +23,12 @@ namespace AutoTrade
         const int Stage_Order_Login_Success = 3;//登入下單API成功
         const int Stage_Order_New_Start = 4;//新倉開始下單
         const int Stage_Order_New_Success = 5;//新倉回報下單成功        
-        const int Stage_Orde_New_Fail = 6;//新倉回報下單失敗  
+        const int Stage_Order_New_Fail = 6;//新倉回報下單失敗  
         const int Stage_Order_Not_Process = 7;//無法下單，可能是尚未登入完成
         const int Stage_Order_Even_Start = 8;//平倉倉開始下單
         const int Stage_Order_Even_Success = 9;//平倉回報下單成功     
-        const int Stage_Orde_Even_Fail = 10;//平倉回報下單失敗  
-        const int Stage_Orde_Fail = 10;//回報下單失敗  
+        const int Stage_Order_Even_Fail = 10;//平倉回報下單失敗  
+        const int Stage_Order_Fail = 11;//回報下單失敗  
 
         const int Out_Not_Out = 0;//尚未平倉出場
         const int Out_Active_Profit = 1;//動態停利出場
@@ -106,9 +106,7 @@ namespace AutoTrade
 
         double maxTradePoint = 0;//市場最高價
 
-        double offsetTradePoint;//最高與最低價格差異區間値 = maxTradePoint - minTradePoint
-
-        int tradeCount = 0;  //交易次數        
+        double offsetTradePoint;//最高與最低價格差異區間値 = maxTradePoint - minTradePoint        
 
         double oneProfit = 0;//單筆利潤
 
@@ -150,7 +148,7 @@ namespace AutoTrade
 
         string fileName = "";
 
-        int  maxLoss ;//單日最大停損
+        int maxLoss;//單日最大停損
 
         //-------------------------------------------------------------------------------------------------------------
         //          物件區
@@ -183,7 +181,7 @@ namespace AutoTrade
         Dictionary<int, int> loseLine;  //認賠的底線
         Dictionary<int, int> winLine;  //停利的底線
 
-        DateTime isStopTradeTime;//今日交易結束時間
+        DateTime stopTradeTime;//今日交易結束時間
         //-------------------------------------------------------------------------------------------------------------        
         //        下單區
         //-------------------------------------------------------------------------------------------------------------
@@ -233,7 +231,9 @@ namespace AutoTrade
         String bestSellFive;                //"賣五"
 
 
-        int dealQty; //已成交量                       
+        int dealQty; //已成交量                     
+
+        string ipAPI = "api.yuantafutures.com.tw";//下單伺服器的網址
 
         string branchCode = "";//分公司
 
@@ -249,7 +249,7 @@ namespace AutoTrade
 
         int lotIndex = 0;//交易口數陣列的第幾個
 
-        int stage;//下單階段
+        int stage = Stage_New;//下單階段
 
         string orderDircetion;//下單方向，買或賣
 
@@ -275,6 +275,16 @@ namespace AutoTrade
         public TradeMaster(Form1 parentForm)
         {
             this.parentForm = parentForm;
+        }
+
+        public void setIpAPI(string ipAPI)
+        {
+            this.ipAPI = ipAPI;
+        }
+
+        public string getIpAPI()
+        {
+            return ipAPI;
         }
 
         public void setBranchCode(string branchCode)
@@ -371,9 +381,20 @@ namespace AutoTrade
         //    }
         //}
 
+        private void showParameters()
+        {
+            debugMsg("Max_Loss:" + maxLoss);
+            debugMsg("Lots:" + lots);
+            //debugMsg("Branch_Code:" + branchCode);
+            //debugMsg("Account_Code:" + account);
+            //debugMsg("ID:" + id);
+            //debugMsg("Password:" + password);
+
+        }
+
         public void prepareReady()
         {
-            prepareOrder();
+
 
             lotArray = lots.Split(',');
 
@@ -423,7 +444,7 @@ namespace AutoTrade
 
             DateTime now = System.DateTime.Now;
 
-            isStopTradeTime = new DateTime(now.Year, now.Month, now.Day, 13, 44, 0);
+            stopTradeTime = new DateTime(now.Year, now.Month, now.Day, 13, 44, 0);
 
             appDir = System.Windows.Forms.Application.StartupPath;
 
@@ -446,6 +467,10 @@ namespace AutoTrade
             RecordScanner.setRecordList(recordList);
 
             debugMsg(now + "------<<開始交易>>");
+
+            showParameters();
+
+            prepareOrder();
 
         }
 
@@ -581,7 +606,7 @@ namespace AutoTrade
         private void loginOrder()
         {
 
-            int ret_code = m_yuanta_ord.SetFutOrdConnection(id, password, "api.yuantafutures.com.tw", 80);
+            int ret_code = m_yuanta_ord.SetFutOrdConnection(id, password, ipAPI, 80);
 
             // 回傳 2 表示已經在 "已經登入" 連線狀態  
             if (ret_code == 2)
@@ -691,15 +716,15 @@ namespace AutoTrade
             {
                 if (stage == Stage_Order_New_Start)
                 {
-                    stage = Stage_Orde_New_Fail;
+                    stage = Stage_Order_New_Fail;
                 }
                 else if (stage == Stage_Order_Even_Start)
                 {
-                    stage = Stage_Orde_Even_Fail;
+                    stage = Stage_Order_Even_Fail;
                 }
                 else
                 {
-                    stage = Stage_Orde_Fail;
+                    stage = Stage_Order_Fail;
                 }
 
             }
@@ -720,6 +745,8 @@ namespace AutoTrade
                 throw e;
             }
 
+            debugMsg("dealOrderNew-->stage:" + Stage_Order_New_Start);
+
             return Stage_Order_New_Start;
         }
 
@@ -737,6 +764,8 @@ namespace AutoTrade
 
                 throw e;
             }
+
+            debugMsg("dealOrderEven-->stage:" + Stage_Order_Even_Start);
 
             return Stage_Order_Even_Start;
         }
@@ -797,7 +826,7 @@ namespace AutoTrade
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                debugMsg(e.StackTrace);
             }
 
             coreLogic();
@@ -809,12 +838,12 @@ namespace AutoTrade
 
         private void coreLogic()//回傳値表示是否結束本日交易
         {
-            if (stage == Stage_Orde_New_Fail)//下單失敗
+            if (stage == Stage_Order_New_Fail)//下單失敗
             {
                 isStartOrder = false;
             }
-            //if (isStartOrder == false && stage != Stage_Order_Success && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //下單版本
-            if (isStartOrder == false && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //測試版本
+            if (isStartOrder == false && stage != Stage_Order_New_Start && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //下單版本
+            //if (isStartOrder == false && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //測試版本
             {
 
                 tradeTime = record.TradeTime;
@@ -845,7 +874,7 @@ namespace AutoTrade
                 }
                 else if (!dealSellOrBuy(record, tradeDateTime))
                 {
-                    return ;//五個時間的的方向不同，下次繼續
+                    return;//五個時間的的方向不同，下次繼續
                 }
 
                 secondAfterTradeToActiveCheck = tradeDateTime.AddSeconds(ActiveProfitStartPeriod);//5秒內利潤擴大50點
@@ -886,8 +915,8 @@ namespace AutoTrade
             }
 
 
-            //if (isStartOrder == true && stage == Stage_Order_Success)//已經開始下單，而且下單成功
-            if (isStartOrder == true)//已經開始下單
+            if (isStartOrder == true && stage == Stage_Order_New_Success)//已經開始下單，而且下單成功
+            //if (isStartOrder == true)//已經開始下單
             {
 
                 if (nowTradeType == TradeType.BUY.GetHashCode())
@@ -927,7 +956,7 @@ namespace AutoTrade
 
                     outStyle = Out_Time_Up;
 
-                    
+                    debugMsg("outStyle = Out_Time_Up");
 
                 }//end 交易時間結束
                 else if ((isActiveCheckProfit == false) && (record.TradeMoment > secondAfterTradeToActiveCheck))//還沒開始【動態停利】，檢查時間到了，看看是否要啟動動態停利機制
@@ -941,11 +970,6 @@ namespace AutoTrade
 
                         tempOneProfit = oneProfit;
 
-                        if (stage == Stage_Order_Even_Success || stage == Stage_Order_Login_Success)
-                        {
-                            stage = this.dealOrderNew(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
-                        }
-                        
                     }
                     else
                     {
@@ -984,8 +1008,7 @@ namespace AutoTrade
                                 stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
                             }
 
-
-                            outStyle = Out_Active_Profit;
+                            debugMsg("outStyle = Out_Active_Profit");
 
                         }
                         else
@@ -1014,10 +1037,10 @@ namespace AutoTrade
 
                             minuteAfterStartActiveProfit = minuteAfterStartActiveProfit.AddMinutes(ActiveProfitCheckPeriod);//繼續跑XX秒
 
-                            
+
                         }
-                    }//開始動態停利，但是還不到檢查的時間
-                   
+                    }// end 開始動態停利，到了檢查的時間
+
 
                 }//end 執行動態停利檢查
 
@@ -1031,7 +1054,7 @@ namespace AutoTrade
                         stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
                     }
 
-                    outStyle = Out_Loss_Buy; ;
+                    debugMsg("outStyle = Out_Loss_Buy");
 
                 }
                 else if (nowTradeType == TradeType.SELL.GetHashCode() && (record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
@@ -1042,6 +1065,8 @@ namespace AutoTrade
                     {
                         stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
                     }
+
+                    debugMsg("outStyle = Out_Loss_Sell");
 
                     outStyle = Out_Loss_Sell;
 
@@ -1056,6 +1081,8 @@ namespace AutoTrade
                         stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
                     }
 
+                    debugMsg("outStyle = Out_Win_Buy");
+
                     outStyle = Out_Win_Buy;
 
                 }
@@ -1069,6 +1096,8 @@ namespace AutoTrade
                         stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
                     }
 
+                    debugMsg("outStyle = Out_Win_Sell");
+
                     outStyle = Out_Win_Sell;
 
                 }
@@ -1076,14 +1105,14 @@ namespace AutoTrade
 
             }//下單結束
 
-            if (maxLoss <0 && totalProfit * 50 < maxLoss)  //已達最大虧損水平線
+            if (maxLoss < 0 && totalProfit * valuePerPoint < maxLoss)  //已達最大虧損水平線
             {
 
-                 loseOut();
+                loseOut();
 
-                 isStopTodayTrade = true;
+                isStopTodayTrade = true;
             }
-            
+
 
         }
 
@@ -1142,65 +1171,52 @@ namespace AutoTrade
 
         private void dealOutTimeUp()//時間到出場
         {
+            debugMsg("時間到，平倉。");
+
+            dealOutCore();
+
+        }
+
+        private void dealOutActiveProfit()//動態停利
+        {
+            debugMsg("動態停利。");
+
+            dealOutCore();
+
+            winOut();
+        }
+
+        private void dealOutCore()//處理平倉後記錄獲利動作的核心
+        {
             calOneProfit();
 
-             onePureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+            totalProfit += oneProfit;
+
+            onePureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
 
             totalPureProfit += onePureProfit;
-
-            debugMsg("時間到賣出平倉");
 
             debugMsg("平倉點數---->" + orderEvenPrice);
 
             debugMsg("平倉時間---->" + orderEvenTime);
 
-            debugMsg("純利:" + onePureProfit);
+            debugMsg("純利潤 : " + onePureProfit);
 
-            debugMsg("停損策略:" + loseLine[nowStrategyCount]);
+            debugMsg("停損策略 : " + loseLine[nowStrategyCount]);
 
-            debugMsg("停利策略:" + winLine[nowStrategyCount]);
-
-            debugMsg("----------------------------------------------------------------------------------------------");
-
-            totalProfit += oneProfit;
-
-            tradeCount++;
-        }
-
-        private void dealOutActiveProfit()//動態停利
-        {
-            calOneProfit();
-
-            totalProfit += oneProfit;
-
-            onePureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
-
-            totalPureProfit += onePureProfit;
-
-            debugMsg("******平倉點數009---->" + orderEvenPrice);
-
-            debugMsg("******平倉時間---->" + orderEvenTime);
-
-            debugMsg("純利:" + onePureProfit);
+            debugMsg("停利策略 : " + winLine[nowStrategyCount]);
 
             debugMsg("----------------------------------------------------------------------------------------------");
 
+            winOut();
 
-            winOut();//獲利出場    
         }
 
         private void dealOutWinSell()//賣出停利
         {
+            debugMsg("賣出停利");
 
-            calOneProfit();
-
-            oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
-
-            totalProfit += oneProfit;
-
-            onePureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
-
-            totalPureProfit += onePureProfit;
+            dealOutCore();
 
             lotIndex++;
 
@@ -1209,34 +1225,14 @@ namespace AutoTrade
                 lotIndex = lotArray.Length - 1;
             }
 
-            debugMsg("停利出場");
-
-            debugMsg("平倉點數004---->" + orderEvenPrice);
-
-            debugMsg("平倉時間---->" + orderEvenTime);
-
-            debugMsg("純利潤:" + onePureProfit);
-
-            debugMsg("停損策略:" + loseLine[nowStrategyCount]);
-
-            debugMsg("停利策略:" + winLine[nowStrategyCount]);
-
-            debugMsg("----------------------------------------------------------------------------------------------");
-
             prevTradeType = TradeType.SELL.GetHashCode();
-
-            winOut();
         }
 
         private void dealOutWinBuy()//買入停利
         {
-            calOneProfit();
+            debugMsg("買入停利");
 
-            totalProfit += oneProfit;
-
-            onePureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
-
-            totalPureProfit += onePureProfit;
+            dealOutCore();
 
             lotIndex++;
 
@@ -1245,90 +1241,35 @@ namespace AutoTrade
                 lotIndex = lotArray.Length - 1;
             }
 
-            debugMsg("停利出場");
-
-            debugMsg("平倉點數003---->" + evenPrice);
-
-            debugMsg("平倉時間---->" + record.TradeMoment);
-
-            debugMsg("純利:" + onePureProfit);
-
-            debugMsg("停損策略:" + loseLine[nowStrategyCount]);
-
-            debugMsg("停利策略:" + winLine[nowStrategyCount]);
-
-            debugMsg("----------------------------------------------------------------------------------------------");
-
             prevTradeType = TradeType.BUY.GetHashCode();
-
-             winOut();
         }
 
         private void dealOutLossSell()//賣出停損
         {
 
-            calOneProfit();
+            debugMsg("賣出停損");
 
-            totalProfit += oneProfit;
-
-            onePureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
-
-            totalPureProfit += onePureProfit;
+            dealOutCore();
 
             lotIndex = Array_Begin_Index;
 
-            debugMsg("認賠殺出");
-
-            debugMsg("平倉點數002---->" + orderEvenPrice);
-
-            debugMsg("平倉時間---->" + orderEvenTime);
-
-            debugMsg("純利潤:" + onePureProfit);
-
-            debugMsg("停損策略:" + loseLine[nowStrategyCount]);
-
-            debugMsg("停利策略:" + winLine[nowStrategyCount]);
-
-            debugMsg("----------------------------------------------------------------------------------------------");
-
             prevTradeType = TradeType.SELL.GetHashCode();
 
-            loseOut();
         }
 
         private void dealOutLossBuy()//買入停損
         {
-            calOneProfit();
+            debugMsg("買入停損");
 
-            totalProfit += oneProfit;
-
-            onePureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
-
-            totalPureProfit += onePureProfit;
+            dealOutCore();
 
             lotIndex = Array_Begin_Index;
 
-            debugMsg("認賠殺出");
-
-            debugMsg("平倉點數001---->" + orderEvenPrice);
-
-            debugMsg("平倉時間---->" + orderEvenTime);
-
-            debugMsg("純利:" + onePureProfit);
-
-            debugMsg("停損策略:" + loseLine[nowStrategyCount]);
-
-            debugMsg("停利策略:" + winLine[nowStrategyCount]);
-
-            debugMsg("----------------------------------------------------------------------------------------------");
-
             prevTradeType = TradeType.BUY.GetHashCode();
-
-            loseOut();
         }
 
 
-        private Boolean winOut()//獲利出場
+        private void winOut()//獲利出場
         {
             winCount++;
 
@@ -1336,10 +1277,10 @@ namespace AutoTrade
 
             isPrevLose = false;
 
-            return tradeOut();
+            tradeOut();
         }
 
-        private Boolean loseOut()//認賠出場
+        private void loseOut()//認賠出場
         {
             loseCount++;
 
@@ -1347,15 +1288,13 @@ namespace AutoTrade
 
             isPrevLose = true;
 
-            return tradeOut();
+            tradeOut();
         }
 
-        private Boolean tradeOut()//結束單筆交易的動作
+        private void tradeOut()//結束單筆交易的動作
         {
 
             isStartOrder = false;
-
-            tradeCount++;
 
             isActiveCheckProfit = false;//停止動態停利檢查
 
@@ -1365,7 +1304,6 @@ namespace AutoTrade
 
             befofeRecord = null;
 
-            return NEXT_TRADE;//結束此次交易//繼續下一筆交易行情運算
         }
 
 
