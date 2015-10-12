@@ -13,6 +13,8 @@ namespace AutoTrade
 {
     public partial class Form1 : Form
     {
+        string tradeMasterMessage = "";//來自TradeMaster的訊息
+
         string appDir = "";//應用程式所在目錄
 
         const string Config_Dir = "Config";//設定檔目錄
@@ -50,6 +52,18 @@ namespace AutoTrade
 
         }
 
+
+        public void setTradeMasterMessage(string msg)
+        {
+            this.tradeMasterMessage = msg;
+
+            textBox_status2.Text = msg;
+        }
+
+        public string getTradeMasterMessage()
+        {
+            return tradeMasterMessage;
+        }
 
 
         //連線Event OnMktStatusChange (int Status, char* Msg)	與行情發送端連線的狀態,回傳LinkStatus 
@@ -142,7 +156,7 @@ namespace AutoTrade
             {
                 MessageBox.Show("讀取  設定檔  失敗。原因 : " + ex.Message);
 
-                return ;
+                return;
             }
 
             tradeCode = configFile.readConfig("Trade_Code");
@@ -179,22 +193,22 @@ namespace AutoTrade
 
             account = configFile.readConfig("Account_Code");
 
-            master = new TradeMaster();
-
-            master.setMaxLoss(maxLoss);
-
-            master.setID(id);
-
-            master.setPassword(password);
-
-            master.setBranchCode(branchCode);
-
-            master.setAccount(account);
-
-            master.setLots(lots);
-
             try
             {
+
+                master = new TradeMaster();
+
+                master.setMaxLoss(Convert.ToInt32(maxLoss));
+
+                master.setID(id);
+
+                master.setPassword(password);
+
+                master.setBranchCode(branchCode);
+
+                master.setAccount(account);
+
+                master.setLots(lots);
 
                 master.prepareReady();
 
