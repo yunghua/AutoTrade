@@ -142,6 +142,10 @@ namespace QuickTradeTest
 
         double ratio = 0.9;//動態停利的反轉比率，小於1，越接近1表示要回檔接近停利設定，才會執行停利，也就是越不敏感。
 
+        int valuePerPoint = 50;
+
+        int cost = 68;
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 程式區。
@@ -999,7 +1003,9 @@ namespace QuickTradeTest
 
                                     debugMsg("******平倉時間---->" + record.TradeMoment);
 
-                                    debugMsg("利潤:" + oneProfit * 50);
+                                    double pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                                    debugMsg("純利:" + pureProfit);
 
                                     debugMsg("動態停利範圍:" + reverseLitmit);
 
@@ -1068,7 +1074,15 @@ namespace QuickTradeTest
 
                             oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
 
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
+
                             lotIndex = Array_Begin_Index;
+
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
 
                             totalProfit += oneProfit;
 
@@ -1080,7 +1094,9 @@ namespace QuickTradeTest
 
                             debugMsg("平倉時間---->" + record.TradeMoment);
 
-                            debugMsg("利潤:" + oneProfit * 50);
+                            double pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                            debugMsg("純利:" + pureProfit);
 
                             debugMsg("停損策略:" + loseLine[nowStrategyCount]);
 
@@ -1108,7 +1124,15 @@ namespace QuickTradeTest
 
                             oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
 
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
+
                             lotIndex = Array_Begin_Index;
+
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
 
                             totalProfit += oneProfit;
 
@@ -1120,8 +1144,9 @@ namespace QuickTradeTest
 
                             debugMsg("平倉時間---->" + record.TradeMoment);
 
-                            debugMsg("利潤:" + oneProfit * 50);
+                            double pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
 
+                            debugMsg("純利:" + pureProfit);
                             debugMsg("停損策略:" + loseLine[nowStrategyCount]);
 
                             debugMsg("停利策略:" + winLine[nowStrategyCount]);
@@ -1146,12 +1171,20 @@ namespace QuickTradeTest
 
                             oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
 
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
+
                             lotIndex++;
 
                             if (lotIndex >= lotArray.Length)
                             {
                                 lotIndex = lotArray.Length - 1;
                             }
+
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
 
                             totalProfit += oneProfit;
 
@@ -1163,7 +1196,9 @@ namespace QuickTradeTest
 
                             debugMsg("平倉時間---->" + record.TradeMoment);
 
-                            debugMsg("利潤:" + oneProfit * 50);
+                            double pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                            debugMsg("純利:" + pureProfit);
 
                             debugMsg("停損策略:" + loseLine[nowStrategyCount]);
 
@@ -1190,12 +1225,20 @@ namespace QuickTradeTest
 
                             oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
 
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
+
                             lotIndex++;
 
                             if (lotIndex >= lotArray.Length)
                             {
                                 lotIndex = lotArray.Length - 1;
                             }
+
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
 
                             totalProfit += oneProfit;
 
@@ -1207,7 +1250,9 @@ namespace QuickTradeTest
 
                             debugMsg("平倉時間---->" + record.TradeMoment);
 
-                            debugMsg("利潤:" + oneProfit * 50);
+                            double pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                            debugMsg("純利:" + pureProfit);
 
                             debugMsg("停損策略:" + loseLine[nowStrategyCount]);
 
@@ -1241,6 +1286,8 @@ namespace QuickTradeTest
 
                             evenPrice = record.TradePrice;
 
+                            oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
+
                             totalProfit += oneProfit;
 
                             isStartOrder = false;
@@ -1269,7 +1316,13 @@ namespace QuickTradeTest
 
                             debugMsg("平倉時間---->" + record.TradeMoment);
 
-                            debugMsg("利潤:" + oneProfit * 50);
+                            debugMsg("lotIndex---->" + lotIndex);
+
+                            debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
+
+                            double pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                            debugMsg("純利:" + pureProfit);
 
                             debugMsg("停損策略:" + loseLine[nowStrategyCount]);
 
