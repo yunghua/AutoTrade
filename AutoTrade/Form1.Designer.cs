@@ -68,6 +68,11 @@
             this.TolMatchQty = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBox_status_order = new System.Windows.Forms.TextBox();
+            this.textBox_status_ready = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
@@ -89,7 +94,7 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(5);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(5);
-            this.groupBox3.Size = new System.Drawing.Size(419, 206);
+            this.groupBox3.Size = new System.Drawing.Size(445, 206);
             this.groupBox3.TabIndex = 15;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Yuanta Quote API 連線資訊";
@@ -150,9 +155,9 @@
             this.label4.Location = new System.Drawing.Point(10, 171);
             this.label4.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(41, 20);
+            this.label4.Size = new System.Drawing.Size(89, 20);
             this.label4.TabIndex = 18;
-            this.label4.Text = "狀態";
+            this.label4.Text = "Quote狀態";
             // 
             // groupBox1
             // 
@@ -162,7 +167,7 @@
             this.groupBox1.Controls.Add(this.textBox_sym);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.groupBox1.Location = new System.Drawing.Point(419, 0);
+            this.groupBox1.Location = new System.Drawing.Point(445, 0);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(5);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(5);
@@ -340,18 +345,63 @@
             this.timer1.Interval = 5000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // timer2
+            // 
+            this.timer2.Interval = 5000;
+            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(10, 234);
+            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(85, 20);
+            this.label1.TabIndex = 25;
+            this.label1.Text = "Order狀態";
+            // 
+            // textBox_status_order
+            // 
+            this.textBox_status_order.Location = new System.Drawing.Point(104, 225);
+            this.textBox_status_order.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_status_order.Name = "textBox_status_order";
+            this.textBox_status_order.Size = new System.Drawing.Size(294, 29);
+            this.textBox_status_order.TabIndex = 25;
+            // 
+            // textBox_status_ready
+            // 
+            this.textBox_status_ready.Location = new System.Drawing.Point(571, 225);
+            this.textBox_status_ready.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_status_ready.Name = "textBox_status_ready";
+            this.textBox_status_ready.Size = new System.Drawing.Size(294, 29);
+            this.textBox_status_ready.TabIndex = 24;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(460, 234);
+            this.label2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(59, 20);
+            this.label2.TabIndex = 26;
+            this.label2.Text = "Ready:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(891, 240);
+            this.ClientSize = new System.Drawing.Size(891, 411);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.textBox_status_ready);
+            this.Controls.Add(this.textBox_status_order);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.panel1);
             this.Font = new System.Drawing.Font("Microsoft JhengHei", 12F);
             this.Margin = new System.Windows.Forms.Padding(5);
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V0.05  # # # # # ";
+            this.Text = " # # # # # 自動下單機V0.06  # # # # # ";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -361,6 +411,7 @@
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -378,6 +429,7 @@
         //private System.Windows.Forms.DataGridView DataGrid;
         private System.Windows.Forms.BindingSource bindingSource1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer timer2;
         private System.Windows.Forms.DataGridViewTextBoxColumn key;
         private System.Windows.Forms.DataGridViewTextBoxColumn RefPri;
         private System.Windows.Forms.DataGridViewTextBoxColumn OpenPri;
@@ -389,12 +441,16 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn MatchPri;
         private System.Windows.Forms.DataGridViewTextBoxColumn MatchQty;
         private System.Windows.Forms.DataGridViewTextBoxColumn TolMatchQty;
-        private AxYuantaQuoteLib.AxYuantaQuote axYuantaQuote1;
+        private AxYuantaQuoteLib.AxYuantaQuote axYuantaQuote1;        
         private System.Windows.Forms.Label label_Version;
         private System.Windows.Forms.TextBox textBox_loseLine;
         private System.Windows.Forms.TextBox textBox1_winLine;
         private System.Windows.Forms.Label label_loseLine;
         private System.Windows.Forms.Label label_winLine;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBox_status_order;
+        private System.Windows.Forms.TextBox textBox_status_ready;
+        private System.Windows.Forms.Label label2;
     }
 }
 

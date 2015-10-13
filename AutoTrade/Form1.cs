@@ -7,12 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using TradeUtility;
-
+using YuantaOrdLib;
 
 namespace AutoTrade
 {
     public partial class Form1 : Form
     {
+        Boolean isOrderAPIReady = false;
+
         string tradeMasterMessage = "";//來自TradeMaster的訊息
 
         string appDir = "";//應用程式所在目錄
@@ -46,6 +48,8 @@ namespace AutoTrade
         string branchCode = "";//分公司代碼
 
         string account = "";//帳號
+
+        private YuantaOrdLib.YuantaOrdClass yuantaOrderAPI;
 
         public Form1()
         {
@@ -101,7 +105,8 @@ namespace AutoTrade
 
 
 
-        private void LoginFn()
+
+        private void loginQuote()
         {
             try
             {
@@ -110,8 +115,65 @@ namespace AutoTrade
             }
             catch (Exception ex)
             {
-                MessageBox.Show("SetMktConnection失敗：" + ex.Message);
+                MessageBox.Show("SetMktLogon失敗：" + ex.Message);
 
+            }
+        }
+
+        // Order API 登入
+        private void loginOrder()
+        {
+            try
+            {
+                int ret_code = yuantaOrderAPI.SetFutOrdConnection(id, password, ipAPI, 80);
+
+                // 回傳 2 表示已經在 "已經登入" 連線狀態  
+                if (ret_code == 2)
+                {
+
+                    textBox_status_order.Text = "已經登入";
+
+
+                    timer2.Enabled = false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("LoginOrder失敗：" + ex.Message);
+
+            }
+        }
+
+        // TLinkStatus: 回傳連線狀態, AccList: 回傳帳號, Casq: 憑證序號, Cast: 憑證狀態
+        void yuantaOrderAPI_OnLogonS(int TLinkStatus, string AccList, string Casq, string Cast)
+        {
+
+            if (TLinkStatus == 2)//登入成功
+            {
+
+                textBox_status_order.Text = DateTime.Now.ToString("HH:mm:ss.fff ") + "交易API登入成功: ";
+
+                isOrderAPIReady = true;
+
+                timer2.Enabled = false;
+
+                try
+                {
+                    master.setIsOrderAPIReady(isOrderAPIReady);
+
+                    textBox_status_ready.Text = "isOrderAPIReady :" + isOrderAPIReady;
+                }
+                catch (Exception e)
+                {
+
+                    MessageBox.Show("yuantaOrderAPI_OnLogonS:" + e.StackTrace);
+                }
+            }
+            else
+            {
+                textBox_status_order.Text = DateTime.Now.ToString("HH:mm:ss.fff ") + "交易API連線失敗，隔5秒重新連線";
+                timer2.Enabled = true;
             }
         }
 
@@ -141,6 +203,17 @@ namespace AutoTrade
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            this.yuantaOrderAPI = new YuantaOrdClass();
+
+            try
+            {
+                yuantaOrderAPI.OnLogonS += new _DYuantaOrdEvents_OnLogonSEventHandler(yuantaOrderAPI_OnLogonS);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
             timer1.Enabled = false;
 
             label_Version.Text = TradeUtility.TradeUtility.version;
@@ -216,9 +289,13 @@ namespace AutoTrade
 
                 master.setIpAPI(ipAPI);
 
+                master.setOrderAPI(yuantaOrderAPI);
+
+                master.setTradeCode(tradeCode);
+
                 master.prepareReady();
 
-                
+
 
             }
             catch (Exception ez)
@@ -233,9 +310,9 @@ namespace AutoTrade
             textBox1_winLine.Text = Convert.ToString(master.getWinLine()[1]);
 
 
-            LoginFn();
+            loginQuote();
 
-
+            loginOrder();
 
         }
 
@@ -245,19 +322,30 @@ namespace AutoTrade
             {
                 configFile.close();
             }
+
             if (master != null)
             {
                 master.stop();
             }
+
+            if (yuantaOrderAPI != null)
+            {
+                this.yuantaOrderAPI.DoLogout();
+            }
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
-            LoginFn();
+            loginQuote();
         }
 
-
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            timer2.Enabled = false;
+            loginOrder();
+        }
 
 
         private void textBox_sym_Click(object sender, EventArgs e)

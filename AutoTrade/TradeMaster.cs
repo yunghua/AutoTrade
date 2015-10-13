@@ -186,7 +186,9 @@ namespace AutoTrade
         //        下單區
         //-------------------------------------------------------------------------------------------------------------
 
-        private YuantaOrdLib.YuantaOrdClass m_yuanta_ord = new YuantaOrdClass();
+        private YuantaOrdLib.YuantaOrdClass yuantaOrderAPI;//元大下單API
+
+        Boolean isOrderAPIReady = false;//Order API 登入成功與否
 
         const string Function_Code_01 = "01";//委託
         const string Function_Code_02 = "02";//減量
@@ -275,6 +277,26 @@ namespace AutoTrade
         public TradeMaster(Form1 parentForm)
         {
             this.parentForm = parentForm;
+        }
+
+        public void setTradeCode(string code)
+        {
+            this.tradeCode = code;
+        }
+
+        public void setIsOrderAPIReady(Boolean ready)
+        {
+            this.isOrderAPIReady = ready;
+        }
+
+        public void setOrderAPI(YuantaOrdClass api)
+        {
+            this.yuantaOrderAPI = api;
+        }
+
+        public YuantaOrdClass getOrderAPI()
+        {
+            return yuantaOrderAPI;
         }
 
         public void setIpAPI(string ipAPI)
@@ -470,7 +492,7 @@ namespace AutoTrade
 
             showParameters();
 
-            prepareOrder();
+            prepareOrderAPI();
 
         }
 
@@ -602,60 +624,15 @@ namespace AutoTrade
         }
 
 
-        // Order API 登入
-        private void loginOrder()
+
+
+
+        private void prepareOrderAPI()
         {
-
-            int ret_code = m_yuanta_ord.SetFutOrdConnection(id, password, ipAPI, 80);
-
-            // 回傳 2 表示已經在 "已經登入" 連線狀態  
-            if (ret_code == 2)
-            {
-                debugMsg("Order API已經登入!");
-
-                orderAPIStatus = Stage_Order_Login_Success;
-
-                parentForm.setTradeMasterMessage("Order API已經登入!");
-            }
-
-        }//end of login
-
-        // TLinkStatus: 回傳連線狀態, AccList: 回傳帳號, Casq: 憑證序號, Cast: 憑證狀態
-        void m_yuanta_ord_OnLogonS(int TLinkStatus, string AccList, string Casq, string Cast)
-        {
-            debugMsg(String.Format("OnLogonS: {0},{1},{2},{3}", TLinkStatus, AccList, Casq, Cast));
-
-            if (TLinkStatus == 2)//登入成功
-            {
-                debugMsg("Order API登入成功! " + TLinkStatus.ToString());
-
-                orderAPIStatus = Stage_Order_Login_Success;
-
-                parentForm.setTradeMasterMessage("Order API登入成功!");
-            }
-        }
-
-        private void prepareOrder()
-        {
-
-            loginOrder();
-
-
-
             try
             {
-                m_yuanta_ord.OnLogonS += new _DYuantaOrdEvents_OnLogonSEventHandler(m_yuanta_ord_OnLogonS);
-                m_yuanta_ord.OnOrdMatF += new _DYuantaOrdEvents_OnOrdMatFEventHandler(m_yuanta_ord_OnOrdMatF);
-                m_yuanta_ord.OnOrdRptF += new _DYuantaOrdEvents_OnOrdRptFEventHandler(m_yuanta_ord_OnOrdRptF);
-                //m_yuanta_ord.OnDealQuery += new _DYuantaOrdEvents_OnDealQueryEventHandler(m_yuanta_ord_OnDealQuery);
-                //m_yuanta_ord.OnReportQuery += new _DYuantaOrdEvents_OnReportQueryEventHandler(m_yuanta_ord_OnReportQuery);
-                //m_yuanta_ord.OnOrdResult += new _DYuantaOrdEvents_OnOrdResultEventHandler(m_yuanta_ord_OnOrdResult);
-                //m_yuanta_ord.OnRfOrdRptRF += new _DYuantaOrdEvents_OnRfOrdRptRFEventHandler(m_yuanta_ord_OnRfOrdRptRF);
-                //m_yuanta_ord.OnRfReportQuery += new _DYuantaOrdEvents_OnRfReportQueryEventHandler(m_yuanta_ord_OnRfReportQuery);
-                //m_yuanta_ord.OnRfOrdMatRF += new _DYuantaOrdEvents_OnRfOrdMatRFEventHandler(m_yuanta_ord_OnRfOrdMatRF);
-                //m_yuanta_ord.OnRfDealQuery += new _DYuantaOrdEvents_OnRfDealQueryEventHandler(m_yuanta_ord_OnRfDealQuery);
-                //m_yuanta_ord.OnUserDefinsFuncResult += new _DYuantaOrdEvents_OnUserDefinsFuncResultEventHandler(m_yuanta_ord_OnUserDefinsFuncResult);
-
+                yuantaOrderAPI.OnOrdMatF += new _DYuantaOrdEvents_OnOrdMatFEventHandler(yuantaOrderAPI_OnOrdMatF);
+                yuantaOrderAPI.OnOrdRptF += new _DYuantaOrdEvents_OnOrdRptFEventHandler(yuantaOrderAPI_OnOrdRptF);
             }
             catch (Exception e)
             {
@@ -666,8 +643,10 @@ namespace AutoTrade
 
 
 
+
+
         // 即時成交回報
-        void m_yuanta_ord_OnOrdMatF(string Omkt, string Buys, string Cmbf, string Bhno, string AcNo, string Suba, string Symb, string Scnam, string O_Kind, string S_Buys, string O_Prc, string A_Prc, string O_Qty, string Deal_Qty, string T_Date, string D_Time, string Order_No, string O_Src, string O_Lin, string Oseq_No)
+        void yuantaOrderAPI_OnOrdMatF(string Omkt, string Buys, string Cmbf, string Bhno, string AcNo, string Suba, string Symb, string Scnam, string O_Kind, string S_Buys, string O_Prc, string A_Prc, string O_Qty, string Deal_Qty, string T_Date, string D_Time, string Order_No, string O_Src, string O_Lin, string Oseq_No)
         {
             string mat_str = String.Format("Omkt={0},Buys={1},Cmbf={2},Bhno={3},Acno={4},Suba={5},Symb={6},Scnam={7},O_Kind={8},S_Buys={9},O_Prc={10},A_Prc={11},O_Qty={12},Deal_Qty={13},T_Date={14},D_Time={15},Order_No={16},O_Src={17},O_Lin={18},Oseq_No={19}"
                                     , Omkt.Trim(), Buys.Trim(), Cmbf.Trim(), Bhno.Trim(), AcNo.Trim(), Suba.Trim(), Symb.Trim(), Scnam.Trim(), O_Kind.Trim(), S_Buys.Trim(), O_Prc.Trim(), A_Prc.Trim(), O_Qty.Trim(), Deal_Qty.Trim(), T_Date.Trim(), D_Time.Trim(), Order_No.Trim(), O_Src.Trim(), O_Lin.Trim(), Oseq_No.Trim());
@@ -705,14 +684,14 @@ namespace AutoTrade
         }
 
         // 即時委託回報
-        void m_yuanta_ord_OnOrdRptF(string Omkt, string Mktt, string Cmbf, string Statusc, string Ts_Code, string Ts_Msg, string Bhno, string AcNo, string Suba, string Symb, string Scnam, string O_Kind, string O_Type, string Buys, string S_Buys, string O_Prc, string O_Qty, string Work_Qty, string Kill_Qty, string Deal_Qty, string Order_No, string T_Date, string O_Date, string O_Time, string O_Src, string O_Lin, string A_Prc, string Oseq_No, string Err_Code, string Err_Msg, string R_Time, string D_Flag)
+        void yuantaOrderAPI_OnOrdRptF(string Omkt, string Mktt, string Cmbf, string Statusc, string Ts_Code, string Ts_Msg, string Bhno, string AcNo, string Suba, string Symb, string Scnam, string O_Kind, string O_Type, string Buys, string S_Buys, string O_Prc, string O_Qty, string Work_Qty, string Kill_Qty, string Deal_Qty, string Order_No, string T_Date, string O_Date, string O_Time, string O_Src, string O_Lin, string A_Prc, string Oseq_No, string Err_Code, string Err_Msg, string R_Time, string D_Flag)
         {
             string rpt_str = String.Format("Omkt={0},Mktt={1},Cmbf={2},Statusc={3},Ts_Code={4},Ts_Msg={5},Bhno={6},Acno={7},Suba={8},Symb={9},Scnam={10},O_Kind={11},O_Type={12},Buys={13},S_Buys={14},O_Prc={15},O_Qty={16},Work_Qty={17},Kill_Qty={18},Deal_Qty={19},Order_No={20},T_Date={21},O_Date={22},O_Time={23},O_Src={24},O_Lin={25},A_Prc={26},Oseq_No={27},Err_Code={28},Err_Msg={29},R_Time={30},D_Flag={31}"
                                     , Omkt.Trim(), Mktt.Trim(), Cmbf.Trim(), Statusc.Trim(), Ts_Code.Trim(), Ts_Msg.Trim(), Bhno.Trim(), AcNo.Trim(), Suba.Trim(), Symb.Trim(), Scnam.Trim(), O_Kind.Trim(), O_Type.Trim(), Buys.Trim(), S_Buys.Trim(), O_Prc.Trim(), O_Qty.Trim(), Work_Qty.Trim(), Kill_Qty.Trim(), Deal_Qty.Trim(), Order_No.Trim(), T_Date.Trim(), O_Date.Trim(), O_Time.Trim(), O_Src.Trim(), O_Lin.Trim(), A_Prc.Trim(), Oseq_No.Trim(), Err_Code.Trim(), Err_Msg.Trim(), R_Time.Trim(), D_Flag.Trim());
 
             debugMsg("即時委託回報" + rpt_str);
 
-            if (Ts_Code.Equals("05") || Ts_Code.Equals("07") || Ts_Code.Equals("11"))
+            if (Ts_Code.Trim().Equals("05") || Ts_Code.Trim().Equals("07") || Ts_Code.Trim().Equals("11"))
             {
                 if (stage == Stage_Order_New_Start)
                 {
@@ -737,11 +716,10 @@ namespace AutoTrade
             {
                 orderPrice = "";//市價下單
 
-                dealOrder(tradeCode, orderPrice, orderLot, orderDirection, Trade_Type_NEW);
+                dealOrder(tradeCode, orderPrice, orderLot, orderDirection, Trade_Type_ONEDAY);
             }
             catch (Exception e)
             {
-
                 throw e;
             }
 
@@ -779,21 +757,19 @@ namespace AutoTrade
         private void dealOrder(string tradeCode, string orderPrice, string orderLot, string orderDirection, string tradeType)//用來下單，回傳值:stage
         {
 
-
-
-            if (orderAPIStatus != Stage_Order_Login_Success)
+            if (!isOrderAPIReady)
             {
                 stage = Stage_Order_Not_Process;
 
                 throw new Exception("下單API尚未登入成功!");
             }
 
-            m_yuanta_ord.SetWaitOrdResult(1);//等待委託單回報
-            //m_yuanta_ord.SetWaitOrdResult(0);//不等待委託單回報
+            yuantaOrderAPI.SetWaitOrdResult(1);//等待委託單回報
+            //yuantaOrderAPI.SetWaitOrdResult(0);//不等待委託單回報
 
             string ret_no = string.Empty;
 
-            ret_no = m_yuanta_ord.SendOrderF(Function_Code_01, Type_Code_0, branchCode, account, Sub_Account, Order_No, orderDirection, tradeCode, orderPrice, orderLot, tradeType, Price_Type_M, Order_Cond_I, "", "");
+            ret_no = yuantaOrderAPI.SendOrderF(Function_Code_01, Type_Code_0, branchCode, account, Sub_Account, Order_No, orderDirection, tradeCode, orderPrice, orderLot, tradeType, Price_Type_M, Order_Cond_I, "", "");
 
             string orderResult = "下單結果:" + ret_no + "'\n";
 
@@ -829,14 +805,17 @@ namespace AutoTrade
                 debugMsg(e.StackTrace);
             }
 
-            coreLogic();
+            if (isOrderAPIReady)
+            {
+                coreLogic();
+            }
 
         }
 
 
 
 
-        private void coreLogic()//回傳値表示是否結束本日交易
+        private void coreLogic()
         {
             if (stage == Stage_Order_New_Fail)//下單失敗
             {
@@ -910,12 +889,14 @@ namespace AutoTrade
                 catch (Exception e)
                 {
                     debugMsg(e.StackTrace);
+                    debugMsg(e.Message);
                 }
 
             }
 
 
-            if (isStartOrder == true && stage == Stage_Order_New_Success)//已經開始下單，而且下單成功
+            if (isStartOrder == true && (stage == Stage_Order_New_Success || stage == Stage_Order_Even_Fail))//已經開始下單，而且下單成功，或是平倉失敗
+
             //if (isStartOrder == true)//已經開始下單
             {
 
@@ -932,119 +913,124 @@ namespace AutoTrade
                 }
 
 
-                if (record.TradeHour >= 13 && record.TradeMinute >= 44)
-                {
+                //if (record.TradeHour >= 13 && record.TradeMinute >= 44)
+                //{
 
 
-                    if (nowTradeType == TradeType.BUY.GetHashCode())
-                    {
-                        debugMsg("時間到買入平倉");
+                //    if (nowTradeType == TradeType.BUY.GetHashCode())
+                //    {
+                //        debugMsg("時間到買入平倉");
 
-                        orderDircetion = BS_Type_S;
-                    }
-                    else if (nowTradeType == TradeType.SELL.GetHashCode())
-                    {
-                        debugMsg("時間到賣出平倉");
+                //        orderDircetion = BS_Type_S;
+                //    }
+                //    else if (nowTradeType == TradeType.SELL.GetHashCode())
+                //    {
+                //        debugMsg("時間到賣出平倉");
 
-                        orderDircetion = BS_Type_B;
-                    }
+                //        orderDircetion = BS_Type_B;
+                //    }
 
-                    if (stage == Stage_Order_New_Success)
-                    {
-                        stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
-                    }
+                //    if (stage == Stage_Order_New_Success)
+                //    {
+                //        stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
+                //    }
 
-                    outStyle = Out_Time_Up;
+                //    outStyle = Out_Time_Up;
 
-                    debugMsg("outStyle = Out_Time_Up");
+                //    debugMsg("outStyle = Out_Time_Up");
 
-                }//end 交易時間結束
-                else if ((isActiveCheckProfit == false) && (record.TradeMoment > secondAfterTradeToActiveCheck))//還沒開始【動態停利】，檢查時間到了，看看是否要啟動動態停利機制
-                {
+                //    isStopTodayTrade = true;
 
-                    if (oneProfit - tempOneProfit > ActiveProfitPoint)
-                    {
-                        isActiveCheckProfit = true;//開始動態停利
+                //}//end 交易時間結束
+                //else 
+                //if ((isActiveCheckProfit == false) && (record.TradeMoment > secondAfterTradeToActiveCheck))//還沒開始【動態停利】，檢查時間到了，看看是否要啟動動態停利機制
+                //{
 
-                        debugMsg("開始動態停利---->" + record.TradeMoment + " ---------->Profit:" + oneProfit + "-----------tempOneProfit:" + tempOneProfit);
+                //    if (oneProfit - tempOneProfit > ActiveProfitPoint)
+                //    {
+                //        isActiveCheckProfit = true;//開始動態停利
 
-                        tempOneProfit = oneProfit;
+                //        debugMsg("開始動態停利---->" + record.TradeMoment + " ---------->Profit:" + oneProfit + "-----------tempOneProfit:" + tempOneProfit);
 
-                    }
-                    else
-                    {
-                        secondAfterTradeToActiveCheck = secondAfterTradeToActiveCheck.AddSeconds(ActiveProfitStartPeriod);//繼續跑XX秒
+                //        tempOneProfit = oneProfit;
 
-                        tempOneProfit = oneProfit;
-                    }
+                //    }
+                //    else
+                //    {
+                //        secondAfterTradeToActiveCheck = secondAfterTradeToActiveCheck.AddSeconds(ActiveProfitStartPeriod);//繼續跑XX秒
 
-                }// end 檢查是否開始動態停利
+                //        tempOneProfit = oneProfit;
+                //    }
 
-                else if ((isActiveCheckProfit == true))//開始動態停利
-                {
-                    if ((record.TradeMoment > minuteAfterStartActiveProfit))//到了規定的檢查時間
-                    {
-                        double reverseLitmit = getReverseLitmit(ActiveProfitPoint, number);//動態停利的停利條件
+                //}// end 檢查是否開始動態停利
 
-                        if (oneProfit < tempOneProfit - reverseLitmit)//這短時間內增加的獲利少於規定的點數，預測趨勢將反轉，獲利了結
-                        {
-                            debugMsg("動態停利範圍:" + reverseLitmit);
+                //else if ((isActiveCheckProfit == true))//開始動態停利
+                //{
+                //    if ((record.TradeMoment > minuteAfterStartActiveProfit))//到了規定的檢查時間
+                //    {
+                //        double reverseLitmit = getReverseLitmit(ActiveProfitPoint, number);//動態停利的停利條件
 
-                            if (nowTradeType == TradeType.BUY.GetHashCode())
-                            {
-                                prevTradeType = TradeType.BUY.GetHashCode();
+                //        if (oneProfit < tempOneProfit - reverseLitmit)//這短時間內增加的獲利少於規定的點數，預測趨勢將反轉，獲利了結
+                //        {
+                //            debugMsg("動態停利範圍:" + reverseLitmit);
 
-                                orderDircetion = BS_Type_S;
-                            }
-                            else
-                            {
-                                prevTradeType = TradeType.SELL.GetHashCode();
+                //            if (nowTradeType == TradeType.BUY.GetHashCode())
+                //            {
+                //                prevTradeType = TradeType.BUY.GetHashCode();
 
-                                orderDircetion = BS_Type_B;
-                            }
+                //                orderDircetion = BS_Type_S;
+                //            }
+                //            else
+                //            {
+                //                prevTradeType = TradeType.SELL.GetHashCode();
 
-                            if (stage == Stage_Order_New_Success)
-                            {
-                                stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
-                            }
+                //                orderDircetion = BS_Type_B;
+                //            }
 
-                            debugMsg("outStyle = Out_Active_Profit");
+                //            if (stage == Stage_Order_New_Success)
+                //            {
+                //                stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
+                //            }
 
-                        }
-                        else
-                        {
+                //            debugMsg("outStyle = Out_Active_Profit");
 
-                            number++;//再跑一個間隔
+                //        }
+                //        else
+                //        {
 
-                            if (number <= 1)//第一次檢查
-                            {
-                                tempOneProfit = oneProfit;
-                            }
-                            else
-                            {
-                                if (tempOneProfit < oneProfit)
-                                {
-                                    tempOneProfit = oneProfit;
-                                }
+                //            number++;//再跑一個間隔
 
-                            }
+                //            if (number <= 1)//第一次檢查
+                //            {
+                //                tempOneProfit = oneProfit;
+                //            }
+                //            else
+                //            {
+                //                if (tempOneProfit < oneProfit)
+                //                {
+                //                    tempOneProfit = oneProfit;
+                //                }
 
-                            //debugMsg("----------------------------------------------------------------------------------------------");
+                //            }
 
-                            debugMsg("RUN!!" + minuteAfterStartActiveProfit);
+                //            //debugMsg("----------------------------------------------------------------------------------------------");
 
-                            //debugMsg("----------------------------------------------------------------------------------------------");
+                //            debugMsg("RUN!!" + minuteAfterStartActiveProfit);
 
-                            minuteAfterStartActiveProfit = minuteAfterStartActiveProfit.AddMinutes(ActiveProfitCheckPeriod);//繼續跑XX秒
+                //            //debugMsg("----------------------------------------------------------------------------------------------");
 
-
-                        }
-                    }// end 開始動態停利，到了檢查的時間
+                //            minuteAfterStartActiveProfit = minuteAfterStartActiveProfit.AddMinutes(ActiveProfitCheckPeriod);//繼續跑XX秒
 
 
-                }//end 執行動態停利檢查
+                //        }
+                //    }// end 開始動態停利，到了檢查的時間
 
-                else if (nowTradeType == TradeType.BUY.GetHashCode() && (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])
+
+                //}//end 執行動態停利檢查
+
+                //else
+
+                if (nowTradeType == TradeType.BUY.GetHashCode() && (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])
                 {//賠了XX點，認賠殺出
 
                     orderDircetion = BS_Type_S;
@@ -1061,6 +1047,8 @@ namespace AutoTrade
                 {
                     //賠了XX點，認賠殺出
 
+                    orderDircetion = BS_Type_B;
+
                     if (stage == Stage_Order_New_Success)
                     {
                         stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
@@ -1076,6 +1064,8 @@ namespace AutoTrade
                 {
                     //賺了XX點，停利出場
 
+                    orderDircetion = BS_Type_S;
+
                     if (stage == Stage_Order_New_Success)
                     {
                         stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), lotArray[lotIndex], orderDircetion);
@@ -1090,6 +1080,8 @@ namespace AutoTrade
                 else if (nowTradeType == TradeType.SELL.GetHashCode() && (orderPrice - record.TradePrice) > winLine[nowStrategyCount])
                 {
                     //賺了XX點，停利出場
+
+                    orderDircetion = BS_Type_B;
 
                     if (stage == Stage_Order_New_Success)
                     {
