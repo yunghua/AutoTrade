@@ -110,13 +110,13 @@ namespace AutoTrade
 
         double offsetTradePoint;//最高與最低價格差異區間値 = maxTradePoint - minTradePoint        
 
-        double oneProfit = 0;//單筆利潤
+        double oneProfitPoint = 0;//單筆利潤
 
-        double totalProfit = 0;//總利潤
+        double totalProfitPoint = 0;//總利潤
 
-        double onePureProfit = 0;//單筆純利
+        double oneNetProfit = 0;//單筆純利
 
-        double totalPureProfit = 0;//總純利
+        double totalNetProfit = 0;//總純利
 
         string tradeTime = "";//交易時間點
 
@@ -698,14 +698,35 @@ namespace AutoTrade
                 if (stage == Stage_Order_New_Start)
                 {
                     stage = Stage_Order_New_Fail;
+
+                    debugMsg("stage = Stage_Order_New_Fail");
                 }
                 else if (stage == Stage_Order_Even_Start)
                 {
                     stage = Stage_Order_Even_Fail;
+
+                    debugMsg("stage = Stage_Order_Even_Fail");
+
+                    if (record.TradeHour >= 13 && record.TradeMinute >= 30)
+                    {
+                        stage = Stage_End;
+
+                        debugMsg("stage = Stage_End");
+                    }
                 }
                 else
                 {
                     stage = Stage_Order_Fail;
+
+                    debugMsg("stage = Stage_Order_Fail");
+
+                    if (record.TradeHour >= 13 && record.TradeMinute >= 30)
+                    {
+                        stage = Stage_End;
+
+                        debugMsg("stage = Stage_End");
+                    }
+
                 }
 
             }
@@ -905,13 +926,13 @@ namespace AutoTrade
                 if (nowTradeType == TradeType.BUY.GetHashCode())
                 {
 
-                    oneProfit = record.TradePrice - orderPrice;
+                    oneProfitPoint = record.TradePrice - orderPrice;
 
                 }
                 else if (nowTradeType == TradeType.SELL.GetHashCode())
                 {
 
-                    oneProfit = orderPrice - record.TradePrice;
+                    oneProfitPoint = orderPrice - record.TradePrice;
                 }
 
                 ////時間到
@@ -1046,6 +1067,8 @@ namespace AutoTrade
 
                         debugMsg("outStyle = Out_Loss_Buy");
 
+                        outStyle = Out_Loss_Buy;
+
                     }
                     else if (nowTradeType == TradeType.SELL.GetHashCode() && (record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
                     {
@@ -1101,17 +1124,21 @@ namespace AutoTrade
 
             }//下單結束
 
-            if (maxLoss < 0 && totalProfit * valuePerPoint < maxLoss)  //已達最大虧損水平線
+            if (maxLoss < 0 && totalNetProfit < maxLoss)  //已達最大虧損水平線
             {
-
-                loseOut();
-
-                isStopTodayTrade = true;
-
-                stage = Stage_End;
+                endTodayTrade();               
             }
 
 
+        }
+
+        private void endTodayTrade()
+        {
+            loseOut();
+
+            isStopTodayTrade = true;
+
+            stage = Stage_End;
         }
 
         private void dealOut()
@@ -1152,14 +1179,14 @@ namespace AutoTrade
             {
                 if (nowTradeType == TradeType.BUY.GetHashCode())
                 {
-                    oneProfit = orderEvenPrice - orderNewPrice;
+                    oneProfitPoint = orderEvenPrice - orderNewPrice;
                 }
                 else if (nowTradeType == TradeType.SELL.GetHashCode())
                 {
-                    oneProfit = orderNewPrice - orderEvenPrice;
+                    oneProfitPoint = orderNewPrice - orderEvenPrice;
                 }
 
-                oneProfit *= Convert.ToInt32(lotArray[lotIndex]);
+                oneProfitPoint *= Convert.ToInt32(lotArray[lotIndex]);
             }
             catch (Exception e)
             {
@@ -1188,17 +1215,19 @@ namespace AutoTrade
         {
             calOneProfit();
 
-            totalProfit += oneProfit;
+            totalProfitPoint += oneProfitPoint;
 
-            onePureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+            oneNetProfit = oneProfitPoint * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
 
-            totalPureProfit += onePureProfit;
+            totalNetProfit += oneNetProfit;
 
             debugMsg("平倉點數---->" + orderEvenPrice);
 
             debugMsg("平倉時間---->" + orderEvenTime);
 
-            debugMsg("純利潤 : " + onePureProfit);
+            debugMsg("純利潤 : " + oneNetProfit);
+
+            debugMsg("總純利 : " + totalNetProfit);
 
             debugMsg("停損策略 : " + loseLine[nowStrategyCount]);
 
@@ -1375,7 +1404,7 @@ namespace AutoTrade
                     {
                         direction[i] = TradeType.BUY.GetHashCode();
                     }
-                    else
+                    else if ((record.TradePrice - basePrice) < 0)//目前交易金額小於XX分鐘前的交易金額
                     {
                         direction[i] = TradeType.SELL.GetHashCode();
                     }
