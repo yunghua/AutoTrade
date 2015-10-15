@@ -70,6 +70,8 @@ namespace QuickTradeTest
 
         double ratio;//動態停利的反轉比率，小於1，越接近1表示要回檔接近停利設定，才會執行停利，也就是越不敏感。
 
+        string lots;
+
         //Boolean isPrepared = false;
 
         public TestManager()
@@ -126,7 +128,7 @@ namespace QuickTradeTest
             try
             {
 
-                string lots = configFile.readConfig("Lots");
+                lots = configFile.readConfig("Lots");
 
                 lotArray = lots.Split(',');
 
@@ -161,6 +163,24 @@ namespace QuickTradeTest
                 conclusionMsg("單日設定最大停損" + maxLoss);
 
                 conclusionMsg("動態停利反轉比率:" + ratio);
+
+                conclusionMsg("下單口數:" + lots);
+
+                conclusionMsg("測試次數:" + runCount);
+
+                conclusionMsg("----------------------------------------------------------------------------------------------");
+
+                for (int i = 1; i <= winLine.Count; i++)
+                {
+                    conclusionMsg("測試規則WIN   00" + i + ":" + winLine[i]);
+                }
+
+                conclusionMsg("----------------------------------------------------------------------------------------------");
+
+                for (int i = 1; i <= winLine.Count; i++)
+                {
+                    conclusionMsg("測試規則LOSE  00" + i + ":" + loseLine[i]);
+                }
 
                 return true;
             }
