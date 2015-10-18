@@ -24,6 +24,8 @@ namespace TradeUtility
 
         Dictionary<int, int> winLine;  //停利的底線
 
+        Dictionary<int, int> stopRatio;  //逆勢動態停利
+
         int maxStrategyCount = 0; //停損停利規則最大有幾種
 
         public void close()
@@ -48,6 +50,11 @@ namespace TradeUtility
             return strategyInstance;
         }
 
+        public Dictionary<int, int> getStopRatio()
+        {
+            return stopRatio;
+        }
+
         public Dictionary<int, int> getLoseLine()
         {
             return loseLine;
@@ -63,6 +70,58 @@ namespace TradeUtility
             return dealStrategyRule(appDir,Strategy_File_Name);
         }
 
+        public Boolean dealStopRatioRule(string appDir, string fileName)//讀取逆勢動態停利規則檔
+        {
+            try
+            {
+
+                strategyFileName = fileName;
+
+                strategyFilePath = appDir + "\\" + Config_Dir + "\\" + fileName;
+
+                strategyFile = new TradeFile(strategyFilePath);
+
+                strategyFile.prepareReader();
+
+                stopRatio = new Dictionary<int, int>();                               
+
+                int checkRange;//最高點與最低點的範圍
+
+                int ratio;//停利或是停損的計算百分比
+
+                String tmpLine = "";
+
+                String[] tmpData = new String[2];
+
+                while (strategyFile.hasNext())
+                {
+
+                    tmpLine = strategyFile.getLine();
+
+                    tmpData = tmpLine.Split(',');
+
+                    checkRange = int.Parse(tmpData[0]);
+
+                    ratio = int.Parse(tmpData[1]);
+
+                    stopRatio.Add(checkRange, ratio);                    
+
+                    
+                }
+
+                Console.WriteLine(stopRatio.ToString());          
+                
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Source);
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                return false;
+            }
+            return true;
+        }
 
         public Boolean dealStrategyRule(string appDir ,string fileName)//讀取停損停利規則檔
         {

@@ -16,13 +16,34 @@ namespace QuickTradeTest
         //-------------------------------------------------------------------------------------------------------------
         //
 
-        public const string Core_Method_1 = "Core_Method_1";
+        const int Stage_New = 1;//初始化
+        const int Stage_Order_Login_Start = 2;//登入下單API開始
+        const int Stage_Order_Login_Success = 3;//登入下單API成功
+        const int Stage_Order_New_Start = 4;//新倉開始下單
+        const int Stage_Order_New_Success = 5;//新倉回報下單成功        
+        const int Stage_Order_New_Fail = 6;//新倉回報下單失敗  
+        const int Stage_Order_Not_Process = 7;//無法下單，可能是尚未登入完成
+        const int Stage_Order_Even_Start = 8;//平倉倉開始下單
+        const int Stage_Order_Even_Success = 9;//平倉回報下單成功     
+        const int Stage_Order_Even_Fail = 10;//平倉回報下單失敗  
+        const int Stage_Order_Fail = 11;//回報下單失敗  
+        const int Stage_Order_Time_Up = 12;//時間到停止下單
+        const int Stage_End = 13;//結束
 
-        public const string Core_Method_2 = "Core_Method_2";
+        private const int Direction_None = 0;//無方向
+        private const int Direction_LowToHigh = 1;//由低向高之後反轉
+        private const int Direction_HighToLow = 2;//由高向低之後反轉
+
+
+        public const string Core_Method_1 = "Core_Method_1";//獲利加碼
+
+        public const string Core_Method_2 = "Core_Method_2";//動態停利
+
+        public const string Core_Method_3 = "Core_Method_3";//逆勢動態停利
 
         const int Array_Begin_Index = 0;
 
-        const Boolean DEBUG = false;
+        const Boolean DEBUG = true;
 
         const int Random_Seed = 888;//隨機參數種子
 
@@ -150,11 +171,25 @@ namespace QuickTradeTest
 
         double totalPureProfit;//總純利
 
+        int maxLot = 0;//最大交易口數
+
+        Dictionary<int, int> stopRatio;  //逆勢動態停利的百分比查表，第一個int 是點數間隔，第二個是百分比
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 程式區。
         /// </summary>
         /// 
+
+        public void setStopRatio(Dictionary<int, int> stopRatio)
+        {
+            this.stopRatio = stopRatio;
+        }
+
+        public int getMaxLot()
+        {
+            return maxLot;
+        }
 
         public void setRatio(double ratio)
         {
@@ -355,6 +390,10 @@ namespace QuickTradeTest
             {
                 return coreLogic2();
             }
+            else if (this.coreMethod.Equals(Core_Method_3))
+            {
+                return coreLogic3();
+            }
             else
             {
                 throw new Exception("沒有設定Core Method!!");
@@ -462,6 +501,327 @@ namespace QuickTradeTest
             }
 
             return oneProfit;
+        }
+
+        private int getReversePercentage(double offsetPoint)//取得轉折點反轉的百分比
+        {
+            foreach (KeyValuePair<int, int> item in stopRatio)
+            {
+
+                if (offsetPoint <= Convert.ToDouble(item.Key))
+                {
+                    return item.Value;
+                }
+
+            }
+            return 0;
+        }
+
+        private double coreLogic3()//逆勢動態停利
+        {
+            const int Trade_Period_Need = 20;//至少要20點間隔才能新倉
+            int stage = Stage_New;
+            double originalPoint = 0;// 今日交易起始點
+            double maxHighPoint = 0;//轉折點高點
+            double maxLowPoint = 0;//轉折點低點
+
+            double offsetPoint;//高低差
+            double orderPriceTarget;//下單點位目標
+
+            int reversePercentage;//停利或是停損，反轉的百分比
+
+            double tradePeriod;//交易點位距離轉折點的距離
+
+            int direction = 0;//波段的方向，例如由低向高之後反轉，或是由高向低之後反轉
+
+            tradeCount = 0;
+
+            while (sourceFile.hasNext())
+            {
+
+                try
+                {
+
+                    nowLine = sourceFile.getLine();
+
+                    record = OriginalRecordConverter.getOriginalRecord(nowLine);
+
+                    recordList.Add(record);
+
+                    if (record.TradePrice > maxHighPoint)//取得相對高點
+                    {
+                        maxHighPoint = record.TradePrice;
+                    }
+                    else if (record.TradePrice < maxLowPoint)//取得相對低點
+                    {
+                        maxLowPoint = record.TradePrice;
+                    }
+
+                    offsetPoint = maxHighPoint - maxLowPoint;
+
+                    if (offsetPoint < Trade_Period_Need)
+                    {
+                        continue;
+                    }
+
+                    reversePercentage = getReversePercentage(offsetPoint);//查表，取得反轉百分比
+
+                    tradePeriod = offsetPoint * reversePercentage / 100;
+
+                    if (isStartOrder == false)//還沒新倉
+                    {
+                        if (recordList.Count == 1)//第一筆資料進來
+                        {
+                            originalPoint = record.TradePrice;
+                            maxHighPoint = record.TradePrice;
+                            maxLowPoint = record.TradePrice;
+                        }
+                        else
+                        {
+                            if (tradeCount == 0)//第一次交易開始之前
+                            {
+                                if (originalPoint - maxHighPoint < 0)//低至高之後反轉，賣出
+                                {
+                                    direction = Direction_LowToHigh;
+
+                                }
+                                else if (originalPoint - maxLowPoint > 0)//高至低之後反轉，買入
+                                {
+                                    direction = Direction_HighToLow;
+                                }
+                            }
+
+                            if (direction == Direction_HighToLow)
+                            {
+                                orderPriceTarget = maxLowPoint + tradePeriod;
+
+                                if (record.TradePrice >= orderPriceTarget)
+                                {
+                                    stage = Stage_Order_New_Success;
+                                    orderPrice = record.TradePrice;//實際交易點位
+                                    isStartOrder = true;
+                                    nowTradeType = TradeType.BUY.GetHashCode();
+                                    maxHighPoint = orderPrice;//把上一個相對低點拿掉
+
+
+                                    debugMsg("交易方式---->" + TradeType.BUY);
+
+                                    debugMsg("交易金額---->" + orderPrice);
+
+                                    debugMsg("交易時間---->" + tradeDateTime);
+                                }
+                            }
+                            else if (direction == Direction_LowToHigh)
+                            {
+                                orderPriceTarget = maxHighPoint - tradePeriod;
+                                if (record.TradePrice <= orderPriceTarget)
+                                {
+                                    stage = Stage_Order_New_Success;
+                                    orderPrice = record.TradePrice;//實際交易點位
+                                    isStartOrder = true;
+                                    nowTradeType = TradeType.SELL.GetHashCode();
+                                    maxLowPoint = orderPrice;//把上一個相對低點拿掉
+
+
+                                    debugMsg("交易方式---->" + TradeType.SELL);
+
+                                    debugMsg("交易金額---->" + orderPrice);
+
+                                    debugMsg("交易時間---->" + tradeDateTime);
+                                }
+                            }
+
+                        }
+                    }
+                    else if (isStartOrder == true)//已經新倉，準備平倉
+                    {
+                        if (record.TradeHour >= 13 && record.TradeMinute >= 44)//交易時間截止
+                        {
+                            evenPrice = record.TradePrice;
+
+                            oneProfit = calOneProfit(orderPrice);
+
+                            totalProfit += oneProfit;
+
+                            isStartOrder = false;
+
+                            tradeCount++;
+
+                            if (nowTradeType == TradeType.BUY.GetHashCode())
+                            {
+                                debugMsg("時間到買入平倉");
+                            }
+                            else if (nowTradeType == TradeType.SELL.GetHashCode())
+                            {
+                                debugMsg("時間到賣出平倉");
+                            }
+
+                            debugMsg("平倉點數---->" + evenPrice);
+
+                            debugMsg("平倉時間---->" + record.TradeMoment);
+
+                            debugMsg("純利:" + (oneProfit * valuePerPoint - cost));
+
+                            debugMsg("----------------------------------------------------------------------------------------------");
+
+                            if (oneProfit > 0)
+                            {
+                                winCount++;
+                            }
+                            else
+                            {
+                                loseCount++;
+                            }
+
+                            return totalProfit;
+                        }
+                        else
+                            //停利的部分
+                            if (direction == Direction_HighToLow)
+                            {
+                                orderPriceTarget = maxHighPoint - tradePeriod;
+                                if (record.TradePrice <= orderPriceTarget)
+                                {
+                                    stage = Stage_Order_Even_Success;
+                                    oneProfit = calOneProfit(orderPrice);
+                                    totalProfit += oneProfit;
+                                    isStartOrder = false;
+                                    tradeCount++;
+                                    winCount++;
+
+                                    debugMsg("買入停利出場");
+
+                                    debugMsg("平倉點數---->" + record.TradePrice);
+
+                                    debugMsg("平倉時間---->" + record.TradeMoment);
+
+                                    pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                                    debugMsg("純利:" + pureProfit);
+
+                                    totalPureProfit += pureProfit;
+
+                                    debugMsg("總純利:" + totalPureProfit);
+
+                                    debugMsg("停利次數:" + winCount);
+
+                                    debugMsg("----------------------------------------------------------------------------------------------");
+                                    continue;
+                                }
+                            }
+                            else if (direction == Direction_LowToHigh)
+                            {
+
+                                orderPriceTarget = maxLowPoint + tradePeriod;
+
+                                if (record.TradePrice >= orderPriceTarget)
+                                {
+                                    stage = Stage_Order_Even_Success;
+                                    oneProfit = calOneProfit(orderPrice);
+                                    totalProfit += oneProfit;
+                                    isStartOrder = false;
+                                    tradeCount++;
+                                    winCount++;
+
+                                    debugMsg("賣出停利出場");
+
+                                    debugMsg("平倉點數---->" + record.TradePrice);
+
+                                    debugMsg("平倉時間---->" + record.TradeMoment);
+
+                                    pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                                    debugMsg("純利:" + pureProfit);
+
+                                    totalPureProfit += pureProfit;
+
+                                    debugMsg("總純利:" + totalPureProfit);
+
+                                    debugMsg("停利次數:" + winCount);
+
+                                    debugMsg("----------------------------------------------------------------------------------------------");
+                                    continue;
+                                }
+                            }
+                        //停損的部分
+                        if (direction == Direction_HighToLow)
+                        {
+
+                            orderPriceTarget = maxLowPoint - tradePeriod;
+
+                            if (record.TradePrice <= orderPriceTarget)
+                            {
+                                stage = Stage_Order_Even_Success;
+                                oneProfit = calOneProfit(orderPrice);
+                                totalProfit += oneProfit;
+                                isStartOrder = false;
+                                tradeCount++;
+                                loseCount++;
+
+                                debugMsg("買入認賠殺出");
+
+                                debugMsg("平倉點數---->" + record.TradePrice);
+
+                                debugMsg("平倉時間---->" + record.TradeMoment);
+
+                                pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                                debugMsg("純利:" + pureProfit);
+
+                                totalPureProfit += pureProfit;
+
+                                debugMsg("總純利:" + totalPureProfit);
+
+                                debugMsg("停損次數:" + loseCount);
+
+                                debugMsg("----------------------------------------------------------------------------------------------");
+                                continue;
+                            }
+                        }
+                        else if (direction == Direction_LowToHigh)
+                        {
+
+                            orderPriceTarget = maxLowPoint + tradePeriod;
+
+                            if (record.TradePrice >= orderPriceTarget)
+                            {
+                                stage = Stage_Order_Even_Success;
+                                oneProfit = calOneProfit(orderPrice);
+                                totalProfit += oneProfit;
+                                isStartOrder = false;
+                                tradeCount++;
+                                loseCount++;
+                                debugMsg("賣出認賠殺出");
+
+                                debugMsg("平倉點數---->" + record.TradePrice);
+
+                                debugMsg("平倉時間---->" + record.TradeMoment);
+
+                                pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
+
+                                debugMsg("純利:" + pureProfit);
+
+                                totalPureProfit += pureProfit;
+
+                                debugMsg("總純利:" + totalPureProfit);
+
+                                debugMsg("停損次數:" + loseCount);
+
+                                debugMsg("----------------------------------------------------------------------------------------------");
+                                continue;
+                            }
+                        }
+
+                    }
+
+
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+            return totalProfit;
         }
 
         private double coreLogic2()//動態停利
@@ -955,6 +1315,12 @@ namespace QuickTradeTest
                             oneProfit = orderPrice - record.TradePrice;
                         }
 
+                        //if (((oneProfit*valuePerPoint-cost)*Convert.ToInt32(lotArray[lotIndex])+totalPureProfit)<maxProfitLoss)//每個Tick都計算有沒有超過當日最大停損
+                        //{
+                        //    totalPureProfit = (oneProfit * valuePerPoint - cost) *Convert.ToInt32(lotArray[lotIndex]) + totalPureProfit;
+                        //    totalProfit = oneProfit * Convert.ToInt32(lotArray[lotIndex]);
+                        //    return totalProfit;
+                        //}else
 
 
                         //if ((isActiveCheckProfit == false) && (record.TradeMoment > secondAfterTradeToActiveCheck))//還沒開始【動態停利】，檢查時間到了，看看是否要啟動動態停利機制
@@ -1192,6 +1558,8 @@ namespace QuickTradeTest
                                 lotIndex = lotArray.Length - 1;
                             }
 
+                            maxLot = Convert.ToInt32(lotArray[lotIndex]);
+
                             debugMsg("lotIndex---->" + lotIndex);
 
                             debugMsg("Convert.ToInt32(lotArray[lotIndex])---->" + Convert.ToInt32(lotArray[lotIndex]));
@@ -1249,6 +1617,8 @@ namespace QuickTradeTest
                             {
                                 lotIndex = lotArray.Length - 1;
                             }
+
+                            maxLot = Convert.ToInt32(lotArray[lotIndex]);
 
                             debugMsg("lotIndex---->" + lotIndex);
 

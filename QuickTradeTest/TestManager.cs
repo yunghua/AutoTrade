@@ -11,7 +11,13 @@ namespace QuickTradeTest
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
 
-        const double cost = 66;//手續費成本
+        public const string Core_Method_1 = "Core_Method_1";//獲利加碼
+
+        public const string Core_Method_2 = "Core_Method_2";//動態停利
+
+        public const string Core_Method_3 = "Core_Method_3";//逆勢動態停利
+
+        const double cost = 68;//手續費成本
 
         const double valuePerPoint = 50;//每點價值，小台50元/點，大台200元/點        
 
@@ -68,9 +74,19 @@ namespace QuickTradeTest
 
         string maxLoss = "";//單日最大停損
 
+
+
         double ratio;//動態停利的反轉比率，小於1，越接近1表示要回檔接近停利設定，才會執行停利，也就是越不敏感。
 
         string lots;
+
+        int maxLot;//最大交易口數
+
+        string maxLosePureProfitFileName;//最大賠錢是哪一天
+
+        string maxWinPureProfitFileName;//最大獲利是哪一天
+
+        Dictionary<int, int> stopRatio;  //逆勢動態停利的百分比查表，第一個int 是點數間隔，第二個是百分比
 
         //Boolean isPrepared = false;
 
@@ -82,17 +98,7 @@ namespace QuickTradeTest
         public Boolean prepareTest()
         {
 
-
-            StrategyFile strategyInstance = StrategyFile.getInstance();
-
             string appDir = System.IO.Directory.GetCurrentDirectory(); //主程式所在目錄
-
-            Boolean isRuleReady = strategyInstance.dealStrategyRule(appDir, "TestStrategy.txt");
-
-            if (!isRuleReady)
-            {
-                return false;
-            }
 
             appDir = System.Windows.Forms.Application.StartupPath;
 
@@ -138,9 +144,40 @@ namespace QuickTradeTest
                 Console.WriteLine(ee.StackTrace);
             }
 
-            this.winLine = strategyInstance.getWinLine();
+            //-----------------------------------------------------------------------------------------------------------------------------------
+            //-----------------------------------------------------------------------------------------------------------------------------------
 
-            this.loseLine = strategyInstance.getLoseLine();
+            StrategyFile strategyInstance = StrategyFile.getInstance();
+
+
+
+            Boolean isRuleReady = false;
+
+            if (TradeManager.Core_Method_1.Equals(coreMethod) || TradeManager.Core_Method_2.Equals(coreMethod))
+            {
+
+                isRuleReady = strategyInstance.dealStrategyRule(appDir, "TestStrategy.txt");
+
+                this.winLine = strategyInstance.getWinLine();
+
+                this.loseLine = strategyInstance.getLoseLine();
+
+            }
+            else if (TradeManager.Core_Method_3.Equals(coreMethod))
+            {
+                isRuleReady = strategyInstance.dealStopRatioRule(appDir, "TestStrategy.txt");
+
+                this.stopRatio = strategyInstance.getStopRatio();
+            }
+
+            if (!isRuleReady)
+            {
+                return false;
+            }
+
+
+            //-----------------------------------------------------------------------------------------------------------------------------------
+            //-----------------------------------------------------------------------------------------------------------------------------------
 
             reportDir = appDir + "\\" + Report_Dir + "\\";
 
@@ -149,26 +186,28 @@ namespace QuickTradeTest
             sourceFileDir = appDir + "\\" + sourceDir + "\\";
 
 
+
+
+            conclusionReportFileName = conclusionDir + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_Conclusion.rpt";
+
+            conclusionReport = new TradeFile(conclusionReportFileName);
+
+            conclusionReport.prepareWriter();
+
+            conclusionMsg("使用核心:" + coreMethod);
+
+            conclusionMsg("單日設定最大停損" + maxLoss);
+
+            conclusionMsg("動態停利反轉比率:" + ratio);
+
+            conclusionMsg("下單口數:" + lots);
+
+            conclusionMsg("測試次數:" + runCount);
+
+            conclusionMsg("----------------------------------------------------------------------------------------------");
+
             if (winLine != null && loseLine != null)
             {
-
-                conclusionReportFileName = conclusionDir + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_Conclusion.rpt";
-
-                conclusionReport = new TradeFile(conclusionReportFileName);
-
-                conclusionReport.prepareWriter();
-
-                conclusionMsg("使用核心:" + coreMethod);
-
-                conclusionMsg("單日設定最大停損" + maxLoss);
-
-                conclusionMsg("動態停利反轉比率:" + ratio);
-
-                conclusionMsg("下單口數:" + lots);
-
-                conclusionMsg("測試次數:" + runCount);
-
-                conclusionMsg("----------------------------------------------------------------------------------------------");
 
                 for (int i = 1; i <= winLine.Count; i++)
                 {
@@ -182,10 +221,14 @@ namespace QuickTradeTest
                     conclusionMsg("測試規則LOSE  00" + i + ":" + loseLine[i]);
                 }
 
-                return true;
             }
 
-            return false;
+            if (stopRatio != null)
+            {
+                conclusionMsg("逆勢動態停利規則 : " + stopRatio.ToString());
+            }
+
+            return true;
 
         }
 
@@ -201,70 +244,77 @@ namespace QuickTradeTest
                 return;
             }
 
-
-
-            try
+            if (coreMethod.Equals(Core_Method_3))
             {
-                int j = 0;
+                startTest(1001);
+            }
+            else
+            {
 
-
-
-                Dictionary<int, int> initialLoseLine = new Dictionary<int, int>();
-
-                for (int xx = 1; xx <= loseLine.Count; xx++)
+                try
                 {
-                    initialLoseLine[xx] = loseLine[xx];
-                }
+                    int j = 0;
 
 
 
-                for (int k = 1; k <= ruleCountWin; k++)
-                {
-                    j = 0;
+                    Dictionary<int, int> initialLoseLine = new Dictionary<int, int>();
 
-                    int tmpWin = 0;
-
-                    for (j = 1; j <= winLine.Count; j++)
+                    for (int xx = 1; xx <= loseLine.Count; xx++)
                     {
-                        tmpWin = winLine[j] + j * rulePeriod;
-
-                        winLine[j] = tmpWin;
-                    }    // end winLine
-
-
-
-
-                    for (int i = 1; i <= ruleCountLose; i++)
-                    {
-
-                        j = 0;
-
-                        int tmpLose = 0;
-
-                        for (j = 1; j <= loseLine.Count; j++)
-                        {
-                            tmpLose = loseLine[j] + j * rulePeriod;
-
-                            loseLine[j] = tmpLose;
-                        }
-
-                        startTest(k * 1000 + i);
-
-                    }//end for i
-
-                    for (int i = 1; i <= loseLine.Count; i++)
-                    {
-                        loseLine[i] = initialLoseLine[i];
+                        initialLoseLine[xx] = loseLine[xx];
                     }
 
-                }//end for k
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Source);
-                Console.WriteLine(e.StackTrace);
-                Console.WriteLine(e.Message);
-                return;
+
+
+                    for (int k = 1; k <= ruleCountWin; k++)
+                    {
+                        j = 0;
+
+                        int tmpWin = 0;
+
+                        for (j = 1; j <= winLine.Count; j++)
+                        {
+                            tmpWin = winLine[j] + j * rulePeriod;
+
+                            winLine[j] = tmpWin;
+                        }    // end winLine
+
+
+
+
+                        for (int i = 1; i <= ruleCountLose; i++)
+                        {
+
+                            j = 0;
+
+                            int tmpLose = 0;
+
+                            for (j = 1; j <= loseLine.Count; j++)
+                            {
+                                tmpLose = loseLine[j] + j * rulePeriod;
+
+                                loseLine[j] = tmpLose;
+                            }
+
+                            startTest(k * 1000 + i);
+
+                        }//end for i
+
+                        for (int i = 1; i <= loseLine.Count; i++)
+                        {
+                            loseLine[i] = initialLoseLine[i];
+                        }
+
+                    }//end for k
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Source);
+                    Console.WriteLine(e.StackTrace);
+                    Console.WriteLine(e.Message);
+                    return;
+                }
+
             }
 
         }
@@ -307,13 +357,16 @@ namespace QuickTradeTest
             int totalLoseCountRunManyTimes = 0;//總賠錢次數
 
 
-            int[] profitRange = new int[31];//獲利的範圍
+            int[] profitRange = new int[45];//獲利的範圍
 
-            double maxWinPureProfit = 0;
+            double maxWinPureProfit = 0;//單日最大獲利
 
-            double maxLosePureProfit = 0;
+            double maxLosePureProfit = 0;//單日最大賠錢
 
-            for (int i = 0; i < 31; i++)
+
+
+
+            for (int i = 0; i < 45; i++)
             {
                 profitRange[i] = 0;
             }
@@ -351,6 +404,8 @@ namespace QuickTradeTest
                         manager.setMaxProfitLoss(Convert.ToDouble(maxLoss));
                     }
 
+                    manager.setStopRatio(stopRatio);
+
                     manager.setRatio(ratio);
 
                     manager.setCore(coreMethod);
@@ -364,6 +419,13 @@ namespace QuickTradeTest
                     manager.setSourceFile(oFileList[j]);
 
                     oneDayProfit = manager.startTrade();
+
+                    int tmpMaxLot = manager.getMaxLot();
+
+                    if (tmpMaxLot > maxLot)
+                    {
+                        maxLot = tmpMaxLot;
+                    }
 
                     winCountInOneDayTradeRunManyTimes += manager.getWinCount();
 
@@ -384,17 +446,53 @@ namespace QuickTradeTest
                     if (oneDayPureProfit > maxWinPureProfit)
                     {
                         maxWinPureProfit = oneDayPureProfit;
+
+                        maxWinPureProfitFileName = oFileList[j].getFileName();
                     }
 
                     if (oneDayPureProfit < maxLosePureProfit)
                     {
                         maxLosePureProfit = oneDayPureProfit;
+
+                        maxLosePureProfitFileName = oFileList[j].getFileName();
                     }
 
                     if (oneDayPureProfit > 0 && oneDayPureProfit < 2000)
                     {
 
                         profitRange[0]++;
+                    }
+                    else if (oneDayPureProfit > 100000)
+                    {
+                        profitRange[38]++;
+                    }
+                    else if (oneDayPureProfit > 90000)
+                    {
+                        profitRange[37]++;
+                    }
+                    else if (oneDayPureProfit > 80000)
+                    {
+                        profitRange[36]++;
+                    }
+                    else if (oneDayPureProfit > 70000)
+                    {
+                        profitRange[35]++;
+                    }
+                    else if (oneDayPureProfit > 60000)
+                    {
+                        profitRange[34]++;
+                    }
+                    else if (oneDayPureProfit > 50000)
+                    {
+                        profitRange[33]++;
+                    }
+                    else if (oneDayPureProfit > 40000)
+                    {
+                        profitRange[32]++;
+                    }
+                    else if (oneDayPureProfit > 30000)
+                    {
+                        profitRange[31]++;
                     }
                     else if (oneDayPureProfit > 20000)
                     {
@@ -435,6 +533,18 @@ namespace QuickTradeTest
                     else if (oneDayPureProfit > 2000)
                     {
                         profitRange[1]++;
+                    }
+                    else if (oneDayPureProfit < -50000)
+                    {
+                        profitRange[41]++;
+                    }
+                    else if (oneDayPureProfit < -40000)
+                    {
+                        profitRange[40]++;
+                    }
+                    else if (oneDayPureProfit < -30000)
+                    {
+                        profitRange[39]++;
                     }
                     else if (oneDayPureProfit < -20000)
                     {
@@ -501,86 +611,106 @@ namespace QuickTradeTest
 
                 reportMsg(oFileList[j].getFullPath() + "交易結束，單日交易平均利潤 : " + ((oneDayRunManyTimesTotalProfit * valuePerPoint) - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * cost) / runCount);
 
-                reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利次數 : " + winCountInOneDayTradeRunManyTimes);
+                reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利口數 : " + winCountInOneDayTradeRunManyTimes);
 
-                reportMsg(oFileList[j].getFullPath() + "交易結束，單日賠錢次數 : " + loseCountInOneDayTradeRunManyTimes);
+                reportMsg(oFileList[j].getFullPath() + "交易結束，單日賠錢口數 : " + loseCountInOneDayTradeRunManyTimes);
 
-                reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利次數的總比率 : " + Convert.ToDouble(winCountInOneDayTradeRunManyTimes) / ((Convert.ToDouble(winCountInOneDayTradeRunManyTimes) + Convert.ToDouble(loseCountInOneDayTradeRunManyTimes))) * 100 + " %");
+                reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利口數的總比率 : " + Convert.ToDouble(winCountInOneDayTradeRunManyTimes) / ((Convert.ToDouble(winCountInOneDayTradeRunManyTimes) + Convert.ToDouble(loseCountInOneDayTradeRunManyTimes))) * 100 + " %");
 
             }//end for fileList
 
 
-            reportMsg(" 測試編號 : " + guid);
-            reportMsg(" 每個交易日的測試次數 : " + runCount);
+            conclusionMsg(" 測試編號 : " + guid);
+            conclusionMsg(" 每個交易日的測試次數 : " + runCount);
 
-            reportMsg("獲利次數 : " + totalWinCountRumManyTimes);
-            reportMsg("賠錢次數 : " + totalLoseCountRunManyTimes);
-            reportMsg("交易結束，獲利次數的總比率 : " + Convert.ToDouble(totalWinCountRumManyTimes) / ((Convert.ToDouble(totalWinCountRumManyTimes) + Convert.ToDouble(totalLoseCountRunManyTimes))) * 100 + " %");
+            conclusionMsg("獲利口數 : " + totalWinCountRumManyTimes);
+            conclusionMsg("賠錢口數 : " + totalLoseCountRunManyTimes);
+            conclusionMsg("交易結束，獲利口數的總比率 : " + Convert.ToDouble(totalWinCountRumManyTimes) / ((Convert.ToDouble(totalWinCountRumManyTimes) + Convert.ToDouble(totalLoseCountRunManyTimes))) * 100 + " %");
 
-            reportMsg("獲利日數 : " + winDayCount);
-            reportMsg("賠錢日數" + loseDayCount);
-            reportMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
+            conclusionMsg("獲利日數 : " + winDayCount);
+            conclusionMsg("賠錢日數" + loseDayCount);
+            conclusionMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
 
-            reportMsg("單日最大獲利 : " + maxWinPureProfit);
-            reportMsg("單日最大賠錢 : " + maxLosePureProfit);
-            reportMsg("單日設定最大停損" + maxLoss);
+            conclusionMsg("單日最大獲利 : " + maxWinPureProfit);
+            conclusionMsg("最大獲利 是哪一天: " + maxWinPureProfitFileName);
+            conclusionMsg("單日最大賠錢 : " + maxLosePureProfit);
+            conclusionMsg("最大賠錢 是哪一天: " + maxLosePureProfitFileName);
+
+            conclusionMsg("單日設定最大停損" + maxLoss);
 
 
-            reportMsg("最大交易口數 : " + lotArray[lotArray.Length - 1]);
+            conclusionMsg("曾經最大交易口數 : " + maxLot);
 
-            reportMsg("總獲利口數 : " + totalWinCountRumManyTimes);
+            conclusionMsg("總獲利口數 : " + totalWinCountRumManyTimes);
 
-            reportMsg("總賠錢口數 : " + totalLoseCountRunManyTimes);
+            conclusionMsg("總賠錢口數 : " + totalLoseCountRunManyTimes);
 
-            reportMsg("總手續費 : " + (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * cost);
+            conclusionMsg("總手續費 : " + (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * cost);
 
-            reportMsg("平均手續費 : " + ((totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * cost) / (runCount * testDayCount));
+            conclusionMsg("平均手續費 : " + ((totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * cost) / (runCount * testDayCount));
 
             double pureProfit = ((totalProfit * valuePerPoint - (totalWinCountRumManyTimes + totalLoseCountRunManyTimes) * cost)) / (runCount * testDayCount);
 
-            reportMsg(runCount * oFileList.Count + "次，總利潤 : " + totalProfit * valuePerPoint);
+            conclusionMsg(runCount * oFileList.Count + "次，總利潤 : " + totalProfit * valuePerPoint);
 
-            reportMsg(runCount * oFileList.Count + "次，扣除手續費後，總平均利潤 : " + pureProfit);
+            conclusionMsg(runCount * oFileList.Count + "次，扣除手續費後，總平均利潤 : " + pureProfit);
 
 
 
-            reportMsg("獲利兩千以下次數 : " + profitRange[0]);
-            reportMsg("獲利兩千以上次數 : " + profitRange[1]);
-            reportMsg("獲利三千以上次數 : " + profitRange[2]);
-            reportMsg("獲利四千以上次數 : " + profitRange[3]);
-            reportMsg("獲利五千以上次數 : " + profitRange[4]);
-            reportMsg("獲利六千以上次數 : " + profitRange[5]);
-            reportMsg("獲利七千以上次數 : " + profitRange[6]);
-            reportMsg("獲利八千以上次數 : " + profitRange[7]);
-            reportMsg("獲利九千以上次數 : " + profitRange[8]);
-            reportMsg("獲利一萬以上次數 : " + profitRange[9]);
-            reportMsg("獲利兩萬以上次數 : " + profitRange[10]);
+            conclusionMsg("獲利兩千以下次數 : " + profitRange[0]);
+            conclusionMsg("獲利兩千以上次數 : " + profitRange[1]);
+            conclusionMsg("獲利三千以上次數 : " + profitRange[2]);
+            conclusionMsg("獲利四千以上次數 : " + profitRange[3]);
+            conclusionMsg("獲利五千以上次數 : " + profitRange[4]);
+            conclusionMsg("獲利六千以上次數 : " + profitRange[5]);
+            conclusionMsg("獲利七千以上次數 : " + profitRange[6]);
+            conclusionMsg("獲利八千以上次數 : " + profitRange[7]);
+            conclusionMsg("獲利九千以上次數 : " + profitRange[8]);
+            conclusionMsg("獲利一萬以上次數 : " + profitRange[9]);
+            conclusionMsg("獲利兩萬以上次數 : " + profitRange[10]);
+            conclusionMsg("獲利三萬以上次數 : " + profitRange[31]);
+            conclusionMsg("獲利四萬以上次數 : " + profitRange[32]);
+            conclusionMsg("獲利五萬以上次數 : " + profitRange[33]);
+            conclusionMsg("獲利六萬以上次數 : " + profitRange[34]);
+            conclusionMsg("獲利七萬以上次數 : " + profitRange[35]);
+            conclusionMsg("獲利八萬以上次數 : " + profitRange[36]);
+            conclusionMsg("獲利九萬以上次數 : " + profitRange[37]);
+            conclusionMsg("獲利十萬以上次數 : " + profitRange[38]);
+            conclusionMsg("----------------------------------------------------------------------------------------------");
+            conclusionMsg("賠錢兩千以下次數 : " + profitRange[20]);
+            conclusionMsg("賠錢兩千以上次數 : " + profitRange[21]);
+            conclusionMsg("賠錢三千以上次數 : " + profitRange[22]);
+            conclusionMsg("賠錢四千以上次數 : " + profitRange[23]);
+            conclusionMsg("賠錢五千以上次數 : " + profitRange[24]);
+            conclusionMsg("賠錢六千以上次數 : " + profitRange[25]);
+            conclusionMsg("賠錢七千以上次數 : " + profitRange[26]);
+            conclusionMsg("賠錢八千以上次數 : " + profitRange[27]);
+            conclusionMsg("賠錢九千以上次數 : " + profitRange[28]);
+            conclusionMsg("賠錢一萬以上次數 : " + profitRange[29]);
+            conclusionMsg("賠錢兩萬以上次數 : " + profitRange[30]);
+            conclusionMsg("賠錢三萬以上次數 : " + profitRange[39]);
+            conclusionMsg("賠錢四萬以上次數 : " + profitRange[40]);
+            conclusionMsg("賠錢五萬以上次數 : " + profitRange[41]);
+
             reportMsg("----------------------------------------------------------------------------------------------");
-            reportMsg("賠錢兩千以下次數 : " + profitRange[20]);
-            reportMsg("賠錢兩千以上次數 : " + profitRange[21]);
-            reportMsg("賠錢三千以上次數 : " + profitRange[22]);
-            reportMsg("賠錢四千以上次數 : " + profitRange[23]);
-            reportMsg("賠錢五千以上次數 : " + profitRange[24]);
-            reportMsg("賠錢六千以上次數 : " + profitRange[25]);
-            reportMsg("賠錢七千以上次數 : " + profitRange[26]);
-            reportMsg("賠錢八千以上次數 : " + profitRange[27]);
-            reportMsg("賠錢九千以上次數 : " + profitRange[28]);
-            reportMsg("賠錢一萬以上次數 : " + profitRange[29]);
-            reportMsg("賠錢兩萬以上次數 : " + profitRange[30]);
 
-            reportMsg("----------------------------------------------------------------------------------------------");
-            for (int i = 1; i <= winLine.Count; i++)
+            if (winLine != null)
             {
-                reportMsg("測試規則WIN   00" + i + ":" + winLine[i]);
+                for (int i = 1; i <= winLine.Count; i++)
+                {
+                    reportMsg("測試規則WIN   00" + i + ":" + winLine[i]);
+                }
+
+                reportMsg("----------------------------------------------------------------------------------------------");
             }
-
-            reportMsg("----------------------------------------------------------------------------------------------");
-
-            for (int i = 1; i <= winLine.Count; i++)
+            if (loseLine != null)
             {
-                reportMsg("測試規則LOSE  00" + i + ":" + loseLine[i]);
-            }
+                for (int i = 1; i <= winLine.Count; i++)
+                {
+                    reportMsg("測試規則LOSE  00" + i + ":" + loseLine[i]);
+                }
 
+            }
             reportMsg("----------------------------------------------------------------------------------------------");
             reportMsg("----------------------------------------------------------------------------------------------");
             reportMsg("----------------------------------------------------------------------------------------------");
