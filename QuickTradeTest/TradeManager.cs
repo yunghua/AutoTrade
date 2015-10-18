@@ -175,6 +175,10 @@ namespace QuickTradeTest
 
         Dictionary<int, int> stopRatio;  //逆勢動態停利的百分比查表，第一個int 是點數間隔，第二個是百分比
 
+        enum LastReversePoint : int { MAX, MIN };//最後一個轉折點是最高點還是最低點
+
+        int lastReversePoint = -1;//最後一個轉折點
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 程式區。
@@ -519,7 +523,8 @@ namespace QuickTradeTest
 
         private double coreLogic3()//逆勢動態停利
         {
-            const int Trade_Period_Need = 20;//至少要20點間隔才能新倉
+
+            const int Trade_Period_Need = 10;//最高點、最低點都要離原始點至少要10點間隔才能新倉
             int stage = Stage_New;
             double originalPoint = 0;// 今日交易起始點
             double maxHighPoint = 0;//轉折點高點
@@ -548,20 +553,44 @@ namespace QuickTradeTest
 
                     recordList.Add(record);
 
+                    if (recordList.Count == 1)//第一筆資料進來
+                    {
+                        originalPoint = record.TradePrice;
+                        maxHighPoint = record.TradePrice;
+                        maxLowPoint = record.TradePrice;
+                    }
+
                     if (record.TradePrice > maxHighPoint)//取得相對高點
                     {
                         maxHighPoint = record.TradePrice;
+
+                        lastReversePoint = LastReversePoint.MAX.GetHashCode();
                     }
                     else if (record.TradePrice < maxLowPoint)//取得相對低點
                     {
                         maxLowPoint = record.TradePrice;
+
+                        lastReversePoint = LastReversePoint.MIN.GetHashCode();
                     }
 
                     offsetPoint = maxHighPoint - maxLowPoint;
 
-                    if (offsetPoint < Trade_Period_Need)
+                    if (tradeCount == 0)
                     {
-                        continue;
+
+                        if ((maxHighPoint - originalPoint) > Trade_Period_Need)
+                        {
+                            //最高點大於原始點Trade_Period_Need這麼多點，可以開始交易
+                        }
+                        else if ((originalPoint - maxLowPoint) > Trade_Period_Need)
+                        {
+                            //原始點大於最低點Trade_Period_Need這麼多點，可以開始交易
+                        }
+                        else
+                        {
+                            continue;
+                            //跳過，繼續計算
+                        }
                     }
 
                     reversePercentage = getReversePercentage(offsetPoint);//查表，取得反轉百分比
@@ -570,22 +599,15 @@ namespace QuickTradeTest
 
                     if (isStartOrder == false)//還沒新倉
                     {
-                        if (recordList.Count == 1)//第一筆資料進來
-                        {
-                            originalPoint = record.TradePrice;
-                            maxHighPoint = record.TradePrice;
-                            maxLowPoint = record.TradePrice;
-                        }
-                        else
+
                         {
                             if (tradeCount == 0)//第一次交易開始之前
                             {
-                                if (originalPoint - maxHighPoint < 0)//低至高之後反轉，賣出
+                                if (lastReversePoint == LastReversePoint.MAX.GetHashCode())//低至高之後反轉，賣出
                                 {
                                     direction = Direction_LowToHigh;
-
                                 }
-                                else if (originalPoint - maxLowPoint > 0)//高至低之後反轉，買入
+                                else if (lastReversePoint == LastReversePoint.MIN.GetHashCode())//高至低之後反轉，買入
                                 {
                                     direction = Direction_HighToLow;
                                 }
@@ -597,18 +619,26 @@ namespace QuickTradeTest
 
                                 if (record.TradePrice >= orderPriceTarget)
                                 {
+                                    debugMsg("MAX---->" + maxHighPoint);
+                                    debugMsg("MIN---->" + maxLowPoint);
+                                    debugMsg("Original---->" + originalPoint);
+
                                     stage = Stage_Order_New_Success;
                                     orderPrice = record.TradePrice;//實際交易點位
                                     isStartOrder = true;
                                     nowTradeType = TradeType.BUY.GetHashCode();
-                                    maxHighPoint = orderPrice;//把上一個相對低點拿掉
+                                    maxHighPoint = orderPrice;//把上一個相對高點拿掉
 
+
+                                    debugMsg("MAX---->" + maxHighPoint);
+                                    debugMsg("MIN---->" + maxLowPoint);
+                                    debugMsg("Original---->" + originalPoint);
 
                                     debugMsg("交易方式---->" + TradeType.BUY);
 
                                     debugMsg("交易金額---->" + orderPrice);
 
-                                    debugMsg("交易時間---->" + tradeDateTime);
+                                    debugMsg("交易時間---->" + record.TradeMoment);
                                 }
                             }
                             else if (direction == Direction_LowToHigh)
@@ -616,18 +646,25 @@ namespace QuickTradeTest
                                 orderPriceTarget = maxHighPoint - tradePeriod;
                                 if (record.TradePrice <= orderPriceTarget)
                                 {
+                                    debugMsg("MAX---->" + maxHighPoint);
+                                    debugMsg("MIN---->" + maxLowPoint);
+                                    debugMsg("Original---->" + originalPoint);
+
                                     stage = Stage_Order_New_Success;
                                     orderPrice = record.TradePrice;//實際交易點位
                                     isStartOrder = true;
                                     nowTradeType = TradeType.SELL.GetHashCode();
                                     maxLowPoint = orderPrice;//把上一個相對低點拿掉
 
+                                    debugMsg("MAX---->" + maxHighPoint);
+                                    debugMsg("MIN---->" + maxLowPoint);
+                                    debugMsg("Original---->" + originalPoint);
 
                                     debugMsg("交易方式---->" + TradeType.SELL);
 
                                     debugMsg("交易金額---->" + orderPrice);
 
-                                    debugMsg("交易時間---->" + tradeDateTime);
+                                    debugMsg("交易時間---->" + record.TradeMoment);
                                 }
                             }
 
@@ -676,7 +713,8 @@ namespace QuickTradeTest
                             return totalProfit;
                         }
                         else
-                            //停利的部分
+                        {
+
                             if (direction == Direction_HighToLow)
                             {
                                 orderPriceTarget = maxHighPoint - tradePeriod;
@@ -687,9 +725,40 @@ namespace QuickTradeTest
                                     totalProfit += oneProfit;
                                     isStartOrder = false;
                                     tradeCount++;
-                                    winCount++;
 
-                                    debugMsg("買入停利出場");
+                                    debugMsg("---------------------------------------------------------------------------->");
+
+                                    debugMsg("MAX---->" + maxHighPoint);
+                                    debugMsg("MIN---->" + maxLowPoint);
+                                    debugMsg("Original---->" + originalPoint);
+
+
+                                    if (oneProfit > 0)
+                                    {
+                                        winCount++;
+                                        debugMsg("買入停利出場");
+                                        debugMsg("停利次數:" + winCount);
+
+                                        maxLowPoint = record.TradePrice;//把上一個相對低點拿掉
+
+                                        debugMsg("MAX---->" + maxHighPoint);
+                                        debugMsg("MIN---->" + maxLowPoint);
+                                    }
+                                    else
+                                    {
+                                        loseCount++;
+                                        debugMsg("買入認賠殺出");
+                                        debugMsg("停損次數:" + loseCount);
+
+                                        maxHighPoint = orderPrice;//把上一個相對高點拿掉
+
+                                        debugMsg("MAX---->" + maxHighPoint);
+                                        debugMsg("MIN---->" + maxLowPoint);
+                                    }
+
+
+                                    debugMsg("orderPriceTarget---->" + orderPriceTarget);
+
 
                                     debugMsg("平倉點數---->" + record.TradePrice);
 
@@ -703,7 +772,7 @@ namespace QuickTradeTest
 
                                     debugMsg("總純利:" + totalPureProfit);
 
-                                    debugMsg("停利次數:" + winCount);
+
 
                                     debugMsg("----------------------------------------------------------------------------------------------");
                                     continue;
@@ -716,14 +785,44 @@ namespace QuickTradeTest
 
                                 if (record.TradePrice >= orderPriceTarget)
                                 {
+
+
                                     stage = Stage_Order_Even_Success;
                                     oneProfit = calOneProfit(orderPrice);
                                     totalProfit += oneProfit;
                                     isStartOrder = false;
                                     tradeCount++;
-                                    winCount++;
 
-                                    debugMsg("賣出停利出場");
+                                    debugMsg("---------------------------------------------------------------------------->");
+
+                                    debugMsg("MAX---->" + maxHighPoint);
+                                    debugMsg("MIN---->" + maxLowPoint);
+                                    debugMsg("Original---->" + originalPoint);
+
+                                    if (oneProfit > 0)
+                                    {
+                                        winCount++;
+                                        debugMsg("賣出停利出場");
+                                        debugMsg("停利次數:" + winCount);
+
+                                        maxHighPoint = record.TradePrice;//把上一個相對高點拿掉
+
+                                        debugMsg("MAX---->" + maxHighPoint);
+                                        debugMsg("MIN---->" + maxLowPoint);
+                                    }
+                                    else
+                                    {
+                                        loseCount++;
+                                        debugMsg("賣出認賠殺出");
+                                        debugMsg("停損次數:" + loseCount);
+
+                                        maxLowPoint = orderPrice;//把上一個相對低點拿掉
+
+                                        debugMsg("MAX---->" + maxHighPoint);
+                                        debugMsg("MIN---->" + maxLowPoint);
+                                    }
+
+                                    debugMsg("orderPriceTarget---->" + orderPriceTarget);
 
                                     debugMsg("平倉點數---->" + record.TradePrice);
 
@@ -737,84 +836,15 @@ namespace QuickTradeTest
 
                                     debugMsg("總純利:" + totalPureProfit);
 
-                                    debugMsg("停利次數:" + winCount);
+
+
 
                                     debugMsg("----------------------------------------------------------------------------------------------");
                                     continue;
                                 }
                             }
-                        //停損的部分
-                        if (direction == Direction_HighToLow)
-                        {
-
-                            orderPriceTarget = maxLowPoint - tradePeriod;
-
-                            if (record.TradePrice <= orderPriceTarget)
-                            {
-                                stage = Stage_Order_Even_Success;
-                                oneProfit = calOneProfit(orderPrice);
-                                totalProfit += oneProfit;
-                                isStartOrder = false;
-                                tradeCount++;
-                                loseCount++;
-
-                                debugMsg("買入認賠殺出");
-
-                                debugMsg("平倉點數---->" + record.TradePrice);
-
-                                debugMsg("平倉時間---->" + record.TradeMoment);
-
-                                pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
-
-                                debugMsg("純利:" + pureProfit);
-
-                                totalPureProfit += pureProfit;
-
-                                debugMsg("總純利:" + totalPureProfit);
-
-                                debugMsg("停損次數:" + loseCount);
-
-                                debugMsg("----------------------------------------------------------------------------------------------");
-                                continue;
-                            }
                         }
-                        else if (direction == Direction_LowToHigh)
-                        {
-
-                            orderPriceTarget = maxLowPoint + tradePeriod;
-
-                            if (record.TradePrice >= orderPriceTarget)
-                            {
-                                stage = Stage_Order_Even_Success;
-                                oneProfit = calOneProfit(orderPrice);
-                                totalProfit += oneProfit;
-                                isStartOrder = false;
-                                tradeCount++;
-                                loseCount++;
-                                debugMsg("賣出認賠殺出");
-
-                                debugMsg("平倉點數---->" + record.TradePrice);
-
-                                debugMsg("平倉時間---->" + record.TradeMoment);
-
-                                pureProfit = oneProfit * valuePerPoint - Convert.ToInt32(lotArray[lotIndex]) * cost;
-
-                                debugMsg("純利:" + pureProfit);
-
-                                totalPureProfit += pureProfit;
-
-                                debugMsg("總純利:" + totalPureProfit);
-
-                                debugMsg("停損次數:" + loseCount);
-
-                                debugMsg("----------------------------------------------------------------------------------------------");
-                                continue;
-                            }
-                        }
-
                     }
-
-
                 }
                 catch (Exception e)
                 {

@@ -328,7 +328,17 @@ namespace QuickTradeTest
             {
 
 
-                testReportFileName = reportDir + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_" + loseLine[1] + "_" + winLine[1] + "_" + guid + ".rpt";
+                testReportFileName = reportDir + now.Year + "_" + now.Month + "_" + now.Day + "_" + now.Hour + "_" + now.Minute + "_" + now.Second + "_";
+                if (loseLine != null)
+                {
+                    testReportFileName += loseLine[1] + "_";
+                }
+                if (winLine != null)
+                {
+                    testReportFileName += winLine[1] + "_";
+                }
+                testReportFileName += guid + ".rpt";
+
 
                 testReportFile = new TradeFile(testReportFileName);
 
@@ -719,7 +729,7 @@ namespace QuickTradeTest
 
             if (pureProfit > 0)
             {
-                conclusionMsg("------------loseLine : " + loseLine[1] + "----------------winLine : " + winLine[1] + "-------------PureProfit : " + pureProfit);
+                conclusionMsg("PureProfit : " + pureProfit);
             }
 
 
