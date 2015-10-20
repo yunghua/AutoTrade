@@ -17,6 +17,8 @@ namespace QuickTradeTest
 
         public const string Core_Method_3 = "Core_Method_3";//逆勢動態停利
 
+        public const string Core_Method_4 = "Core_Method_4";//順勢動態停利
+
         const double cost = 68;//手續費成本
 
         const double valuePerPoint = 50;//每點價值，小台50元/點，大台200元/點        
@@ -163,7 +165,7 @@ namespace QuickTradeTest
                 this.loseLine = strategyInstance.getLoseLine();
 
             }
-            else if (TradeManager.Core_Method_3.Equals(coreMethod))
+            else if (TradeManager.Core_Method_3.Equals(coreMethod) || TradeManager.Core_Method_4.Equals(coreMethod))
             {
                 isRuleReady = strategyInstance.dealStopRatioRule(appDir, "TestStrategy.txt");
 
@@ -223,10 +225,10 @@ namespace QuickTradeTest
 
             }
 
-            if (stopRatio != null)
-            {
-                conclusionMsg("逆勢動態停利規則 : " + stopRatio.ToString());
-            }
+            //if (stopRatio != null)
+            //{
+            //    conclusionMsg("逆勢動態停利規則 : " + stopRatio.ToString());
+            //}
 
             return true;
 
@@ -244,7 +246,7 @@ namespace QuickTradeTest
                 return;
             }
 
-            if (coreMethod.Equals(Core_Method_3))
+            if (coreMethod.Equals(Core_Method_3) || coreMethod.Equals(Core_Method_4))
             {
                 startTest(1001);
             }
