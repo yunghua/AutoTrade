@@ -30,16 +30,16 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.textBox_loseLine = new System.Windows.Forms.TextBox();
             this.textBox1_winLine = new System.Windows.Forms.TextBox();
@@ -73,6 +73,8 @@
             this.textBox_status_order = new System.Windows.Forms.TextBox();
             this.textBox_status_ready = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.button_Reverse = new System.Windows.Forms.Button();
+            this.button_Enable = new System.Windows.Forms.Button();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
@@ -250,8 +252,8 @@
             // RefPri
             // 
             this.RefPri.DataPropertyName = "參考價";
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.RefPri.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.RefPri.DefaultCellStyle = dataGridViewCellStyle21;
             this.RefPri.HeaderText = "參考價";
             this.RefPri.Name = "RefPri";
             this.RefPri.ReadOnly = true;
@@ -260,8 +262,8 @@
             // OpenPri
             // 
             this.OpenPri.DataPropertyName = "開盤價";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.OpenPri.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.OpenPri.DefaultCellStyle = dataGridViewCellStyle22;
             this.OpenPri.HeaderText = "開盤價";
             this.OpenPri.Name = "OpenPri";
             this.OpenPri.ReadOnly = true;
@@ -270,8 +272,8 @@
             // HighPri
             // 
             this.HighPri.DataPropertyName = "最高價";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.HighPri.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.HighPri.DefaultCellStyle = dataGridViewCellStyle23;
             this.HighPri.HeaderText = "最高價";
             this.HighPri.Name = "HighPri";
             this.HighPri.ReadOnly = true;
@@ -279,8 +281,8 @@
             // LowPri
             // 
             this.LowPri.DataPropertyName = "最低價";
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.LowPri.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.LowPri.DefaultCellStyle = dataGridViewCellStyle24;
             this.LowPri.HeaderText = "最低價";
             this.LowPri.Name = "LowPri";
             this.LowPri.ReadOnly = true;
@@ -288,8 +290,8 @@
             // UpPri
             // 
             this.UpPri.DataPropertyName = "漲停價";
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UpPri.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UpPri.DefaultCellStyle = dataGridViewCellStyle25;
             this.UpPri.HeaderText = "漲停價";
             this.UpPri.Name = "UpPri";
             this.UpPri.ReadOnly = true;
@@ -297,8 +299,8 @@
             // DnPri
             // 
             this.DnPri.DataPropertyName = "跌停價";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.DnPri.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.DnPri.DefaultCellStyle = dataGridViewCellStyle26;
             this.DnPri.HeaderText = "跌停價";
             this.DnPri.Name = "DnPri";
             this.DnPri.ReadOnly = true;
@@ -306,8 +308,8 @@
             // MatchTim
             // 
             this.MatchTim.DataPropertyName = "成交時間";
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.MatchTim.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.MatchTim.DefaultCellStyle = dataGridViewCellStyle27;
             this.MatchTim.HeaderText = "成交時間";
             this.MatchTim.Name = "MatchTim";
             this.MatchTim.ReadOnly = true;
@@ -316,8 +318,8 @@
             // MatchPri
             // 
             this.MatchPri.DataPropertyName = "成交價位";
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.MatchPri.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.MatchPri.DefaultCellStyle = dataGridViewCellStyle28;
             this.MatchPri.HeaderText = "成交價位";
             this.MatchPri.Name = "MatchPri";
             this.MatchPri.ReadOnly = true;
@@ -325,8 +327,8 @@
             // MatchQty
             // 
             this.MatchQty.DataPropertyName = "成交數量";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.MatchQty.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.MatchQty.DefaultCellStyle = dataGridViewCellStyle29;
             this.MatchQty.HeaderText = "成交數量";
             this.MatchQty.Name = "MatchQty";
             this.MatchQty.ReadOnly = true;
@@ -334,8 +336,8 @@
             // TolMatchQty
             // 
             this.TolMatchQty.DataPropertyName = "總成交量";
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.TolMatchQty.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.TolMatchQty.DefaultCellStyle = dataGridViewCellStyle30;
             this.TolMatchQty.HeaderText = "總成交量";
             this.TolMatchQty.Name = "TolMatchQty";
             this.TolMatchQty.ReadOnly = true;
@@ -386,11 +388,35 @@
             this.label2.TabIndex = 26;
             this.label2.Text = "Ready:";
             // 
+            // button_Reverse
+            // 
+            this.button_Reverse.Font = new System.Drawing.Font("Microsoft JhengHei", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.button_Reverse.ForeColor = System.Drawing.Color.Red;
+            this.button_Reverse.Location = new System.Drawing.Point(238, 302);
+            this.button_Reverse.Name = "button_Reverse";
+            this.button_Reverse.Size = new System.Drawing.Size(423, 70);
+            this.button_Reverse.TabIndex = 27;
+            this.button_Reverse.Text = "Reverse";
+            this.button_Reverse.UseVisualStyleBackColor = true;
+            this.button_Reverse.Click += new System.EventHandler(this.button_Reverse_Click);
+            // 
+            // button_Enable
+            // 
+            this.button_Enable.Location = new System.Drawing.Point(730, 328);
+            this.button_Enable.Name = "button_Enable";
+            this.button_Enable.Size = new System.Drawing.Size(75, 44);
+            this.button_Enable.TabIndex = 28;
+            this.button_Enable.Text = "enable";
+            this.button_Enable.UseVisualStyleBackColor = true;
+            this.button_Enable.Click += new System.EventHandler(this.button_Enable_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(891, 411);
+            this.Controls.Add(this.button_Enable);
+            this.Controls.Add(this.button_Reverse);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox_status_ready);
             this.Controls.Add(this.textBox_status_order);
@@ -451,6 +477,8 @@
         private System.Windows.Forms.TextBox textBox_status_order;
         private System.Windows.Forms.TextBox textBox_status_ready;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button button_Reverse;
+        private System.Windows.Forms.Button button_Enable;
     }
 }
 

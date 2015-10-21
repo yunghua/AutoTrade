@@ -40,6 +40,13 @@ namespace TradeUtility
             return utility;
         }
 
+        public string dealYearMonth()//計算現在是哪個交易月份
+        {
+            DateTime now = System.DateTime.Now;
+
+            return Convert.ToString(now.Year) + dealTradMonth(now);
+        }
+
         private string dealTradMonth(DateTime now)//用日期計算出交易月份是哪一個月
         {
             // 本月第一天
@@ -90,6 +97,8 @@ namespace TradeUtility
 
             return dealTradeCode(code);
         }
+
+
 
         private string dealTradeCode(string code)//自動計算當天的商品代碼
         {

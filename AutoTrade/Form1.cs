@@ -39,7 +39,7 @@ namespace AutoTrade
         string id = "";
         string password = "";
 
-        string tradeCode = "";//市場別代碼，小台指=MXF，大台指=TXF
+        string tradeCode = "";//元大期貨下單，市場別代碼，小台指=MXF，大台指=TXF
 
         string maxLoss = "";//單日最大停損
 
@@ -50,6 +50,8 @@ namespace AutoTrade
         string account = "";//帳號
 
         private YuantaOrdLib.YuantaOrdClass yuantaOrderAPI;
+
+        string futuresCode = "";//期貨代碼，大台指TX，小台指MTX
 
         public Form1()
         {
@@ -203,6 +205,8 @@ namespace AutoTrade
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            button_Reverse.Enabled = false;
+
             this.yuantaOrderAPI = new YuantaOrdClass();
 
             try
@@ -270,10 +274,14 @@ namespace AutoTrade
 
             account = configFile.readConfig("Account_Code");
 
+            futuresCode = configFile.readConfig("Futures_Code");
+
             try
             {
 
                 master = new TradeMaster();
+
+                master.setFuturesCode(futuresCode);
 
                 master.setMaxLoss(Convert.ToInt32(maxLoss));
 
@@ -351,6 +359,16 @@ namespace AutoTrade
         private void textBox_sym_Click(object sender, EventArgs e)
         {
             textBox_sym.SelectAll();
+        }
+
+        private void button_Enable_Click(object sender, EventArgs e)
+        {
+            button_Reverse.Enabled = true;
+        }
+
+        private void button_Reverse_Click(object sender, EventArgs e)
+        {
+            button_Reverse.Enabled = false;
         }
 
 

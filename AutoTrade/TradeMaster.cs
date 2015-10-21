@@ -98,7 +98,7 @@ namespace AutoTrade
         /// 變數。
         /// </summary>
         ///         
-        
+
 
         int number = 0;//超過檢查時間的次數
 
@@ -136,11 +136,7 @@ namespace AutoTrade
 
         int nowTradeType = 0;//交易方式賣或是買
 
-        int prevTradeType = 0;//上一次交易方式賣或是買        
-
-        string monthFilePath = "";//完整的月份代碼檔案路徑        
-
-        string configFilePath = "";//完整的設定檔案路徑        
+        int prevTradeType = 0;//上一次交易方式賣或是買                
 
         string tradeCode = "";//商品代碼
 
@@ -151,6 +147,8 @@ namespace AutoTrade
         string fileName = "";
 
         int maxLoss;//單日最大停損
+
+        string futuresCode = "";//期貨代碼，大台指TX，小台指MTX
 
         //-------------------------------------------------------------------------------------------------------------
         //          物件區
@@ -167,6 +165,7 @@ namespace AutoTrade
 
         OriginalRecord record = new OriginalRecord();//檔案的一行紀錄     
 
+        DateTime now = System.DateTime.Now;
 
         DateTime[] minuteBeforeTradeTime;//交易前X秒，判斷買或賣
 
@@ -279,6 +278,11 @@ namespace AutoTrade
         public TradeMaster(Form1 parentForm)
         {
             this.parentForm = parentForm;
+        }
+
+        public void setFuturesCode(string code)
+        {
+            this.futuresCode = code;
         }
 
         public void setTradeCode(string code)
@@ -466,13 +470,13 @@ namespace AutoTrade
 
             isPrevWin = false;//上一次交易是否獲利
 
-            DateTime now = System.DateTime.Now;
+            
 
             stopTradeTime = new DateTime(now.Year, now.Month, now.Day, 13, 44, 0);
 
             appDir = System.Windows.Forms.Application.StartupPath;
 
-            fileName = appDir + "\\" + Output_Dir + "\\" + "AllOutput_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
+            fileName = appDir + "\\" + Output_Dir + "\\" + "NEW_Daily_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
 
             allTradeOutputFile = new TradeFile(fileName);
 
@@ -541,7 +545,7 @@ namespace AutoTrade
 
             try
             {
-                outputLine = matchTime + "," + matchPrice + "," + matchQuantity;
+                outputLine = Convert.ToString(now.Year) + Convert.ToString(now.Month) + Convert.ToString(now.Day) + "," + futuresCode + "     ," + TradeUtility.TradeUtility.getInstance().dealYearMonth() + "     ," + matchTime.Substring(0, 2) + matchTime.Substring(3, 2) + matchTime.Substring(6, 2) + "," + matchPrice + "," + matchQuantity + ",-,-,";
 
                 allTradeOutputFile.writeLine(outputLine);
 
