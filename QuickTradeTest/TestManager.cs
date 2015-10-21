@@ -90,11 +90,18 @@ namespace QuickTradeTest
 
         Dictionary<int, int> stopRatio;  //逆勢動態停利的百分比查表，第一個int 是點數間隔，第二個是百分比
 
+        GraphicManager graphic = null;
+
         //Boolean isPrepared = false;
 
         public TestManager()
         {
 
+        }
+
+        public void setGraphicManager(GraphicManager graphic)
+        {
+            this.graphic = graphic;
         }
 
         public Boolean prepareTest()
@@ -410,6 +417,8 @@ namespace QuickTradeTest
                 {
 
                     TradeManager manager = new TradeManager();
+
+                    manager.setGraphicManager(graphic);
 
                     if (maxLoss != null && !maxLoss.Equals(""))
                     {

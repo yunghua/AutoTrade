@@ -220,13 +220,24 @@ namespace QuickTradeTest
 
         double passPointUp = 0;     //最高點往下Enable_Pass_Period這麼多點之後，再往上突破最高點，才開始下單。
 
+        int yBase = 0;//第一個點位的Y座標 
 
+        int yDraw = 0;//要繪圖的Y座標
+
+        int xDraw = 0;//要繪圖的X座標
+
+        GraphicManager graphic = null;
 
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 程式區。
         /// </summary>
         /// 
+
+        public void setGraphicManager(GraphicManager graphic)
+        {
+            this.graphic = graphic;
+        }
 
         public void setStopRatio(Dictionary<int, int> stopRatio)
         {
@@ -987,6 +998,8 @@ namespace QuickTradeTest
 
                     record = OriginalRecordConverter.getOriginalRecord(nowLine);
 
+                    debugMsg("Record Price:" + record.TradePrice+":"+record.TradeMoment);
+
                     recordList.Add(record);
 
                     if (recordList.Count == 1)//第一筆資料進來
@@ -994,10 +1007,15 @@ namespace QuickTradeTest
                         originalPoint = record.TradePrice;
                         maxPoint = record.TradePrice;
                         minPoint = record.TradePrice;
+                        yBase = Convert.ToInt32(record.TradePrice);
                         //reversePoint1 = record.TradePrice;
                     }
 
+                    yDraw = 300 - (Convert.ToInt32(record.TradePrice) - yBase);
 
+                    xDraw++;
+
+                    graphic.drawPoint(xDraw, yDraw);
 
                     //if (record.TradePrice > maxHighPoint)//取得相對高點
                     //{
@@ -1118,6 +1136,8 @@ namespace QuickTradeTest
                                 orderPrice = record.TradePrice;//實際交易點位
                                 isStartOrder = true;
 
+                                graphic.drawSellLine(xDraw, Convert.ToInt32(record.TradePrice));
+
                                 maxPoint = record.TradePrice;//把上一個最高點由交易點取代掉
 
                                 maxPointTime = record.TradeMoment;
@@ -1146,6 +1166,7 @@ namespace QuickTradeTest
                                 stage = Stage_Order_New_Success;
                                 orderPrice = record.TradePrice;//實際交易點位
                                 isStartOrder = true;
+                                graphic.drawBuyLine(xDraw, Convert.ToInt32(record.TradePrice));
 
                                 minPoint = record.TradePrice;//把上一個最低點由交易點取代掉
                                 minPointTime = record.TradeMoment;
@@ -1231,7 +1252,7 @@ namespace QuickTradeTest
                             {
                                 if (maxPoint - minPoint > 10)
                                 {
-                                    orderPriceTarget = minPoint + tradePeriod;                                   
+                                    orderPriceTarget = minPoint + tradePeriod;
 
                                     if (record.TradePrice >= orderPriceTarget)
                                     {
@@ -1245,7 +1266,7 @@ namespace QuickTradeTest
                             {
                                 if (maxPoint - minPoint > 10)
                                 {
-                                    orderPriceTarget = maxPoint - tradePeriod;                                    
+                                    orderPriceTarget = maxPoint - tradePeriod;
 
                                     if (record.TradePrice <= orderPriceTarget)
                                     {
@@ -1284,6 +1305,8 @@ namespace QuickTradeTest
             debugMsg("MIN---->" + minPoint + ":" + minPointTime);
             debugMsg("Original---->" + originalPoint);
 
+
+            graphic.drawBuyLine(xDraw, Convert.ToInt32(record.TradePrice));
 
             if (oneProfit > 0)
             {
@@ -1339,12 +1362,11 @@ namespace QuickTradeTest
             tradeCount++;
 
             debugMsg("---------------------------------------------------------------------------->");
-
-
-
             debugMsg("MAX---->" + maxPoint + ":" + maxPointTime);
             debugMsg("MIN---->" + minPoint + ":" + minPointTime);
             debugMsg("Original---->" + originalPoint);
+
+            graphic.drawSellLine(xDraw, Convert.ToInt32(record.TradePrice));
 
             if (oneProfit > 0)
             {
