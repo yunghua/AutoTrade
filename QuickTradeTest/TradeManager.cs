@@ -15,8 +15,7 @@ namespace QuickTradeTest
         //Const 常數區
         //-------------------------------------------------------------------------------------------------------------
         //
-        const double Enable_Pass_Period = 10;//最高點往下Enable_Pass_Period這麼多點之後，再往上突破最高點，才開始下單，或者
-        //最低點往上Enable_Pass_Period這麼多點之後，再往下突破最低點，才開始下單。
+        const double Enable_Pass_Period = 5;  //轉折點之間至少要大於五點
         const int Stage_New = 1;//初始化
         const int Stage_Order_Login_Start = 2;//登入下單API開始
         const int Stage_Order_Login_Success = 3;//登入下單API成功
@@ -189,23 +188,24 @@ namespace QuickTradeTest
 
         enum ReversePointType : int { MAX, MIN };//最後一個轉折點是最高點還是最低點
 
-        int reversePointType1of3 = -1;//三個轉折點中的第一個轉折點
+        int reversePointType1of3 = -1;//三個轉折點中的第一個轉折點，是高點還是低點
         int reversePointType2of3 = -1;//三個轉折點中的第二個轉折點
         int reversePointType3of3 = -1;//三個轉折點中的最後一個轉折點
 
-        double reversePoint1 = 0;//第一個轉折點的點位
-        double reversePoint2 = 0;//第二個轉折點的點位
+        OriginalRecord reversePoint1 = null;//第一個轉折點的紀錄
+        OriginalRecord reversePoint2 = null;//第二個轉折點的紀錄
+        OriginalRecord reversePoint3 = null;//第三個轉折點的紀錄
 
         int stage = Stage_New;
 
-        const int Trade_Period_Need = 10;//最高點、最低點都要離原始點至少要10點間隔才能新倉
+        const int Trade_Period_Need = 5;
 
         double originalPoint = 0;// 今日交易起始點
         double maxPoint = 0;//轉折點高點
         double minPoint = 0;//轉折點低點
+
         DateTime maxPointTime;
         DateTime minPointTime;
-
 
         double offsetPoint;//高低差
         double orderPriceTarget;//下單點位目標
@@ -910,78 +910,81 @@ namespace QuickTradeTest
             return totalProfit;
         }
 
-        private void dealDirection()//Ｍethod4找方向
+        private void dealStage()//決定是否開始下單
         {
-
-            if (direction == Direction_Down)
+            if (direction == Direction_Down && record.TradePrice < reversePoint2.TradePrice)
             {
-                if (record.TradePrice > minPoint)//目前點位大於最低點，卻又小於最高點
+                if (stage == Stage_New || stage == Stage_Order_Even_Success)
                 {
-                    passPointDown = minPoint + Enable_Pass_Period;
-
-                    if (record.TradePrice > passPointDown && !enablePassDown)
+                    if ((reversePoint3.TradePrice - reversePoint2.TradePrice) >= Enable_Pass_Period)
                     {
-                        enablePassDown = true;//可以準備檢查向下突破機制了
-                        direction = Direction_Up;
+                        stage = Stage_Order_New_Start;
                     }
                 }
             }
-            else if (direction == Direction_Up)
+            else if (direction == Direction_Up && record.TradePrice > reversePoint2.TradePrice)
             {
-                if (record.TradePrice < maxPoint)//目前點位小於最高點，卻又大於最低點
+                if (stage == Stage_New || stage == Stage_Order_Even_Success)
                 {
-                    passPointUp = maxPoint - Enable_Pass_Period;
-
-                    if (record.TradePrice < passPointUp && !enablePassUp)
+                    if ((reversePoint2.TradePrice - reversePoint3.TradePrice) >= Enable_Pass_Period)
                     {
-                        enablePassUp = true;//可以準備檢查向上突破機制了
-                        direction = Direction_Down;
+                        stage = Stage_Order_New_Start;
                     }
                 }
             }
+        }
 
-            if (record.TradePrice > maxPoint)//取得相對高點
+        
+
+        OriginalRecord recordNow = null;//目前的行情Tick
+
+        OriginalRecord recordPrev1 = null;//上一筆行情Tick
+
+        OriginalRecord recordPrev2 = null;//再上一筆行情Tick
+
+        private void dealReverePointAndDirection()//取得轉折點與方向
+        {
+            try
             {
-                maxPoint = record.TradePrice;
+                recordNow = recordList[recordList.Count - 1];
 
-                maxPointTime = record.TradeMoment;
+                recordPrev1 = recordList[recordList.Count - 2];
 
-                direction = Direction_Up;
-
-                if (enablePassUp)
-                {
-                    if (stage == Stage_New)
-                    {
-                        stage = Stage_Order_New_Start;//開始下單
-                    }
-                    else if (stage == Stage_Order_Even_Success)
-                    {
-                        stage = Stage_Order_New_Start;//開始下單
-                    }
-                }
+                recordPrev2 = recordList[recordList.Count - 3];
             }
-            else if (record.TradePrice < minPoint)//取得相對低點
+            catch (Exception e)
             {
-                minPoint = record.TradePrice;
+                throw e;
+            }
 
-                minPointTime = record.TradeMoment;
+            if (recordNow.TradePrice < recordPrev1.TradePrice && recordPrev1.TradePrice > recordPrev2.TradePrice)//高點轉折
+            {
+                reversePoint1 = reversePoint2;
+                reversePoint2 = reversePoint3;
+                reversePoint3 = recordPrev1;
+
+                reversePointType1of3 = reversePointType2of3;
+                reversePointType2of3 = reversePointType3of3;
+                reversePointType3of3 = ReversePointType.MAX.GetHashCode();
 
                 direction = Direction_Down;
-
-                if (enablePassDown)
-                {
-                    if (stage == Stage_New)
-                    {
-                        stage = Stage_Order_New_Start;//開始下單
-                    }
-                    else if (stage == Stage_Order_Even_Success)
-                    {
-                        stage = Stage_Order_New_Start;//開始下單
-                    }
-                }
             }
 
+
+            if (recordNow.TradePrice > recordPrev1.TradePrice && recordPrev1.TradePrice < recordPrev2.TradePrice)//低點轉折
+            {
+                reversePoint1 = reversePoint2;
+                reversePoint2 = reversePoint3;
+                reversePoint3 = recordPrev1;
+
+                reversePointType1of3 = reversePointType2of3;
+                reversePointType2of3 = reversePointType3of3;
+                reversePointType3of3 = ReversePointType.MIN.GetHashCode();
+
+                direction = Direction_Up;
+            }
         }
+
 
         private double coreLogic4()//順勢動態停利
         {
@@ -998,7 +1001,7 @@ namespace QuickTradeTest
 
                     record = OriginalRecordConverter.getOriginalRecord(nowLine);
 
-                    debugMsg("Record Price:" + record.TradePrice+":"+record.TradeMoment);
+                    //debugMsg("Record Price:" + record.TradePrice+":"+record.TradeMoment);
 
                     recordList.Add(record);
 
@@ -1011,11 +1014,13 @@ namespace QuickTradeTest
                         //reversePoint1 = record.TradePrice;
                     }
 
-                    yDraw = 300 - (Convert.ToInt32(record.TradePrice) - yBase);
+                    yDraw = 300 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
 
                     xDraw++;
 
                     graphic.drawPoint(xDraw, yDraw);
+
+                    dealReverePointAndDirection();
 
                     //if (record.TradePrice > maxHighPoint)//取得相對高點
                     //{
@@ -1092,36 +1097,14 @@ namespace QuickTradeTest
                     //}
 
 
-
                     if (isStartOrder == false)//還沒新倉
                     {
-                        dealDirection();//取得方向
 
-                        if (tradeCount == 0)//第一次交易開始之前
-                        {
-                            //if (reversePointType3of3 == ReversePointType.MAX.GetHashCode())
-                            //{
-                            //    if (isFollow == false)//逆勢
-                            //    {
-                            //        direction = Direction_Up;
-                            //    }
-                            //    else//順勢
-                            //    {
-                            //        direction = Direction_Down;
-                            //    }
-                            //}
-                            //else if (reversePointType3of3 == ReversePointType.MIN.GetHashCode())
-                            //{
-                            //    if (isFollow == false)//逆勢
-                            //    {
-                            //        direction = Direction_Down;
-                            //    }
-                            //    else//順勢
-                            //    {
-                            //        direction = Direction_Up;
-                            //    }
-                            //}
-                        }
+
+
+                        dealStage();
+
+                        
 
                         if (direction == Direction_Down)
                         {
@@ -1136,7 +1119,8 @@ namespace QuickTradeTest
                                 orderPrice = record.TradePrice;//實際交易點位
                                 isStartOrder = true;
 
-                                graphic.drawSellLine(xDraw, Convert.ToInt32(record.TradePrice));
+                                yDraw = 300 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+                                graphic.drawSellLine(xDraw, yDraw);
 
                                 maxPoint = record.TradePrice;//把上一個最高點由交易點取代掉
 
@@ -1166,7 +1150,9 @@ namespace QuickTradeTest
                                 stage = Stage_Order_New_Success;
                                 orderPrice = record.TradePrice;//實際交易點位
                                 isStartOrder = true;
-                                graphic.drawBuyLine(xDraw, Convert.ToInt32(record.TradePrice));
+
+                                yDraw = 300 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+                                graphic.drawBuyLine(xDraw, yDraw);
 
                                 minPoint = record.TradePrice;//把上一個最低點由交易點取代掉
                                 minPointTime = record.TradeMoment;
@@ -1188,18 +1174,20 @@ namespace QuickTradeTest
                     }
                     else if (isStartOrder == true)//已經新倉，準備平倉
                     {
-                        if (record.TradePrice > maxPoint)//取得相對高點
-                        {
-                            maxPoint = record.TradePrice;
-                            maxPointTime = record.TradeMoment;
-                        }
-                        else if (record.TradePrice < minPoint)//取得相對低點
-                        {
-                            minPoint = record.TradePrice;
-                            minPointTime = record.TradeMoment;
-                        }
+                        //if (record.TradePrice > maxPoint)//取得相對高點
+                        //{
+                        //    maxPoint = record.TradePrice;
+                        //    maxPointTime = record.TradeMoment;
+                        //}
+                        //else if (record.TradePrice < minPoint)//取得相對低點
+                        //{
+                        //    minPoint = record.TradePrice;
+                        //    minPointTime = record.TradeMoment;
+                        //}
 
-                        offsetPoint = maxPoint - record.TradePrice;
+                        //offsetPoint = maxPoint - record.TradePrice;
+
+                        offsetPoint = reversePoint3.TradePrice - record.TradePrice;
 
                         reversePercentage = getReversePercentage(offsetPoint);//查表，取得反轉百分比
 
@@ -1250,9 +1238,9 @@ namespace QuickTradeTest
 
                             if (direction == Direction_Down)
                             {
-                                if (maxPoint - minPoint > 10)
+                                if (reversePoint2.TradePrice - reversePoint3.TradePrice > 10)
                                 {
-                                    orderPriceTarget = minPoint + tradePeriod;
+                                    orderPriceTarget = reversePoint3.TradePrice + tradePeriod;
 
                                     if (record.TradePrice >= orderPriceTarget)
                                     {
@@ -1264,9 +1252,9 @@ namespace QuickTradeTest
                             }
                             else if (direction == Direction_Up)
                             {
-                                if (maxPoint - minPoint > 10)
+                                if (reversePoint3.TradePrice - reversePoint2.TradePrice > 10)
                                 {
-                                    orderPriceTarget = maxPoint - tradePeriod;
+                                    orderPriceTarget = reversePoint3.TradePrice - tradePeriod;
 
                                     if (record.TradePrice <= orderPriceTarget)
                                     {
@@ -1305,8 +1293,8 @@ namespace QuickTradeTest
             debugMsg("MIN---->" + minPoint + ":" + minPointTime);
             debugMsg("Original---->" + originalPoint);
 
-
-            graphic.drawBuyLine(xDraw, Convert.ToInt32(record.TradePrice));
+            yDraw = 300 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+            graphic.drawBuyLine(xDraw, yDraw);
 
             if (oneProfit > 0)
             {
@@ -1366,7 +1354,8 @@ namespace QuickTradeTest
             debugMsg("MIN---->" + minPoint + ":" + minPointTime);
             debugMsg("Original---->" + originalPoint);
 
-            graphic.drawSellLine(xDraw, Convert.ToInt32(record.TradePrice));
+            yDraw = 300 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+            graphic.drawSellLine(xDraw, yDraw);
 
             if (oneProfit > 0)
             {

@@ -68,6 +68,7 @@ namespace QuickTradeTest
             this.Name = "Form1";
             this.Text = "自動交易回測圖";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.Closed += new System.EventHandler(this.Form1_Close);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
@@ -78,7 +79,7 @@ namespace QuickTradeTest
 
         private System.Windows.Forms.PictureBox pictureBox1;
 
-        private Bitmap b;
+        
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.HScrollBar hScrollBar1;  
     }

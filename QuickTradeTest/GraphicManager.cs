@@ -9,38 +9,30 @@ namespace TradeUtility
 {
     class GraphicManager
     {
-        Graphics m_graphics = null;      
+        Graphics m_graphics = null;
 
-        Pen pointPen =  new Pen(Color.Black, 1);	//畫筆
+        Pen pointPen = new Pen(Color.Black, 1);	//畫筆  
 
-        PictureBox pictureBox1 = null;
-
-        Bitmap b = null;
-
-        public GraphicManager(System.Windows.Forms.PictureBox pictureBox1,Bitmap b)
+        public GraphicManager(Graphics g)
         {
+            m_graphics = g;
+        }
 
-            //Graphics m_graphics = pictureBox1.CreateGraphics();
-
-            this.pictureBox1 = pictureBox1;
-
-            m_graphics = Graphics.FromImage(b);
-
-            m_graphics.Clear(Color.White);
-            
+        public void setGraphic(Graphics g)
+        {
+            m_graphics = g;
         }
 
         public void drawPoint(int x, int y)
-        {            
+        {
 
             if (m_graphics != null)
             {
-                m_graphics.DrawLine(pointPen, x, y, x, y+1);
+                //m_graphics.DrawLine(pointPen, x, y, x, y+3);
+
+                m_graphics.DrawEllipse(pointPen, x, y, 2, 2);
             }
 
-            pictureBox1.Image = b;
-
-            pictureBox1.Invalidate();
         }
 
         public void drawBuyLine(int x, int y)
@@ -55,14 +47,13 @@ namespace TradeUtility
             drawOrderLine(pen, x, y);
         }
 
-        public void drawOrderLine(Pen pen ,int x, int y)
+        public void drawOrderLine(Pen pen, int x, int y)
         {
             if (m_graphics != null)
-            {                
-                m_graphics.DrawLine(pen, x, y, x+1, y + 20);
+            {
+                m_graphics.DrawLine(pen, x, y-20, x, y + 20);
             }
 
-            pictureBox1.Image = b; 
         }
 
     }
