@@ -13,6 +13,8 @@ namespace QuickTradeTest
 {
     public partial class Form1 : Form
     {
+        const Boolean isGoPaint = true;
+
         Thread thread1 = null;
 
         GraphicManager graphicManager = null;
@@ -25,6 +27,8 @@ namespace QuickTradeTest
         Bitmap canvas = null;
 
         const int Picture_Box_Width = 65535;
+
+        const int Picture_Box_Height = 1000;
 
         const int Form_Width = 1300;
 
@@ -54,8 +58,11 @@ namespace QuickTradeTest
 
             graphicManager = new GraphicManager(graphicsForeground);
 
-            //timer1.Enabled = false;
-
+            //if (!isGoPaint)
+            //{
+            //    timer1.Enabled = false;
+            //}
+            timer1.Enabled = true;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -63,9 +70,11 @@ namespace QuickTradeTest
 
             this.Show();
 
-             thread1 = new Thread(runTest);
+            thread1 = new Thread(runTest);
 
-            thread1.Start();
+            thread1.Start();        
+
+
 
         }
 
@@ -75,9 +84,12 @@ namespace QuickTradeTest
 
             manager.setGraphicManager(graphicManager);
 
+            manager.setGoPaint(isGoPaint);
+
             manager.startTest();
 
             manager.stop();
+
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -116,6 +128,25 @@ namespace QuickTradeTest
          
 
         }
+
+        private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
+        {
+            int scrollPosition = e.NewValue;
+
+            int yPictureBoxLocation = 0 - (Picture_Box_Height * scrollPosition / 100);
+
+            pictureBox1.Location = new Point(pictureBox1.Location.X, yPictureBoxLocation);
+        }
+
+
+        //private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
+        //{
+        //    int scrollPosition = e.NewValue;
+
+        //    int yPictureBoxLocation = 0 - (Picture_Box_Height * scrollPosition / 100);
+
+        //    pictureBox1.Location = new Point(pictureBox1.Location.X, yPictureBoxLocation);
+        //}
 
     }
 }

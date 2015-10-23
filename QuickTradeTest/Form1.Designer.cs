@@ -41,13 +41,14 @@ namespace QuickTradeTest
             // 
             this.pictureBox1.Location = new System.Drawing.Point(2, 12);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(65535, 600);
+            this.pictureBox1.Size = new System.Drawing.Size(65535, 1000);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
             // timer1
             // 
             this.timer1.Enabled = true;
+            this.timer1.Interval = 10;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // hScrollBar1
@@ -68,8 +69,8 @@ namespace QuickTradeTest
             this.Name = "Form1";
             this.Text = "自動交易回測圖";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.Closed += new System.EventHandler(this.Form1_Close);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
+            this.Closed += new System.EventHandler(this.Form1_Close);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 

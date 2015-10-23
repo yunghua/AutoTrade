@@ -92,11 +92,18 @@ namespace QuickTradeTest
 
         GraphicManager graphic = null;
 
+        Boolean isGoPaint = false;
+
         //Boolean isPrepared = false;
 
         public TestManager()
         {
 
+        }
+
+        public void setGoPaint(Boolean isGoPaint)
+        {
+            this.isGoPaint = isGoPaint;
         }
 
         public void setGraphicManager(GraphicManager graphic)
@@ -419,6 +426,8 @@ namespace QuickTradeTest
                     TradeManager manager = new TradeManager();
 
                     manager.setGraphicManager(graphic);
+
+                    manager.setGoPaint(isGoPaint);
 
                     if (maxLoss != null && !maxLoss.Equals(""))
                     {
