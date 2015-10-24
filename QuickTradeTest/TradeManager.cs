@@ -16,13 +16,13 @@ namespace QuickTradeTest
         //Const 常數區
         //-------------------------------------------------------------------------------------------------------------
         //
-        const double Period_Reverse_Reverse = 5;  //轉折點之間至少要大於五點
-        const double Period_Order_Reverse = 10;  //轉折點之間至少要大於十點
+        const double Period_Reverse_Reverse = 30;  //兩個轉折點之間至少要大於 XX 點
+        const double Period_Order_Reverse = 30;  //下單點與轉折點之間至少要大於 XX點
 
         const int X_Offset = 5;  //畫點位的X座標位移幅度
 
 
-        const int Picture_Box_Height = 600;//畫布的高度
+        const int Picture_Box_Height = 1000;//畫布的高度
 
         const int Stage_New = 1;//初始化
         const int Stage_Order_Login_Start = 2;//登入下單API開始
@@ -55,7 +55,7 @@ namespace QuickTradeTest
 
         const int Array_Begin_Index = 0;
 
-        const Boolean DEBUG = true;
+        const Boolean DEBUG = false;
 
         const int Random_Seed = 888;//隨機參數種子
 
@@ -1073,8 +1073,8 @@ namespace QuickTradeTest
                         isStartOrder = true;
                         if (isGoPaint)
                         {
-                            //yDraw = Picture_Box_Height/2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
-                            //graphic.drawSellLine(xDraw, yDraw);
+                            yDraw = Picture_Box_Height / 2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+                            graphic.drawSellLine(xDraw, yDraw);
                         }
 
                         nowTradeType = TradeType.SELL.GetHashCode();
@@ -1100,8 +1100,8 @@ namespace QuickTradeTest
 
                         if (isGoPaint)
                         {
-                            //yDraw = Picture_Box_Height/2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
-                            //graphic.drawBuyLine(xDraw, yDraw);
+                            yDraw = Picture_Box_Height / 2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+                            graphic.drawBuyLine(xDraw, yDraw);
                         }
 
                         nowTradeType = TradeType.BUY.GetHashCode();
@@ -1181,7 +1181,7 @@ namespace QuickTradeTest
                     {
 
 
-                        offsetPoint = orderPrice - reversePoint3.TradePrice;
+                        offsetPoint = Math.Abs(orderPrice - reversePoint3.TradePrice);
 
                         reversePercentage = getReversePercentage(offsetPoint);//查表，取得反轉百分比
 
@@ -1207,8 +1207,8 @@ namespace QuickTradeTest
 
                                 if (isGoPaint)
                                 {
-                                    //yDraw = Picture_Box_Height/2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
-                                    //graphic.drawSellLine(xDraw, yDraw);
+                                    yDraw = Picture_Box_Height / 2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+                                    graphic.drawSellLine(xDraw, yDraw);
                                 }
                             }
                             else if (nowTradeType == TradeType.SELL.GetHashCode())
@@ -1217,8 +1217,8 @@ namespace QuickTradeTest
 
                                 if (isGoPaint)
                                 {
-                                    //yDraw = Picture_Box_Height/2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
-                                    //graphic.drawBuyLine(xDraw, yDraw);
+                                    yDraw = Picture_Box_Height / 2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+                                    graphic.drawBuyLine(xDraw, yDraw);
                                 }
                             }
 
@@ -1251,19 +1251,23 @@ namespace QuickTradeTest
 
                             if (direction == Direction_Down && nowTradeType == TradeType.BUY.GetHashCode())
                             {
-                                if (reversePoint3.TradePrice - orderPrice > periodOrderReverse)
+                                if (reversePoint3.TradePrice - orderPrice > periodOrderReverse)//停利
                                 {
-                                    orderPriceTarget = reversePoint3.TradePrice - tradePeriod;//停利
+                                    orderPriceTarget = reversePoint3.TradePrice - tradePeriod;
 
-                                    if (record.TradePrice <= orderPriceTarget)
+                                    if (record.TradePrice >= orderPriceTarget)
                                     {
                                         dealOutHighPointReverse();
                                         continue;
                                     }
 
-                                    orderPriceTarget = reversePoint3.TradePrice + tradePeriod;//停損
 
-                                    if (record.TradePrice >= orderPriceTarget)
+                                }
+                                else if (orderPrice - reversePoint3.TradePrice > periodOrderReverse)//停損
+                                {
+                                    orderPriceTarget = orderPrice - tradePeriod;
+
+                                    if (record.TradePrice <= orderPriceTarget)
                                     {
                                         dealOutHighPointReverse();
                                         continue;
@@ -1273,20 +1277,9 @@ namespace QuickTradeTest
                             }
                             else if (direction == Direction_Up && nowTradeType == TradeType.SELL.GetHashCode())
                             {
-                                if (orderPrice - reversePoint3.TradePrice > periodOrderReverse)
+                                if (orderPrice - reversePoint3.TradePrice > periodOrderReverse)//停利
                                 {
-                                    orderPriceTarget = reversePoint3.TradePrice + tradePeriod;//停利
-
-                                    if (record.TradePrice >= orderPriceTarget)
-                                    {
-                                        {
-
-                                            dealOutLowPointReverse();
-                                            continue;
-                                        }
-                                    }
-
-                                    orderPriceTarget = reversePoint3.TradePrice - tradePeriod;//停損
+                                    orderPriceTarget = reversePoint3.TradePrice + tradePeriod;
 
                                     if (record.TradePrice <= orderPriceTarget)
                                     {
@@ -1297,6 +1290,19 @@ namespace QuickTradeTest
                                         }
                                     }
 
+                                }
+                                else if (reversePoint3.TradePrice - orderPrice > periodOrderReverse)//停損
+                                {
+                                    orderPriceTarget = reversePoint3.TradePrice - tradePeriod;
+
+                                    if (record.TradePrice >= orderPriceTarget)
+                                    {
+                                        {
+
+                                            dealOutLowPointReverse();
+                                            continue;
+                                        }
+                                    }
                                 }
                             }
 
@@ -1333,8 +1339,8 @@ namespace QuickTradeTest
                 //-----------------------------------------------------------------------------------------------------------
                 if (isGoPaint)
                 {
-                    //yDraw = Picture_Box_Height/2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
-                    //graphic.drawBuyLine(xDraw, yDraw);
+                    yDraw = Picture_Box_Height / 2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+                    graphic.drawBuyLine(xDraw, yDraw);
                 }
                 //-----------------------------------------------------------------------------------------------------------
                 //繪圖區 END
@@ -1404,8 +1410,8 @@ namespace QuickTradeTest
                 //-----------------------------------------------------------------------------------------------------------
                 if (isGoPaint)
                 {
-                    //yDraw = Picture_Box_Height/2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
-                    //graphic.drawSellLine(xDraw, yDraw);
+                    yDraw = Picture_Box_Height / 2 - (Convert.ToInt32(record.TradePrice) - yBase) * 4;
+                    graphic.drawSellLine(xDraw, yDraw);
                 }
                 //-----------------------------------------------------------------------------------------------------------
                 //繪圖區 END

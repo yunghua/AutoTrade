@@ -11,9 +11,9 @@ namespace TradeUtility
     {
         Graphics m_graphics = null;
 
-        Font font = new Font("微軟正黑體", 12, FontStyle.Bold);
+        Font font = new Font("微軟正黑體", 12, FontStyle.Regular);
 
-        SolidBrush brush = new SolidBrush(Color.DarkOrchid);
+        SolidBrush brush = new SolidBrush(Color.Black);
 
         Point point = new Point();
 
@@ -33,9 +33,7 @@ namespace TradeUtility
         {
 
             if (m_graphics != null)
-            {
-                //m_graphics.DrawLine(pointPen, x, y, x, y+3);
-
+            {                
                 m_graphics.DrawEllipse(pointPen, x, y, 2, 2);
             }
 
