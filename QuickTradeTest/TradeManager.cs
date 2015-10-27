@@ -9,7 +9,7 @@ namespace QuickTradeTest
     class TradeManager
     {
 
-        const Boolean DEBUG = true;
+        const Boolean DEBUG = false;
 
 
         //Const 常數區
@@ -43,7 +43,7 @@ namespace QuickTradeTest
 
         const int Array_Begin_Index = 0;
 
-        
+
 
         const int Random_Seed = 888;//隨機參數種子
 
@@ -143,6 +143,8 @@ namespace QuickTradeTest
         Dictionary<int, int> loseLine;  //認賠的底線
 
         Dictionary<int, int> winLine;  //停利的底線
+
+        Dictionary<int, int> reverseLine;  //動態停利反轉的底線
 
         int nowStrategyCount = 1; //目前使用哪一行的停損停利規則
 
@@ -244,6 +246,11 @@ namespace QuickTradeTest
             winLine = win;
         }
 
+        public void setReverseLine(Dictionary<int, int> reverse)
+        {
+            reverseLine = reverse;
+        }
+
 
         public TradeManager()
         {
@@ -302,15 +309,22 @@ namespace QuickTradeTest
 
         private void dealStrategyCount(int count)//依照獲利 或是 賠錢，或是加碼次數次數，來定停損停利範圍
         {
+            if (count <= 0)
+            {
+                nowStrategyCount = 1;
+                return;
+            }
 
-            int baseCount = 1;//幾次之後跳下一階
+            //int baseCount = 1;//幾次之後跳下一階
 
             try
             {
-                if (count % baseCount == 0)
+                //if (count % baseCount == 0)
                 {
 
-                    nowStrategyCount = (count / baseCount) + 1;
+                    //nowStrategyCount = (count / baseCount);
+
+                    nowStrategyCount = count;
 
                     if (count >= winLine.Count)
                     {
@@ -1282,24 +1296,27 @@ namespace QuickTradeTest
 
                         minTradePoint = 99999;
 
-                        if (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))
+                        if (//isPrevLose == true ||
+                            isPrevWin == true ||
+                            Dice.run(Random_Seed))
                         {
                             tradeTime = record.TradeTime;
 
                             tradeDateTime = record.TradeMoment;
 
-                            if (isPrevLose == true)
-                            {
-                                if (prevTradeType == TradeType.BUY.GetHashCode())
-                                {
-                                    nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
-                                }
-                                else
-                                {
-                                    nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
-                                }
-                            }
-                            else if (isPrevWin == true)
+                            //if (isPrevLose == true)
+                            //{
+                            //    if (prevTradeType == TradeType.BUY.GetHashCode())
+                            //    {
+                            //        nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                            //    }
+                            //    else
+                            //    {
+                            //        nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                            //    }
+                            //}
+                            //else 
+                            if (isPrevWin == true)
                             {
                                 if (prevTradeType == TradeType.BUY.GetHashCode())
                                 {
@@ -1441,9 +1458,9 @@ namespace QuickTradeTest
                                 //--------------------------------------------------------------------------------------------------------------------------------
                                 //stopPeriod = getReverseLitmit(maxTradePoint - minTradePoint, addTimes, ratio);
 
-                                stopPeriod = loseLine[nowStrategyCount];
+                                stopPeriod = reverseLine[nowStrategyCount];
 
-                                stopPrice = maxTradePoint - Convert.ToInt32(stopPeriod);                                
+                                stopPrice = maxTradePoint - Convert.ToInt32(stopPeriod);
 
                                 if (record.TradePrice < stopPrice)
                                 {
@@ -1575,7 +1592,7 @@ namespace QuickTradeTest
                                 //--------------------------------------------------------------------------------------------------------------------------------
                                 //stopPeriod = getReverseLitmit(maxTradePoint - minTradePoint, addTimes, ratio);
 
-                                stopPeriod = loseLine[nowStrategyCount];
+                                stopPeriod = reverseLine[nowStrategyCount];
 
                                 stopPrice = minTradePoint + Convert.ToInt32(stopPeriod);
 
