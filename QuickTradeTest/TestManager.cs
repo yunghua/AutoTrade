@@ -206,23 +206,7 @@ namespace QuickTradeTest
 
             conclusionMsg("----------------------------------------------------------------------------------------------");
 
-            if (winLine != null && loseLine != null)
-            {
-
-                for (int i = 1; i <= winLine.Count; i++)
-                {
-                    conclusionMsg("測試規則WIN   00" + i + ":" + winLine[i]);
-                }
-
-                conclusionMsg("----------------------------------------------------------------------------------------------");
-
-                for (int i = 1; i <= winLine.Count; i++)
-                {
-                    conclusionMsg("測試規則LOSE  00" + i + ":" + loseLine[i]);
-                }
-
-            }
-
+            
             if (stopRatio != null)
             {
                 conclusionMsg("逆勢動態停利規則 : " + stopRatio.ToString());
@@ -296,7 +280,26 @@ namespace QuickTradeTest
                                 loseLine[j] = tmpLose;
                             }
 
+                            if (winLine != null && loseLine != null)
+                            {
+
+                                for (int s = 1; s <= winLine.Count; s++)
+                                {
+                                    conclusionMsg("測試規則WIN   00" + s + ":" + winLine[s]);
+                                }
+
+
+                                for (int z= 1; z <= winLine.Count; z++)
+                                {
+                                    conclusionMsg("測試規則LOSE  00" + z+ ":" + loseLine[z]);
+                                }
+
+                            }
+
+
                             startTest(k * 1000 + i);
+
+
 
                         }//end for i
 
@@ -702,6 +705,8 @@ namespace QuickTradeTest
             conclusionMsg("賠錢四萬以上次數 : " + profitRange[40]);
             conclusionMsg("賠錢五萬以上次數 : " + profitRange[41]);
 
+            conclusionMsg("----------------------------------------------------------------------------------------------");
+
             reportMsg("----------------------------------------------------------------------------------------------");
 
             if (winLine != null)
@@ -725,7 +730,7 @@ namespace QuickTradeTest
             reportMsg("----------------------------------------------------------------------------------------------");
             reportMsg("----------------------------------------------------------------------------------------------");
 
-
+            reportMsg(runCount * oFileList.Count + "次，扣除手續費後，總平均利潤 : " + pureProfit);
 
             if (pureProfit > 0)
             {

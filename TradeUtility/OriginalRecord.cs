@@ -75,9 +75,9 @@ namespace TradeUtility
             get { return tradeTime; }
             set { tradeTime = value; }
         }
-        private double tradePrice = 0.0;
+        private int tradePrice = 0;
 
-        public double TradePrice
+        public int TradePrice
         {
             get { return tradePrice; }
             set { tradePrice = value; }
