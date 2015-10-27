@@ -55,7 +55,7 @@ namespace QuickTradeTest
 
                 tradeCurrentVolumn = int.Parse(tmpData[5].Trim());
 
-                record.TradePrice = Convert.ToDouble(currentPrice);
+                record.TradePrice = Convert.ToInt32(currentPrice);
 
                 record.TradeVolumn = tradeCurrentVolumn / 2;
 
