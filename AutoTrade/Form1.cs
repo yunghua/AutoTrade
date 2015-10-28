@@ -317,7 +317,8 @@ namespace AutoTrade
 
             textBox1_winLine.Text = Convert.ToString(master.getWinLine()[1]);
 
-
+            textBox_reverseLine.Text = Convert.ToString(master.getReverseLine()[1]);
+            
             loginQuote();
 
             loginOrder();
