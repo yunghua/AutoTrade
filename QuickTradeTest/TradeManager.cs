@@ -9,7 +9,7 @@ namespace QuickTradeTest
     class TradeManager
     {
 
-        const Boolean DEBUG = false;
+        
 
 
         //Const 常數區
@@ -81,6 +81,8 @@ namespace QuickTradeTest
         Boolean isPrevLose = false;
 
         Boolean isActiveCheckProfit = false;//是否動態停利
+
+        Boolean debugEnabled = false;//是否顯示除錯訊息
 
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
@@ -190,6 +192,11 @@ namespace QuickTradeTest
         /// 程式區。
         /// </summary>
         /// 
+
+        public void setDebugEnabled(Boolean b)
+        {
+            debugEnabled = b;
+        }
 
         public void setStopRatio(Dictionary<int, int> stopRatio)
         {
@@ -1442,13 +1449,20 @@ namespace QuickTradeTest
                                 //--------------------------------------------------------------------------------------------------------------------------------
                                 //  加碼部分
                                 //--------------------------------------------------------------------------------------------------------------------------------
+
+
                                 if (nowAddTimes > addTimes)
                                 {
-                                    addTimes = nowAddTimes;//實際要加碼的次數
+                                    if (addTimes < 10)
+                                    {
 
-                                    orderPriceList.Add(record.TradePrice);
+                                        addTimes = nowAddTimes;//實際要加碼的次數
 
-                                    continue;
+                                        orderPriceList.Add(record.TradePrice);
+
+                                        continue;
+                                    }
+
 
                                 }
 
@@ -1576,13 +1590,19 @@ namespace QuickTradeTest
                                 //--------------------------------------------------------------------------------------------------------------------------------
                                 //  加碼部分
                                 //--------------------------------------------------------------------------------------------------------------------------------
+
+
+
                                 if (nowAddTimes > addTimes)
                                 {
-                                    addTimes = nowAddTimes;//實際要加碼的次數
+                                    if (addTimes < 10)
+                                    {
+                                        addTimes = nowAddTimes;//實際要加碼的次數
 
-                                    orderPriceList.Add(record.TradePrice);
+                                        orderPriceList.Add(record.TradePrice);
 
-                                    continue;
+                                        continue;
+                                    }
 
                                 }
 
@@ -1834,7 +1854,7 @@ namespace QuickTradeTest
 
         private void debugMsg(String msg)
         {
-            if (DEBUG)
+            if (debugEnabled)
             {
                 Console.WriteLine(msg);
             }
