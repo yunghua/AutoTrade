@@ -994,7 +994,7 @@ namespace QuickTradeTest
                 if (isGoPaint)
                 {
                     yDraw = Picture_Box_Height / 2 - (Convert.ToInt32(reversePoint3.TradePrice) - yBase) * 4;
-                    graphic.drawUpLine(p3.Index * X_Offset+1, yDraw);
+                    graphic.drawUpLine(p3.Index * X_Offset + 1, yDraw);
                     graphic.drawText(Convert.ToString(reversePoint3.TradePrice), xDraw - X_Offset * 4, yDraw - 42);
                 }
             }
@@ -1022,7 +1022,7 @@ namespace QuickTradeTest
                 if (isGoPaint)
                 {
                     yDraw = Picture_Box_Height / 2 - (Convert.ToInt32(reversePoint3.TradePrice) - yBase) * 4;
-                    graphic.drawDownLine(p3.Index * X_Offset+1, yDraw);
+                    graphic.drawDownLine(p3.Index * X_Offset + 1, yDraw);
                     graphic.drawText(Convert.ToString(reversePoint3.TradePrice), xDraw - X_Offset * 4, yDraw + 21);
                 }
             }
@@ -1050,6 +1050,11 @@ namespace QuickTradeTest
                 int i = 1;
                 do
                 {
+                    if ((recordList.Count - i - 2) < 0)
+                    {
+                        break;
+                    }
+
                     if (recordList[recordList.Count - 1].TradePrice < recordList[recordList.Count - 2].TradePrice)///檢查高點轉折
                     {
                         if (recordList[recordList.Count - i - 1].TradePrice == recordList[recordList.Count - i - 2].TradePrice)//平的，繼續往前看

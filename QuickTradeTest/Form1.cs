@@ -13,7 +13,7 @@ namespace QuickTradeTest
 {
     public partial class Form1 : Form
     {
-        const Boolean isGoPaint = false;
+        const Boolean isGoPaint = true;
 
         Thread thread1 = null;
 
