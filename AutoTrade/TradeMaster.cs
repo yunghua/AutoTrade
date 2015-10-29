@@ -93,6 +93,8 @@ namespace AutoTrade
 
         Boolean isStopTodayTrade = false; //是否停止今日交易
 
+        Boolean enableTrade = true;//是否可以交易
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 變數。
@@ -288,6 +290,11 @@ namespace AutoTrade
         public TradeMaster(Form1 parentForm)
         {
             this.parentForm = parentForm;
+        }
+
+        public void setEnableTrade(Boolean enable)
+        {
+            this.enableTrade = enable;
         }
 
         public void setFuturesCode(string code)
@@ -569,7 +576,7 @@ namespace AutoTrade
                 allTradeOutputFile.writeLine(outputLine);
 
 
-                if (!isStopTodayTrade)
+                if (!isStopTodayTrade && enableTrade)
                 {
                     startTrade(matchTime, matchPrice, matchQuantity);//執行交易程式
                 }
@@ -925,7 +932,7 @@ namespace AutoTrade
                     orderDircetion = BS_Type_S;
                 }
 
-                debugMsg("交易金額---->" + orderPrice);
+                debugMsg("第一筆交易金額---->" + orderPrice);
 
                 debugMsg("交易時間---->" + tradeDateTime);
 
@@ -955,7 +962,7 @@ namespace AutoTrade
 
                 if (nowTradeType == TradeType.BUY.GetHashCode())
                 {
-                    if ((addTimes >= 1 && record.TradePrice == orderPrice) || (orderNewPrice - record.TradePrice) > loseLine[nowStrategyCount])//賠了XX點，認賠殺出
+                    if ((addTimes >= 1 && record.TradePrice == orderPrice) || (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])//賠了XX點，認賠殺出
                     {//認賠殺出
 
                         orderDircetion = BS_Type_S;
@@ -980,7 +987,7 @@ namespace AutoTrade
 
                         //賺了XX點，加碼
 
-                        nowAddTimes = Convert.ToInt16((record.TradePrice - orderPrice) / winLine[nowStrategyCount]);//目前應該有的加碼次數
+                        nowAddTimes = Convert.ToInt16((record.TradePrice - orderNewPrice) / winLine[nowStrategyCount]);//目前應該有的加碼次數
 
                         if (nowAddTimes > addTimes)
                         {
@@ -1034,7 +1041,7 @@ namespace AutoTrade
                 else if (nowTradeType == TradeType.SELL.GetHashCode())
                 {
 
-                    if ((record.TradePrice - orderNewPrice) > loseLine[nowStrategyCount])
+                    if ((addTimes >= 1 && record.TradePrice == orderPrice) || (record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
                     {
                         //賠了XX點，認賠殺出
 
@@ -1042,7 +1049,7 @@ namespace AutoTrade
 
                         if (stage == Stage_Order_New_Success)
                         {
-                            int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes + 1);
+                            int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes);
 
                             stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                         }
@@ -1059,15 +1066,13 @@ namespace AutoTrade
 
                         //賺了XX點，加碼
 
-                        nowAddTimes = Convert.ToInt16((record.TradePrice - orderPrice) / winLine[nowStrategyCount]);//目前應該有的加碼次數
+                        nowAddTimes = Convert.ToInt16((orderNewPrice - record.TradePrice) / winLine[nowStrategyCount]);//目前應該有的加碼次數
 
                         if (nowAddTimes > addTimes)
                         {
                             if (addTimes < 10)
                             {
                                 addTimes = nowAddTimes;//實際要加碼的次數
-
-
 
                                 orderDircetion = BS_Type_S;//繼續賣
 
@@ -1097,7 +1102,7 @@ namespace AutoTrade
 
                             if (stage == Stage_Order_New_Success)
                             {
-                                int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes + 1);
+                                int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes);
 
                                 stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                             }

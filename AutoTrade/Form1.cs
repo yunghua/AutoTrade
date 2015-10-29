@@ -372,6 +372,18 @@ namespace AutoTrade
             button_Reverse.Enabled = false;
         }
 
+        private void checkBox_enableTrade_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_enableTrade.Checked)
+            {
+                master.setEnableTrade(true);
+            }
+            else
+            {
+                master.setEnableTrade(false);
+            }
+        }
+
 
 
     }
