@@ -84,6 +84,8 @@ namespace QuickTradeTest
 
         Boolean debugEnabled = false;//是否顯示除錯訊息
 
+        Boolean reverseEnabled = false;//是否買賣方向轉向
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 變數。
@@ -100,7 +102,7 @@ namespace QuickTradeTest
 
         int lotIndex = 0;//交易口數陣列的第幾個
 
-        List<int> sellOrBuyCheckPeriodList = null;//交易買賣方向的檢查時間間隔
+        int[] sellOrBuyCheckPeriod = null;//交易買賣方向的檢查時間間隔
 
         int number = 0;//超過檢查時間的次數
 
@@ -160,8 +162,7 @@ namespace QuickTradeTest
 
         TradeFile sourceFile;
 
-        OriginalRecord befofeRecord;
-
+        OriginalRecord befofeRecord = null;
 
         string[] lotArray;//獲利加碼的設定
 
@@ -268,10 +269,6 @@ namespace QuickTradeTest
 
         public TradeManager()
         {
-
-            OriginalRecord befofeRecord = new OriginalRecord();
-
-            sellOrBuyCheckPeriodList = new List<int>();
 
 
         }
@@ -435,6 +432,7 @@ namespace QuickTradeTest
             try
             {
 
+                sellOrBuyCheckPeriod = new int[checkCount];
 
                 int baseTimePeriod = 5;
 
@@ -447,13 +445,13 @@ namespace QuickTradeTest
 
                 for (int i = 0; i < checkCount; i++)
                 {
+                    direction[i] = -1;
 
-
-                    sellOrBuyCheckPeriodList.Add(baseTimePeriod);
+                    sellOrBuyCheckPeriod[i] = baseTimePeriod;
 
                     baseTimePeriod += 5;
 
-                    minuteBeforeTradeTime[i] = tradeDateTime.AddSeconds(0 - sellOrBuyCheckPeriodList[i]);
+                    minuteBeforeTradeTime[i] = tradeDateTime.AddSeconds(0 - sellOrBuyCheckPeriod[i]);
 
                     debugMsg("minuteBeforeTradeTime[" + i + "]:" + minuteBeforeTradeTime[i]);
                 }
@@ -464,6 +462,7 @@ namespace QuickTradeTest
                     try
                     {
                         befofeRecord = RecordScanner.getRecordMinuteBeforeOrAfter(minuteBeforeTradeTime[i]);//XX鐘前的交易紀錄
+
                         if (befofeRecord == null)
                         {
                             return false;
@@ -481,39 +480,50 @@ namespace QuickTradeTest
 
                 for (int i = 0; i < checkCount; i++)
                 {
-                    if (i == checkCount - 1)
+
+
+                    if (record.TradePrice > basePrice[i])//目前交易金額大於XX分鐘前的交易金額
                     {
-                        break;
+                        direction[i] = TradeType.BUY.GetHashCode();
+                    }
+                    else if (record.TradePrice < basePrice[i])//目前交易金額小於XX分鐘前的交易金額
+                    {
+                        direction[i] = TradeType.SELL.GetHashCode();
                     }
 
-                    if (i == 0)
-                    {
-                        if ((record.TradePrice - basePrice[i]) > 0)//目前交易金額大於XX分鐘前的交易金額
-                        {
-                            direction[i] = TradeType.BUY.GetHashCode();
-                        }
-                        else if ((record.TradePrice - basePrice[i]) < 0)//目前交易金額小於XX分鐘前的交易金額
-                        {
-                            direction[i] = TradeType.SELL.GetHashCode();
-                        }
-                    }
-                    else
-                    {
-                        if ((basePrice[i] - basePrice[i - 1]) > 0)//目前交易金額大於XX分鐘前的交易金額
-                        {
-                            direction[i] = TradeType.BUY.GetHashCode();
-                        }
-                        else if ((basePrice[i] - basePrice[i - 1]) < 0)//目前交易金額小於XX分鐘前的交易金額
-                        {
-                            direction[i] = TradeType.SELL.GetHashCode();
-                        }
-                    }
+                    //if (i == 0)
+                    //{
+                    //    if (record.TradePrice > basePrice[i])//目前交易金額大於XX分鐘前的交易金額
+                    //    {
+                    //        direction[i] = TradeType.BUY.GetHashCode();
+                    //    }
+                    //    else if (record.TradePrice < basePrice[i])//目前交易金額小於XX分鐘前的交易金額
+                    //    {
+                    //        direction[i] = TradeType.SELL.GetHashCode();
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    if (basePrice[i - 1] > basePrice[i])//目前交易金額大於XX分鐘前的交易金額
+                    //    {
+                    //        direction[i] = TradeType.BUY.GetHashCode();
+                    //    }
+                    //    else if (basePrice[i - 1] < basePrice[i])//目前交易金額小於XX分鐘前的交易金額
+                    //    {
+                    //        direction[i] = TradeType.SELL.GetHashCode();
+                    //    }
+                    //}
 
                 }
 
                 for (int i = checkCount - 1; i > 0; i--)
                 {
                     if (direction[i] != direction[i - 1]) { return false; }
+                }
+
+                if (direction[0] == -1)//五個時間的價位都一樣
+                {
+                    return false;
                 }
 
                 nowTradeType = direction[0];
@@ -1329,7 +1339,7 @@ namespace QuickTradeTest
 
                         minTradePoint = 99999;
 
-                        if (//isPrevLose == true ||
+                        if (isPrevLose == true ||
                             isPrevWin == true ||
                             Dice.run(Random_Seed))
                         {
@@ -1341,11 +1351,26 @@ namespace QuickTradeTest
                             {
                                 if (prevTradeType == TradeType.BUY.GetHashCode())
                                 {
-                                    nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                                    if (reverseEnabled)
+                                    {
+                                        nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                                    }
+                                    else
+                                    {
+                                        nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                                    }
                                 }
                                 else
                                 {
-                                    nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                                    if (reverseEnabled)
+                                    {
+                                        nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                                    }
+                                    else
+                                    {
+                                        nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                                    }
+
                                 }
                             }
                             else
@@ -1353,11 +1378,25 @@ namespace QuickTradeTest
                                 {
                                     if (prevTradeType == TradeType.BUY.GetHashCode())
                                     {
-                                        nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                                        if (reverseEnabled)
+                                        {
+                                            nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                                        }
+                                        else
+                                        {
+                                            nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                                        }
                                     }
                                     else
                                     {
-                                        nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                                        if (reverseEnabled)
+                                        {
+                                            nowTradeType = prevTradeType = TradeType.BUY.GetHashCode();
+                                        }
+                                        else
+                                        {
+                                            nowTradeType = prevTradeType = TradeType.SELL.GetHashCode();
+                                        }
                                     }
                                 }
                                 else if (!dealSellOrBuy(record, tradeDateTime))
@@ -1440,6 +1479,15 @@ namespace QuickTradeTest
 
                                 pureProfit = oneProfit * valuePerPoint - orderPriceList.Count * cost;
 
+                                if (addTimes >= 1)
+                                {
+                                    reverseEnabled = true;
+                                }
+                                else
+                                {
+                                    reverseEnabled = false;
+                                }
+
                                 addTimes = 0;
 
                                 orderPriceList.Clear();
@@ -1463,6 +1511,8 @@ namespace QuickTradeTest
                                 loseOut();
 
                                 prevTradeType = TradeType.BUY.GetHashCode();
+
+
                             }
                             else if ((record.TradePrice - orderPrice) > winLine[nowStrategyCount])
                             {
@@ -1534,6 +1584,15 @@ namespace QuickTradeTest
 
                                     pureProfit = oneProfit * valuePerPoint - addTimes * cost;
 
+                                    if (addTimes >= 1)
+                                    {
+                                        reverseEnabled = true;
+                                    }
+                                    else
+                                    {
+                                        reverseEnabled = false;
+                                    }
+
                                     addTimes = 0;
 
                                     orderPriceList.Clear();
@@ -1555,6 +1614,8 @@ namespace QuickTradeTest
                                     winOut();
 
                                     prevTradeType = TradeType.BUY.GetHashCode();
+
+
 
                                 }
 
@@ -1590,6 +1651,15 @@ namespace QuickTradeTest
 
                                 pureProfit = oneProfit * valuePerPoint - orderPriceList.Count * cost;
 
+                                if (addTimes >= 1)
+                                {
+                                    reverseEnabled = true;
+                                }
+                                else
+                                {
+                                    reverseEnabled = false;
+                                }
+
                                 addTimes = 0;
 
                                 orderPriceList.Clear();
@@ -1611,6 +1681,8 @@ namespace QuickTradeTest
                                 loseOut();
 
                                 prevTradeType = TradeType.SELL.GetHashCode();
+
+
 
                             }
                             else if ((orderPrice - record.TradePrice) > winLine[nowStrategyCount])
@@ -1680,6 +1752,15 @@ namespace QuickTradeTest
 
                                     pureProfit = oneProfit * valuePerPoint - addTimes * cost;
 
+                                    if (addTimes >= 1)
+                                    {
+                                        reverseEnabled = true;
+                                    }
+                                    else
+                                    {
+                                        reverseEnabled = false;
+                                    }
+
                                     addTimes = 0;
 
                                     orderPriceList.Clear();
@@ -1703,6 +1784,8 @@ namespace QuickTradeTest
                                     winOut();
 
                                     prevTradeType = TradeType.SELL.GetHashCode();
+
+
                                 }
 
                             }
@@ -1711,6 +1794,13 @@ namespace QuickTradeTest
 
 
 
+                        //if (totalPureProfit < maxProfitLoss / 2)  //已達最大虧損水平線的一半
+                        //{
+                        //    if ((isPrevLose == true) && (isStartOrder == false))
+                        //    {
+                        //        reverseEnabled = true;
+                        //    }
+                        //}
 
 
                     }//下單結束
