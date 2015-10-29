@@ -9,6 +9,8 @@ namespace QuickTradeTest
     class TestManager
     {
 
+         
+        
         const Boolean DEBUG = false;
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
@@ -94,6 +96,8 @@ namespace QuickTradeTest
 
         Dictionary<int, int> stopRatio;  //逆勢動態停利的百分比查表，第一個int 是點數間隔，第二個是百分比
 
+        int checkCount = 5;//檢查幾個時間間隔，來決定買或是賣
+
         //Boolean isPrepared = false;
 
         public TestManager()
@@ -124,6 +128,8 @@ namespace QuickTradeTest
                 maxLoss = configFile.readConfig("Max_Loss");
                 sourceDir = configFile.readConfig("Source_Dir");
                 ratio = Convert.ToDouble(configFile.readConfig("Ratio"));
+
+                checkCount  = Convert.ToInt32(configFile.readConfig("Check_Count")); 
 
                 if (null == sourceDir)
                 {
@@ -213,6 +219,8 @@ namespace QuickTradeTest
 
             conclusionMsg("測試次數:" + runCount);
 
+            conclusionMsg("確定買賣方向的檢查機制，時間間隔次數:" + checkCount);
+
             conclusionMsg("----------------------------------------------------------------------------------------------");
 
 
@@ -232,7 +240,7 @@ namespace QuickTradeTest
 
             if (!prepareTest())
             {
-                reportMsg("規則檔案讀取失敗!");
+                conclusionMsg("規則檔案讀取失敗!");
 
                 return;
             }
@@ -313,6 +321,9 @@ namespace QuickTradeTest
                                     loseLine[j] = tmpLose;
                                 }
 
+                                startTest(qq * 10000 + k * 1000 + i);
+
+
                                 if (winLine != null && loseLine != null)
                                 {
 
@@ -334,11 +345,7 @@ namespace QuickTradeTest
                                     {
                                         reportMsg("測試規則REVERSE  00" + y + ":" + reverseLine[y]);
                                     }
-                                }
-
-                                startTest(k * 1000 + i);
-
-
+                                }                               
 
                             }//end for i
 
@@ -468,6 +475,11 @@ namespace QuickTradeTest
                     if (maxLoss != null && !maxLoss.Equals(""))
                     {
                         manager.setMaxProfitLoss(Convert.ToDouble(maxLoss));
+                    }
+
+                    if (checkCount > 0)
+                    {
+                        manager.setCheckCount(checkCount);
                     }
 
                     manager.setDebugEnabled(DEBUG);
@@ -696,14 +708,12 @@ namespace QuickTradeTest
             reportMsg("獲利口數 : " + totalWinCountRumManyTimes);
             reportMsg("賠錢口數 : " + totalLoseCountRunManyTimes);
             reportMsg("交易結束，獲利口數的總比率 : " + Convert.ToDouble(totalWinCountRumManyTimes) / ((Convert.ToDouble(totalWinCountRumManyTimes) + Convert.ToDouble(totalLoseCountRunManyTimes))) * 100 + " %");
-            conclusionMsg("交易結束，獲利口數的總比率 : " + Convert.ToDouble(totalWinCountRumManyTimes) / ((Convert.ToDouble(totalWinCountRumManyTimes) + Convert.ToDouble(totalLoseCountRunManyTimes))) * 100 + " %");
-
+           
 
             reportMsg("獲利日數 : " + winDayCount);
             reportMsg("賠錢日數" + loseDayCount);
             reportMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
-            conclusionMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
-
+            
 
             reportMsg("單日最大獲利 : " + maxWinPureProfit);
             reportMsg("最大獲利 是哪一天: " + maxWinPureProfitFileName);
@@ -774,38 +784,43 @@ namespace QuickTradeTest
 
             conclusionMsg("----------------------------------------------------------------------------------------------");
 
-
-            if (loseLine != null)
+            if (pureProfit > 500)
             {
-                for (int i = 1; i <= winLine.Count; i++)
+                conclusionMsg("交易結束，獲利口數的總比率 : " + Convert.ToDouble(totalWinCountRumManyTimes) / ((Convert.ToDouble(totalWinCountRumManyTimes) + Convert.ToDouble(totalLoseCountRunManyTimes))) * 100 + " %");
+
+                conclusionMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
+
+                if (loseLine != null)
                 {
-                    conclusionMsg("測試規則LOSE  00" + i + ":" + loseLine[i]);
+                    for (int i = 1; i <= winLine.Count; i++)
+                    {
+                        conclusionMsg("測試規則LOSE  00" + i + ":" + loseLine[i]);
+                    }
+
                 }
 
-            }
-
-            if (winLine != null)
-            {
-                for (int i = 1; i <= winLine.Count; i++)
+                if (winLine != null)
                 {
-                    conclusionMsg("測試規則WIN   00" + i + ":" + winLine[i]);
+                    for (int i = 1; i <= winLine.Count; i++)
+                    {
+                        conclusionMsg("測試規則WIN   00" + i + ":" + winLine[i]);
+                    }
+
+
                 }
 
-
-            }
-
-            if (reverseLine != null)
-            {
-                for (int i = 1; i <= winLine.Count; i++)
+                if (reverseLine != null)
                 {
-                    conclusionMsg("測試規則REVERSE  00" + i + ":" + reverseLine[i]);
+                    for (int i = 1; i <= winLine.Count; i++)
+                    {
+                        conclusionMsg("測試規則REVERSE  00" + i + ":" + reverseLine[i]);
+                    }
+
                 }
 
-            }
-            if (pureProfit > 0)
                 conclusionMsg(runCount * oFileList.Count + "次，扣除手續費後，總平均利潤 : " + pureProfit);
-            conclusionMsg("----------------------------------------------------------------------------------------------");
-
+                conclusionMsg("----------------------------------------------------------------------------------------------");
+            }
         }//end startTrade(guid)
 
 
@@ -826,9 +841,7 @@ namespace QuickTradeTest
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
-                Console.WriteLine(e.Source);
-                Console.WriteLine(e.Message);
+                throw e;
             }
 
 
