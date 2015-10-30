@@ -886,6 +886,10 @@ namespace AutoTrade
             //if (isStartOrder == false && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //測試版本
             {
 
+                maxTradePoint = 0;
+
+                minTradePoint = 99999;
+
                 tradeTime = record.TradeTime;
 
                 tradeDateTime = record.TradeMoment;
@@ -962,7 +966,7 @@ namespace AutoTrade
 
                 if (nowTradeType == TradeType.BUY.GetHashCode())
                 {
-                    if ((addTimes >= 1 && record.TradePrice == orderPrice) || (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])//賠了XX點，認賠殺出
+                    if ( (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])//賠了XX點，認賠殺出
                     {//認賠殺出
 
                         orderDircetion = BS_Type_S;
@@ -987,7 +991,7 @@ namespace AutoTrade
 
                         //賺了XX點，加碼
 
-                        nowAddTimes = Convert.ToInt16((record.TradePrice - orderNewPrice) / winLine[nowStrategyCount]);//目前應該有的加碼次數
+                        nowAddTimes = Convert.ToInt16((record.TradePrice - orderPrice) / winLine[nowStrategyCount]);//從第一次下單開始，目前應該有的加碼次數
 
                         if (nowAddTimes > addTimes)
                         {
@@ -1041,7 +1045,7 @@ namespace AutoTrade
                 else if (nowTradeType == TradeType.SELL.GetHashCode())
                 {
 
-                    if ((addTimes >= 1 && record.TradePrice == orderPrice) || (record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
+                    if ( (record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
                     {
                         //賠了XX點，認賠殺出
 
@@ -1049,7 +1053,7 @@ namespace AutoTrade
 
                         if (stage == Stage_Order_New_Success)
                         {
-                            int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes);
+                            int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes+1);
 
                             stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                         }
@@ -1066,7 +1070,7 @@ namespace AutoTrade
 
                         //賺了XX點，加碼
 
-                        nowAddTimes = Convert.ToInt16((orderNewPrice - record.TradePrice) / winLine[nowStrategyCount]);//目前應該有的加碼次數
+                        nowAddTimes = Convert.ToInt16((orderPrice - record.TradePrice) / winLine[nowStrategyCount]);//從第一次下單開始，目前應該有的加碼次數
 
                         if (nowAddTimes > addTimes)
                         {
@@ -1102,7 +1106,7 @@ namespace AutoTrade
 
                             if (stage == Stage_Order_New_Success)
                             {
-                                int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes);
+                                int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes+1);
 
                                 stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                             }
