@@ -1560,16 +1560,9 @@ namespace QuickTradeTest
 
                                 stopPrice = maxTradePoint - Convert.ToInt32(stopPeriod);
 
-                                if (maxTradePoint > orderPriceList[addTimes] && record.TradePrice == orderPriceList[addTimes] && addTimes >5)//加碼五次以後，反轉
-                                {
-                                    winOutEnabled = true;
-                                }
-                                else
-                                {
-                                    winOutEnabled = false;
-                                }
+                               
 
-                                if (winOutEnabled == true || record.TradePrice < stopPrice)
+                                if ( record.TradePrice < stopPrice)
                                 {
 
                                     if (addTimes > maxLot)
@@ -1745,16 +1738,9 @@ namespace QuickTradeTest
                                 //    stopPrice = orderPrice - winLine[nowStrategyCount];
                                 //}
 
-                                if (minTradePoint < orderPriceList[addTimes] && record.TradePrice == orderPriceList[addTimes] && addTimes > 5)
-                                {
-                                    winOutEnabled = true;
-                                }
-                                else
-                                {
-                                    winOutEnabled = false;
-                                }
+                               
 
-                                if (winOutEnabled == true || record.TradePrice > stopPrice)
+                                if ( record.TradePrice > stopPrice)
                                 {
 
                                     if (addTimes > maxLot)

@@ -11,7 +11,7 @@ namespace QuickTradeTest
 
 
 
-        const Boolean DEBUG = true;
+        const Boolean DEBUG = false;
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
 
