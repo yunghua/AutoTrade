@@ -1468,7 +1468,7 @@ namespace QuickTradeTest
 
                             pureProfit = oneProfit * valuePerPoint - orderPriceList.Count * cost;
 
-                            if ((pureProfit + totalPureProfit < maxProfitLoss) ||  (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])
+                            if ( (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])
                             {//賠了XX點，認賠殺出
 
                                 totalPureProfit += pureProfit;
@@ -1645,7 +1645,7 @@ namespace QuickTradeTest
 
                             pureProfit = oneProfit * valuePerPoint - orderPriceList.Count * cost;
 
-                            if ((pureProfit + totalPureProfit < maxProfitLoss) || (record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
+                            if ((record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
                             {
                                 //賠了XX點，認賠殺出
 
