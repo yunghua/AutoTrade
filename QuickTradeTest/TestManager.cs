@@ -9,8 +9,8 @@ namespace QuickTradeTest
     class TestManager
     {
 
-         
-        
+
+
         const Boolean DEBUG = true;
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
@@ -109,6 +109,29 @@ namespace QuickTradeTest
 
         }
 
+        public string getVersion()
+        {
+            return testVersion;
+        }
+
+        public string getWinLine()
+        {
+            //if (winLine != null && winLine[1]!= null)
+            return Convert.ToString(winLine[1]);
+        }
+
+        public string getLoseLine()
+        {
+            //if (loseLine != null && loseLine[1] != null)
+            return Convert.ToString(loseLine[1]);
+        }
+
+        public string getReverseLine()
+        {
+            //if (reverseLine != null && reverseLine[1] != null)
+            return Convert.ToString(reverseLine[1]);
+        }
+
         public Boolean prepareTest()
         {
 
@@ -133,7 +156,7 @@ namespace QuickTradeTest
                 sourceDir = configFile.readConfig("Source_Dir");
                 ratio = Convert.ToDouble(configFile.readConfig("Ratio"));
 
-                checkCount  = Convert.ToInt32(configFile.readConfig("Check_Count"));
+                checkCount = Convert.ToInt32(configFile.readConfig("Check_Count"));
 
                 testVersion = configFile.readConfig("Version");
 
@@ -244,12 +267,12 @@ namespace QuickTradeTest
         public void startTest()
         {
 
-            if (!prepareTest())
-            {
-                conclusionMsg("規則檔案讀取失敗!");
+            //if (!prepareTest())
+            //{
+            //    conclusionMsg("規則檔案讀取失敗!");
 
-                return;
-            }
+            //    return;
+            //}
 
             if (coreMethod.Equals(Core_Method_3))
             {
@@ -351,7 +374,7 @@ namespace QuickTradeTest
                                     {
                                         reportMsg("測試規則REVERSE  00" + y + ":" + reverseLine[y]);
                                     }
-                                }                               
+                                }
 
                             }//end for i
 
@@ -379,6 +402,8 @@ namespace QuickTradeTest
                 }
 
             }
+
+            stop();
 
         }
 
@@ -718,7 +743,7 @@ namespace QuickTradeTest
             reportMsg("獲利口數 : " + totalWinCountRumManyTimes);
             reportMsg("賠錢口數 : " + totalLoseCountRunManyTimes);
             reportMsg("交易結束，獲利口數的總比率 : " + Convert.ToDouble(totalWinCountRumManyTimes) / ((Convert.ToDouble(totalWinCountRumManyTimes) + Convert.ToDouble(totalLoseCountRunManyTimes))) * 100 + " %");
-           
+
 
             reportMsg("獲利日數 : " + winDayCount);
             reportMsg("賠錢日數" + loseDayCount);
@@ -726,7 +751,7 @@ namespace QuickTradeTest
             winDayRate = Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount)));
 
             reportMsg("交易結束，獲利日數的總比率 : " + winDayRate * 100 + " %");
-            
+
 
             reportMsg("單日最大獲利 : " + maxWinPureProfit);
             reportMsg("最大獲利 是哪一天: " + maxWinPureProfitFileName);
@@ -797,7 +822,7 @@ namespace QuickTradeTest
 
 
 
-            if (pureProfit > 500 || winDayRate >0.4)
+            if (pureProfit > 500 || winDayRate > 0.4)
             {
                 conclusionMsg("----------------------------------------------------------------------------------------------");
 

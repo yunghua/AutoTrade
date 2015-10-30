@@ -1326,7 +1326,7 @@ namespace QuickTradeTest
             totalPureProfit = 0;
 
             while (sourceFile.hasNext())
-            {
+            { 
 
                 try
                 {
@@ -1560,7 +1560,7 @@ namespace QuickTradeTest
 
                                 stopPrice = maxTradePoint - Convert.ToInt32(stopPeriod);
 
-                                if (minTradePoint < orderPriceList[addTimes] && record.TradePrice == orderPriceList[addTimes] && addTimes >5)
+                                if (maxTradePoint > orderPriceList[addTimes] && record.TradePrice == orderPriceList[addTimes] && addTimes >5)//加碼五次以後，反轉
                                 {
                                     winOutEnabled = true;
                                 }
