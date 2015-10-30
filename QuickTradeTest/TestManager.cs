@@ -11,7 +11,7 @@ namespace QuickTradeTest
 
          
         
-        const Boolean DEBUG = false;
+        const Boolean DEBUG = true;
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
 
@@ -100,6 +100,10 @@ namespace QuickTradeTest
 
         //Boolean isPrepared = false;
 
+        double winDayRate = 0;//獲利日數的比率
+
+        string testVersion = "";//程式版本
+
         public TestManager()
         {
 
@@ -129,7 +133,9 @@ namespace QuickTradeTest
                 sourceDir = configFile.readConfig("Source_Dir");
                 ratio = Convert.ToDouble(configFile.readConfig("Ratio"));
 
-                checkCount  = Convert.ToInt32(configFile.readConfig("Check_Count")); 
+                checkCount  = Convert.ToInt32(configFile.readConfig("Check_Count"));
+
+                testVersion = configFile.readConfig("Version");
 
                 if (null == sourceDir)
                 {
@@ -699,6 +705,10 @@ namespace QuickTradeTest
 
                 reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利口數的總比率 : " + Convert.ToDouble(winCountInOneDayTradeRunManyTimes) / ((Convert.ToDouble(winCountInOneDayTradeRunManyTimes) + Convert.ToDouble(loseCountInOneDayTradeRunManyTimes))) * 100 + " %");
 
+                reportMsg("----------------------------------------------------------------------------------------------");
+                reportMsg("----------------------------------------------------------------------------------------------");
+                reportMsg("----------------------------------------------------------------------------------------------");
+
             }//end for fileList
 
 
@@ -712,7 +722,10 @@ namespace QuickTradeTest
 
             reportMsg("獲利日數 : " + winDayCount);
             reportMsg("賠錢日數" + loseDayCount);
-            reportMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
+
+            winDayRate = Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount)));
+
+            reportMsg("交易結束，獲利日數的總比率 : " + winDayRate * 100 + " %");
             
 
             reportMsg("單日最大獲利 : " + maxWinPureProfit);
@@ -782,10 +795,14 @@ namespace QuickTradeTest
 
             reportMsg("----------------------------------------------------------------------------------------------");
 
-            conclusionMsg("----------------------------------------------------------------------------------------------");
 
-            if (pureProfit > 500)
+
+            if (pureProfit > 500 || winDayRate >0.4)
             {
+                conclusionMsg("----------------------------------------------------------------------------------------------");
+
+                conclusionMsg("程式版本 :" + testVersion);
+
                 conclusionMsg("交易結束，獲利口數的總比率 : " + Convert.ToDouble(totalWinCountRumManyTimes) / ((Convert.ToDouble(totalWinCountRumManyTimes) + Convert.ToDouble(totalLoseCountRunManyTimes))) * 100 + " %");
 
                 conclusionMsg("交易結束，獲利日數的總比率 : " + Convert.ToDouble(winDayCount) / ((Convert.ToDouble(winDayCount) + Convert.ToDouble(loseDayCount))) * 100 + " %");
