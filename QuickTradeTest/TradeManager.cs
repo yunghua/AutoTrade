@@ -1745,7 +1745,7 @@ namespace QuickTradeTest
                                 //    stopPrice = orderPrice - winLine[nowStrategyCount];
                                 //}
 
-                                if (minTradePoint < orderPriceList[addTimes] && record.TradePrice == orderPriceList[addTimes]  && addTimes>5)
+                                if (minTradePoint < orderPriceList[addTimes] && record.TradePrice == orderPriceList[addTimes] && addTimes > 5)
                                 {
                                     winOutEnabled = true;
                                 }
