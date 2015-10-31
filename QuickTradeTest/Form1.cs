@@ -44,6 +44,8 @@ namespace QuickTradeTest
 
             textBox_reverse.Text = manager.getReverseLine();
 
+            this.Text = manager.getAppDir();
+
         }
 
         private void Form1_Close(object sender, EventArgs e)

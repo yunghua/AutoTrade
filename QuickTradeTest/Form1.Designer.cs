@@ -105,7 +105,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(665, 313);
+            this.ClientSize = new System.Drawing.Size(682, 329);
             this.Controls.Add(this.textBox_reverse);
             this.Controls.Add(this.textBox_win);
             this.Controls.Add(this.textBox_lose);
@@ -116,7 +116,6 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_Close);
             this.ResumeLayout(false);
             this.PerformLayout();
 

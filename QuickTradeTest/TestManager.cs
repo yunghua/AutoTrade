@@ -104,9 +104,16 @@ namespace QuickTradeTest
 
         string testVersion = "";//程式版本
 
+        string appDir = "";//主程式的目錄
+
         public TestManager()
         {
 
+        }
+
+        public string getAppDir()
+        {
+            return appDir;
         }
 
         public string getVersion()
@@ -135,7 +142,7 @@ namespace QuickTradeTest
         public Boolean prepareTest()
         {
 
-            string appDir = System.IO.Directory.GetCurrentDirectory(); //主程式所在目錄
+            appDir = System.IO.Directory.GetCurrentDirectory(); //主程式所在目錄
 
             appDir = System.Windows.Forms.Application.StartupPath;
 
@@ -822,7 +829,7 @@ namespace QuickTradeTest
 
 
 
-            if (pureProfit > 500 || winDayRate > 0.4)
+            if (pureProfit > 500 || winDayRate > 0.5)
             {
                 conclusionMsg("----------------------------------------------------------------------------------------------");
 
