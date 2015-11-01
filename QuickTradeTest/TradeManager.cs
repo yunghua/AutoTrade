@@ -1448,7 +1448,7 @@ namespace QuickTradeTest
                         if (nowTradeType == TradeType.BUY.GetHashCode())
                         {
                             if (
-                                (lotIndex >= 1 && (orderPrice - record.TradePrice) > reverseLine[nowStrategyCount]) ||                                
+                                (lotIndex >= 1 && (orderPrice - record.TradePrice) > winLine[nowStrategyCount]) ||                                
                                 ((orderPrice - record.TradePrice) > loseLine[nowStrategyCount])
                                 )
 
@@ -1571,7 +1571,7 @@ namespace QuickTradeTest
                         else if (nowTradeType == TradeType.SELL.GetHashCode())
                         {
                             if (
-                               (lotIndex >= 1 && (record.TradePrice - orderPrice) > reverseLine[nowStrategyCount]) ||
+                                (lotIndex >= 1 && (record.TradePrice - orderPrice) > winLine[nowStrategyCount]) ||
                                 ((record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
                                 )
                             {
