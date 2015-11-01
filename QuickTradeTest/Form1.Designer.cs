@@ -116,6 +116,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_Close);
             this.ResumeLayout(false);
             this.PerformLayout();
 
