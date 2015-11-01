@@ -1448,7 +1448,7 @@ namespace QuickTradeTest
                         if (nowTradeType == TradeType.BUY.GetHashCode())
                         {
                             if (
-                                (lotIndex >= 1 && (orderPrice - record.TradePrice) > reverseLine[nowStrategyCount]) ||                                
+                                (lotIndex >= 1 && (orderPrice - record.TradePrice) > reverseLine[nowStrategyCount]) ||
                                 ((orderPrice - record.TradePrice) > loseLine[nowStrategyCount])
                                 )
 
@@ -1472,7 +1472,7 @@ namespace QuickTradeTest
 
                                 totalProfit += oneProfit;
 
-                                loseCount++;
+                                loseCount += Convert.ToInt16(lotArray[lotIndex]);
 
                                 debugMsg("認賠殺出");
 
@@ -1522,7 +1522,7 @@ namespace QuickTradeTest
 
                                     totalProfit += oneProfit;
 
-                                    winCount++;
+                                    winCount += Convert.ToInt16(lotArray[lotIndex]);
 
                                     debugMsg("停利出場");
 
@@ -1552,14 +1552,14 @@ namespace QuickTradeTest
 
                                     lotIndex++;
 
-                                    if (lotIndex >=lotArray.Count())
+                                    if (lotIndex >= lotArray.Count())
                                     {
-                                        lotIndex =lotArray.Count() - 1;
-                                   }
+                                        lotIndex = lotArray.Count() - 1;
+                                    }
 
-                                     if(maxLot < Convert.ToInt16(lotArray[lotIndex] ))
+                                    if (maxLot < Convert.ToInt16(lotArray[lotIndex]))
                                     {
-                                        maxLot =  Convert.ToInt16(lotArray[lotIndex]);
+                                        maxLot = Convert.ToInt16(lotArray[lotIndex]);
                                     }
 
                                     winOut();
@@ -1596,11 +1596,11 @@ namespace QuickTradeTest
 
                                 totalProfit += oneProfit;
 
-                                loseCount++;
+                                loseCount += Convert.ToInt16(lotArray[lotIndex]);
 
                                 debugMsg("認賠殺出");
 
-                                debugMsg("addTimes---->" + lotArray[lotIndex]);
+                                debugMsg(" lotArray[lotIndex]---->" + lotArray[lotIndex]);
 
                                 debugMsg("平倉點數002---->" + evenPrice);
 
@@ -1642,7 +1642,7 @@ namespace QuickTradeTest
 
                                     totalProfit += oneProfit;
 
-                                    winCount++;
+                                    winCount += Convert.ToInt16(lotArray[lotIndex]);
 
                                     debugMsg("停利出場");
 
@@ -1679,9 +1679,9 @@ namespace QuickTradeTest
                                         lotIndex = lotArray.Count() - 1;
                                     }
 
-                                    if(maxLot < Convert.ToInt16(lotArray[lotIndex] ))
+                                    if (maxLot < Convert.ToInt16(lotArray[lotIndex]))
                                     {
-                                        maxLot =  Convert.ToInt16(lotArray[lotIndex]);
+                                        maxLot = Convert.ToInt16(lotArray[lotIndex]);
                                     }
 
                                     winOut();
@@ -1732,11 +1732,11 @@ namespace QuickTradeTest
 
                             if (oneProfit > 0)
                             {
-                                winCount++;
+                                winCount += Convert.ToInt16(lotArray[lotIndex]);
                             }
                             else
                             {
-                                loseCount++;
+                                loseCount += Convert.ToInt16(lotArray[lotIndex]);
                             }
 
                             if (nowTradeType == TradeType.BUY.GetHashCode())
@@ -1752,11 +1752,15 @@ namespace QuickTradeTest
 
                             debugMsg("平倉時間---->" + record.TradeMoment);
 
-                            debugMsg("addTimes---->" + addTimes);
+                            debugMsg(" lotArray[lotIndex]---->" + lotArray[lotIndex]);
 
                             double pureProfit = oneProfit * valuePerPoint - Convert.ToInt16(lotArray[lotIndex]) * cost;
 
+                            totalPureProfit += pureProfit;
+
                             debugMsg("純利:" + pureProfit);
+
+                            debugMsg("總純利:" + totalPureProfit);
 
                             debugMsg("停損策略:" + loseLine[nowStrategyCount]);
 
