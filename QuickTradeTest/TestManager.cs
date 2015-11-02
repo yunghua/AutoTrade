@@ -57,7 +57,7 @@ namespace QuickTradeTest
 
         Dictionary<int, int> winLine;  //停利的底線
 
-        Dictionary<int, int> reverseLine;  //反轉的底線
+        Dictionary<int, double> reverseLine;  //反轉的底線
 
         DateTime now = System.DateTime.Now;
 
@@ -313,19 +313,19 @@ namespace QuickTradeTest
 
                     //---------------------------------------------------------------------------
 
-                    for (int qq = 1; qq <= ruleCountReverse; qq++)
+                    //for (int qq = 1; qq <= ruleCountReverse; qq++)
                     {
 
-                        j = 0;
+                        //j = 0;
 
-                        int tmpReverse = 0;
+                        //double tmpReverse = 0;
 
-                        for (j = 1; j <= reverseLine.Count; j++)
-                        {
-                            tmpReverse = reverseLine[j] + j * rulePeriod;
+                        //for (j = 1; j <= reverseLine.Count; j++)
+                        //{
+                        //    tmpReverse = reverseLine[j] +  rulePeriod;
 
-                            reverseLine[j] = tmpReverse;
-                        }    // end winLine
+                        //    reverseLine[j] = tmpReverse;
+                        //}    // end 
 
                         for (int k = 1; k <= ruleCountWin; k++)
                         {
@@ -335,7 +335,7 @@ namespace QuickTradeTest
 
                             for (j = 1; j <= winLine.Count; j++)
                             {
-                                tmpWin = winLine[j] + j * rulePeriod;
+                                tmpWin = winLine[j] +  rulePeriod;
 
                                 winLine[j] = tmpWin;
                             }    // end winLine
@@ -352,12 +352,12 @@ namespace QuickTradeTest
 
                                 for (j = 1; j <= loseLine.Count; j++)
                                 {
-                                    tmpLose = loseLine[j] + j * rulePeriod;
+                                    tmpLose = loseLine[j] +  rulePeriod;
 
                                     loseLine[j] = tmpLose;
                                 }
 
-                                startTest(qq * 10000 + k * 1000 + i);
+                                startTest( k * 1000 + i);
 
 
                                 if (winLine != null && loseLine != null)

@@ -24,7 +24,7 @@ namespace TradeUtility
 
         Dictionary<int, int> winLine;  //停利的底線
 
-        Dictionary<int, int> reverseLine;  //動態停利反轉的底線
+        Dictionary<int, double> reverseLine;  //動態停利反轉的底線
 
         Dictionary<int, int> stopRatio;  //逆勢動態停利
 
@@ -57,7 +57,7 @@ namespace TradeUtility
             return stopRatio;
         }
 
-        public Dictionary<int, int> getReverseLine()
+        public Dictionary<int, double> getReverseLine()
         {
             return reverseLine;
         }
@@ -149,7 +149,7 @@ namespace TradeUtility
 
                 winLine = new Dictionary<int, int>();
 
-                reverseLine = new Dictionary<int, int>();
+                reverseLine = new Dictionary<int, double>();
 
                 int strategyCount = 1;//讀取停損停利規則檔案的行數
 
@@ -157,7 +157,7 @@ namespace TradeUtility
 
                 int winPoint;//停利點範圍
 
-                int reversePoint;//動態停利反轉範圍
+                double reversePoint;//動態停利反轉範圍
 
                 String tmpLine = "";
 
@@ -182,7 +182,7 @@ namespace TradeUtility
 
                     try
                     {
-                        reversePoint = int.Parse(tmpData[2]);
+                        reversePoint = double.Parse(tmpData[2]);
                     }
                     catch (Exception e)
                     {

@@ -84,7 +84,7 @@ namespace QuickTradeTest
 
         Boolean debugEnabled = false;//是否顯示除錯訊息
 
-        Boolean reverseEnabled = false;//是否買賣方向轉向
+        Boolean reverseEnabled = true;//是否買賣方向轉向
 
         Boolean winOutEnabled = false;//是否要停利
 
@@ -150,7 +150,7 @@ namespace QuickTradeTest
 
         Dictionary<int, int> winLine;  //停利的底線
 
-        Dictionary<int, int> reverseLine;  //動態停利反轉的底線
+        Dictionary<int, double> reverseLine;  //動態停利反轉的底線
 
         int nowStrategyCount = 1; //目前使用哪一行的停損停利規則
 
@@ -263,7 +263,7 @@ namespace QuickTradeTest
             winLine = win;
         }
 
-        public void setReverseLine(Dictionary<int, int> reverse)
+        public void setReverseLine(Dictionary<int, double> reverse)
         {
             reverseLine = reverse;
         }
@@ -1445,10 +1445,21 @@ namespace QuickTradeTest
 
                         dealStrategyCount(lotIndex);//取得停損停利範圍
 
+                        //if (lotIndex >= 5)
+                        //{
+                        //    debugMsg("GO");
+                        //}
+
+                        stopPeriod = winLine[nowStrategyCount] * reverseLine[nowStrategyCount] - 1.36;
+
+                        
+
                         if (nowTradeType == TradeType.BUY.GetHashCode())
                         {
+                            stopPrice = Convert.ToInt16(orderPrice - stopPeriod);
+
                             if (
-                                (lotIndex >= 1 && (orderPrice - record.TradePrice) > reverseLine[nowStrategyCount]) ||
+                                (lotIndex >= 1 &&  record.TradePrice < stopPrice) ||
                                 ((orderPrice - record.TradePrice) > loseLine[nowStrategyCount])
                                 )
 
@@ -1500,6 +1511,7 @@ namespace QuickTradeTest
 
                                 loseOut();
 
+                                reverseEnabled = true;
 
                             }
                             else if ((record.TradePrice - orderPrice) > winLine[nowStrategyCount])
@@ -1507,8 +1519,7 @@ namespace QuickTradeTest
 
                                 //--------------------------------------------------------------------------------------------------------------------------------
                                 //  停利部分
-                                //--------------------------------------------------------------------------------------------------------------------------------
-
+                                //--------------------------------------------------------------------------------------------------------------------------------                               
 
                                 {
 
@@ -1564,14 +1575,18 @@ namespace QuickTradeTest
 
                                     winOut();
 
+                                    reverseEnabled = false;
+
                                 }
 
                             }
                         }
                         else if (nowTradeType == TradeType.SELL.GetHashCode())
                         {
+                            stopPrice = Convert.ToInt16(orderPrice + stopPeriod);
+
                             if (
-                               (lotIndex >= 1 && (record.TradePrice - orderPrice) > reverseLine[nowStrategyCount]) ||
+                               (lotIndex >= 1 && record.TradePrice> stopPrice) ||
                                 ((record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
                                 )
                             {
@@ -1624,13 +1639,16 @@ namespace QuickTradeTest
 
                                 loseOut();
 
+                                reverseEnabled = true;
+
                             }
                             else if ((orderPrice - record.TradePrice) > winLine[nowStrategyCount])
                             {
-
+                                //--------------------------------------------------------------------------------------------------------------------------------
+                                //  停利部分
+                                //--------------------------------------------------------------------------------------------------------------------------------                                                        
                                 {
-
-                                    //停利
+                              
 
                                     evenPrice = record.TradePrice;
 
@@ -1686,6 +1704,7 @@ namespace QuickTradeTest
 
                                     winOut();
 
+                                    reverseEnabled = false;
 
                                 }
 
