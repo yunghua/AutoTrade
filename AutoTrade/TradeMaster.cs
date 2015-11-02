@@ -158,6 +158,9 @@ namespace AutoTrade
 
         int nowAddTimes = 0;//目前加碼的次數
 
+        string nowDay = "";//今天日期
+        string nowMonth = "";//今天月份
+
         //-------------------------------------------------------------------------------------------------------------
         //          物件區
         //-------------------------------------------------------------------------------------------------------------    
@@ -189,7 +192,7 @@ namespace AutoTrade
 
         Dictionary<int, int> loseLine;  //認賠的底線
         Dictionary<int, int> winLine;  //停利的底線
-        Dictionary<int, int> reverseLine;  //動態停利反轉的底線
+        Dictionary<int, double> reverseLine;  //動態停利反轉的底線
 
         DateTime stopTradeTime;//今日交易結束時間
         //-------------------------------------------------------------------------------------------------------------        
@@ -402,7 +405,7 @@ namespace AutoTrade
             return loseLine;
         }
 
-        public Dictionary<int, int> getReverseLine()
+        public Dictionary<int, double> getReverseLine()
         {
             return reverseLine;
         }
@@ -444,6 +447,23 @@ namespace AutoTrade
 
         public void prepareReady()
         {
+            if (now.Day <= 9)
+            {
+                nowDay = Convert.ToString("0" + now.Day);
+            }
+            else
+            {
+                nowDay = Convert.ToString(now.Day);
+            }
+
+            if (now.Month <= 9)
+            {
+                nowMonth = Convert.ToString("0" + now.Month);
+            }
+            else
+            {
+                nowMonth = Convert.ToString(now.Month);
+            }
 
 
             lotArray = lots.Split(',');
@@ -456,7 +476,7 @@ namespace AutoTrade
 
             winLine = new Dictionary<int, int>();
 
-            reverseLine = new Dictionary<int, int>();
+            reverseLine = new Dictionary<int, double>();
 
             //configFilePath = appDir + "\\" + Config_Dir + "\\" + Config_File_Name;
 
@@ -571,7 +591,8 @@ namespace AutoTrade
 
             try
             {
-                outputLine = Convert.ToString(now.Year) + Convert.ToString(now.Month) + Convert.ToString(now.Day) + "," + futuresCode + "     ," + TradeUtility.TradeUtility.getInstance().dealYearMonth() + "     ," + matchTime.Substring(0, 2) + matchTime.Substring(3, 2) + matchTime.Substring(6, 2) + "," + matchPrice + "," + matchQuantity + ",-,-,";
+
+                outputLine = Convert.ToString(now.Year) + nowMonth + nowDay+ "," + futuresCode + "     ," + TradeUtility.TradeUtility.getInstance().dealYearMonth() + "     ," + matchTime.Substring(0, 2) + matchTime.Substring(3, 2) + matchTime.Substring(6, 2) + "," + matchPrice + "," + matchQuantity + ",-,-,";
 
                 allTradeOutputFile.writeLine(outputLine);
 
@@ -710,7 +731,7 @@ namespace AutoTrade
             {
                 stage = Stage_Order_Even_Success;
 
-                orderEvenPrice = dealPrice;                
+                orderEvenPrice = dealPrice;
 
                 debugMsg("orderEvenPrice:" + orderEvenPrice);
 
@@ -966,7 +987,7 @@ namespace AutoTrade
 
                 if (nowTradeType == TradeType.BUY.GetHashCode())
                 {
-                    if ( (orderPrice - record.TradePrice) > loseLine[nowStrategyCount])//賠了XX點，認賠殺出
+                    if ((orderPrice - record.TradePrice) > loseLine[nowStrategyCount])//賠了XX點，認賠殺出
                     {//認賠殺出
 
                         orderDircetion = BS_Type_S;
@@ -1045,7 +1066,7 @@ namespace AutoTrade
                 else if (nowTradeType == TradeType.SELL.GetHashCode())
                 {
 
-                    if ( (record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
+                    if ((record.TradePrice - orderPrice) > loseLine[nowStrategyCount])
                     {
                         //賠了XX點，認賠殺出
 
@@ -1053,7 +1074,7 @@ namespace AutoTrade
 
                         if (stage == Stage_Order_New_Success)
                         {
-                            int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes+1);
+                            int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes + 1);
 
                             stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                         }
@@ -1106,7 +1127,7 @@ namespace AutoTrade
 
                             if (stage == Stage_Order_New_Success)
                             {
-                                int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes+1);
+                                int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (addTimes + 1);
 
                                 stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                             }
