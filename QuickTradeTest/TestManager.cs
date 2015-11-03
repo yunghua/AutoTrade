@@ -106,6 +106,14 @@ namespace QuickTradeTest
 
         string appDir = "";//主程式的目錄
 
+        string comment = "";//註解
+
+        public string Comment
+        {
+            get { return comment; }
+            set { comment = value; }
+        }
+
         public TestManager()
         {
 
@@ -164,6 +172,8 @@ namespace QuickTradeTest
                 ratio = Convert.ToDouble(configFile.readConfig("Ratio"));
 
                 checkCount = Convert.ToInt32(configFile.readConfig("Check_Count"));
+
+                comment =configFile.readConfig("Comment");
 
                 testVersion = configFile.readConfig("Version");
 
@@ -547,11 +557,11 @@ namespace QuickTradeTest
                         maxLot = tmpMaxLot;
                     }
 
-                    winCountInOneDayTradeRunManyTimes += manager.getWinCount();
+                    winCountInOneDayTradeRunManyTimes += manager.WinVolume;
 
-                    loseCountInOneDayTradeRunManyTimes += manager.getLoseCount();
+                    loseCountInOneDayTradeRunManyTimes += manager.LoseVolume;
 
-                    oneDayPureProfit = oneDayProfit * valuePerPoint - (manager.getWinCount() + manager.getLoseCount()) * cost;
+                    oneDayPureProfit = oneDayProfit * valuePerPoint - (manager.WinVolume + manager.LoseVolume) * cost;
 
                     if (oneDayPureProfit > 0)
                     {

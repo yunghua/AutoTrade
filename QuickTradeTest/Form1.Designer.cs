@@ -35,6 +35,7 @@
             this.textBox_lose = new System.Windows.Forms.TextBox();
             this.textBox_win = new System.Windows.Forms.TextBox();
             this.textBox_reverse = new System.Windows.Forms.TextBox();
+            this.label_comment = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label_Version
@@ -101,11 +102,22 @@
             this.textBox_reverse.Size = new System.Drawing.Size(271, 35);
             this.textBox_reverse.TabIndex = 6;
             // 
+            // label_comment
+            // 
+            this.label_comment.AutoSize = true;
+            this.label_comment.Font = new System.Drawing.Font("Microsoft JhengHei", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label_comment.Location = new System.Drawing.Point(42, 301);
+            this.label_comment.Name = "label_comment";
+            this.label_comment.Size = new System.Drawing.Size(162, 40);
+            this.label_comment.TabIndex = 7;
+            this.label_comment.Text = "comment";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(682, 329);
+            this.ClientSize = new System.Drawing.Size(687, 429);
+            this.Controls.Add(this.label_comment);
             this.Controls.Add(this.textBox_reverse);
             this.Controls.Add(this.textBox_win);
             this.Controls.Add(this.textBox_lose);
@@ -115,7 +127,7 @@
             this.Controls.Add(this.label_Version);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.Form1_Load);            
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_Close);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -131,6 +143,7 @@
         private System.Windows.Forms.TextBox textBox_lose;
         private System.Windows.Forms.TextBox textBox_win;
         private System.Windows.Forms.TextBox textBox_reverse;
+        private System.Windows.Forms.Label label_comment;
 
     }
 }
