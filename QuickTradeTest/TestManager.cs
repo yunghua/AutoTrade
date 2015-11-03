@@ -108,6 +108,8 @@ namespace QuickTradeTest
 
         string comment = "";//註解
 
+        int lotLimit = 8;//可以下單口數的上限
+
         public string Comment
         {
             get { return comment; }
@@ -170,6 +172,7 @@ namespace QuickTradeTest
                 maxLoss = configFile.readConfig("Max_Loss");
                 sourceDir = configFile.readConfig("Source_Dir");
                 ratio = Convert.ToDouble(configFile.readConfig("Ratio"));
+                lotLimit = Convert.ToInt32(configFile.readConfig("Lot_Limit"));
 
                 checkCount = Convert.ToInt32(configFile.readConfig("Check_Count"));
 
@@ -532,6 +535,8 @@ namespace QuickTradeTest
                     {
                         manager.setCheckCount(checkCount);
                     }
+
+                    manager.LotLimit = lotLimit;
 
                     manager.setDebugEnabled(DEBUG);
 
