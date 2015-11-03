@@ -106,6 +106,14 @@ namespace QuickTradeTest
 
         string appDir = "";//主程式的目錄
 
+        string comment = "";//註解
+
+        public string Comment
+        {
+            get { return comment; }
+            set { comment = value; }
+        }
+
         public TestManager()
         {
 
@@ -164,6 +172,8 @@ namespace QuickTradeTest
                 ratio = Convert.ToDouble(configFile.readConfig("Ratio"));
 
                 checkCount = Convert.ToInt32(configFile.readConfig("Check_Count"));
+
+                comment =configFile.readConfig("Comment");
 
                 testVersion = configFile.readConfig("Version");
 
@@ -318,14 +328,16 @@ namespace QuickTradeTest
 
                         //j = 0;
 
-                        //double tmpReverse = 0;
+
+                        //int tmpReverse = 0;
 
                         //for (j = 1; j <= reverseLine.Count; j++)
                         //{
-                        //    tmpReverse = reverseLine[j] +  rulePeriod;
+                        //    tmpReverse = reverseLine[j] + rulePeriod;
 
                         //    reverseLine[j] = tmpReverse;
-                        //}    // end 
+                        //}    // end reverseLine
+
 
                         for (int k = 1; k <= ruleCountWin; k++)
                         {
@@ -352,7 +364,8 @@ namespace QuickTradeTest
 
                                 for (j = 1; j <= loseLine.Count; j++)
                                 {
-                                    tmpLose = loseLine[j] +  rulePeriod;
+
+                                    tmpLose = loseLine[j] + rulePeriod;
 
                                     loseLine[j] = tmpLose;
                                 }
@@ -547,11 +560,11 @@ namespace QuickTradeTest
                         maxLot = tmpMaxLot;
                     }
 
-                    winCountInOneDayTradeRunManyTimes += manager.getWinCount();
+                    winCountInOneDayTradeRunManyTimes += manager.WinVolume;
 
-                    loseCountInOneDayTradeRunManyTimes += manager.getLoseCount();
+                    loseCountInOneDayTradeRunManyTimes += manager.LoseVolume;
 
-                    oneDayPureProfit = oneDayProfit * valuePerPoint - (manager.getWinCount() + manager.getLoseCount()) * cost;
+                    oneDayPureProfit = oneDayProfit * valuePerPoint - (manager.WinVolume + manager.LoseVolume) * cost;
 
                     if (oneDayPureProfit > 0)
                     {
