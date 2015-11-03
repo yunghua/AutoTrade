@@ -328,6 +328,7 @@ namespace QuickTradeTest
 
                         //j = 0;
 
+
                         //int tmpReverse = 0;
 
                         //for (j = 1; j <= reverseLine.Count; j++)
@@ -336,6 +337,7 @@ namespace QuickTradeTest
 
                         //    reverseLine[j] = tmpReverse;
                         //}    // end reverseLine
+
 
                         for (int k = 1; k <= ruleCountWin; k++)
                         {
@@ -362,6 +364,7 @@ namespace QuickTradeTest
 
                                 for (j = 1; j <= loseLine.Count; j++)
                                 {
+
                                     tmpLose = loseLine[j] + rulePeriod;
 
                                     loseLine[j] = tmpLose;
