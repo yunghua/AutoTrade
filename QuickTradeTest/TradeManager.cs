@@ -975,8 +975,7 @@ namespace QuickTradeTest
                             }
                         }
                         else if (nowTradeType == TradeType.SELL.GetHashCode())
-                        {
-                            stopPrice = Convert.ToInt16(orderPrice + stopPeriod);
+                        {                            
 
                             if (addTimes >= 1)
                             {
