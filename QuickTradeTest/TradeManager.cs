@@ -214,6 +214,10 @@ namespace QuickTradeTest
             set { loseVolume = value; }
         }
 
+        int tmpOneProfit = 0;
+
+        double tmpPureProfit = 0;
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 程式區。
@@ -613,6 +617,33 @@ namespace QuickTradeTest
             return oneProfit;
         }
 
+        private double calPureProfit(int nowTradeType)
+        {
+            tmpOneProfit = 0;
+
+            tmpPureProfit = 0;
+
+            if (nowTradeType == TradeType.BUY.GetHashCode())
+            {
+                for (int i = 0; i < orderPriceList.Count; i++)
+                {
+                    tmpOneProfit += record.TradePrice - orderPriceList[i];
+                }
+            }
+            else if (nowTradeType == TradeType.SELL.GetHashCode())
+            {
+                for (int i = 0; i < orderPriceList.Count; i++)
+                {
+                    tmpOneProfit += orderPriceList[i] - record.TradePrice;
+                }
+
+            }
+
+            tmpPureProfit = tmpOneProfit * valuePerPoint - orderPriceList.Count * cost;
+
+            return tmpPureProfit;
+        }
+
         private int getReversePercentage(double offsetPoint)//取得轉折點反轉的百分比
         {
             foreach (KeyValuePair<int, int> item in stopRatio)
@@ -764,10 +795,8 @@ namespace QuickTradeTest
 
                         dealLoseLineIndex(loseCount);//取得停損範圍
 
-
                         if (nowTradeType == TradeType.BUY.GetHashCode())
                         {
-
 
                             if (addTimes >= 1)
                             {
@@ -776,7 +805,7 @@ namespace QuickTradeTest
                                 stopPrice = orderPriceList[orderPriceList.Count - 1] - stopPeriod;
                             }
 
-                            if (
+                            if (((calPureProfit(nowTradeType) + totalPureProfit) <= maxProfitLoss) ||//隨時監控有沒有超出當日停損點
                                  (addTimes >= 1 && record.TradePrice <= stopPrice) ||//反轉
                                 (orderPrice - record.TradePrice) > loseLine[nowLoseLineIndex]
 
@@ -850,7 +879,7 @@ namespace QuickTradeTest
                                 prevTradeType = TradeType.BUY.GetHashCode();
 
                                 loseOut();
-                                
+
 
                             }
                             else if ((record.TradePrice - orderPrice) > winLine[nowWinLineIndex])
@@ -976,7 +1005,6 @@ namespace QuickTradeTest
                         }
                         else if (nowTradeType == TradeType.SELL.GetHashCode())
                         {
-                            stopPrice = Convert.ToInt16(orderPrice + stopPeriod);
 
                             if (addTimes >= 1)
                             {
@@ -985,7 +1013,7 @@ namespace QuickTradeTest
                                 stopPrice = orderPriceList[orderPriceList.Count - 1] + stopPeriod;
                             }
 
-                            if (
+                            if (((calPureProfit(nowTradeType) + totalPureProfit) <= maxProfitLoss) ||//隨時監控有沒有超出當日停損點
                                 (addTimes >= 1 && record.TradePrice >= stopPrice) ||
                                 (record.TradePrice - orderPrice) > loseLine[nowLoseLineIndex])
                             {
@@ -1191,7 +1219,6 @@ namespace QuickTradeTest
 
                     if (totalPureProfit < maxProfitLoss)  //已達最大虧損水平線
                     {
-
                         return totalProfit;
                     }
 
@@ -1208,7 +1235,7 @@ namespace QuickTradeTest
                                 for (int i = 0; i < orderPriceList.Count; i++)
                                 {
                                     oneProfit += evenPrice - orderPriceList[i];
-                                }                               
+                                }
                             }
                             else if (nowTradeType == TradeType.SELL.GetHashCode())
                             {
@@ -1216,7 +1243,7 @@ namespace QuickTradeTest
                                 {
                                     oneProfit += orderPriceList[i] - evenPrice;
                                 }
-                               
+
                             }
 
                             totalProfit += oneProfit;
