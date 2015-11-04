@@ -828,11 +828,11 @@ namespace QuickTradeTest
 
                                 if (addTimes >= 1)
                                 {
-                                    reverseEnabled = false;
+                                    reverseEnabled = true;//獲利後，反方向
                                 }
                                 else
                                 {
-                                    reverseEnabled = true;
+                                    reverseEnabled = true;//一開始就賠錢，反方向
                                 }
 
                                 debugMsg("純利:" + pureProfit);
@@ -1039,13 +1039,12 @@ namespace QuickTradeTest
 
                                 if (addTimes >= 1)
                                 {
-                                    reverseEnabled = false;
+                                    reverseEnabled = true;//獲利後，反方向
                                 }
                                 else
                                 {
-                                    reverseEnabled = true;
+                                    reverseEnabled = true;//一開始就賠錢，反方向
                                 }
-
 
                                 debugMsg("純利:" + pureProfit);
 
