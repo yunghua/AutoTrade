@@ -44,7 +44,7 @@ namespace QuickTradeTest
 
             textBox_reverse.Text = manager.getReverseLine();
 
-            label_comment.Text = manager.Comment;
+            textBox_comment.Text = TestManager.Comment;            
 
             this.Text = manager.getAppDir();
 

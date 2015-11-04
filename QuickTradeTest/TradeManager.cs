@@ -750,7 +750,15 @@ namespace QuickTradeTest
 
                     else if (isStartOrder == true)//已經開始下單
                     {
+                        //if (record.TradePrice < minTradePoint)
+                        //{
+                        //    minTradePoint = record.TradePrice;
+                        //}
 
+                        //if (record.TradePrice > maxTradePoint)
+                        //{
+                        //    maxTradePoint = record.TradePrice;
+                        //}
 
                         dealWinLineIndex(addTimes);//取得停利範圍
 
@@ -813,6 +821,10 @@ namespace QuickTradeTest
                                 debugMsg("平倉點數001---->" + evenPrice);
 
                                 debugMsg("平倉時間---->" + record.TradeMoment);
+
+                                //debugMsg("平倉前最低價:"+minTradePoint);
+
+                                //debugMsg("平倉前最高價:" + maxTradePoint);
 
                                 if (addTimes >= 1)
                                 {
@@ -1020,6 +1032,10 @@ namespace QuickTradeTest
 
                                 debugMsg("平倉時間---->" + record.TradeMoment);
 
+                                //debugMsg("平倉前最低價:" + minTradePoint);
+
+                                //debugMsg("平倉前最高價:" + maxTradePoint);
+
 
                                 if (addTimes >= 1)
                                 {
@@ -1189,15 +1205,18 @@ namespace QuickTradeTest
 
                             if (nowTradeType == TradeType.BUY.GetHashCode())
                             {
-                                oneProfit += evenPrice - orderPrice;
-
-                                oneProfit *= Convert.ToInt16(addTimes);
+                                for (int i = 0; i < orderPriceList.Count; i++)
+                                {
+                                    oneProfit += evenPrice - orderPriceList[i];
+                                }                               
                             }
                             else if (nowTradeType == TradeType.SELL.GetHashCode())
                             {
-                                oneProfit += orderPrice - evenPrice;
-
-                                oneProfit *= Convert.ToInt16(addTimes);
+                                for (int i = 0; i < orderPriceList.Count; i++)
+                                {
+                                    oneProfit += orderPriceList[i] - evenPrice;
+                                }
+                               
                             }
 
                             totalProfit += oneProfit;
@@ -1237,6 +1256,10 @@ namespace QuickTradeTest
                             debugMsg(" addTimes---->" + addTimes);
 
                             debugMsg(" 平倉口數---->" + orderPriceList.Count);
+
+                            //debugMsg("平倉前最低價:" + minTradePoint);
+
+                            //debugMsg("平倉前最高價:" + maxTradePoint);
 
                             pureProfit = oneProfit * valuePerPoint - (addTimes + 1) * cost;
 

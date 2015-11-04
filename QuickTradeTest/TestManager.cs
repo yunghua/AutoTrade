@@ -13,6 +13,10 @@ namespace QuickTradeTest
 
         const Boolean DEBUG = false;
 
+        public const string Version = "V1.11.5";
+
+        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。";
+
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
 
         public const string Core_Method_1 = "Core_Method_1";//獲利加碼
@@ -100,21 +104,11 @@ namespace QuickTradeTest
 
         //Boolean isPrepared = false;
 
-        double winDayRate = 0;//獲利日數的比率
-
-        string testVersion = "";//程式版本
+        double winDayRate = 0;//獲利日數的比率      
 
         string appDir = "";//主程式的目錄
 
-        string comment = "";//註解
-
-        int lotLimit = 8;//可以下單口數的上限
-
-        public string Comment
-        {
-            get { return comment; }
-            set { comment = value; }
-        }
+        int lotLimit = 8;//可以下單口數的上限        
 
         public TestManager()
         {
@@ -128,7 +122,7 @@ namespace QuickTradeTest
 
         public string getVersion()
         {
-            return testVersion;
+            return Version;
         }
 
         public string getWinLine()
@@ -175,10 +169,6 @@ namespace QuickTradeTest
                 lotLimit = Convert.ToInt32(configFile.readConfig("Lot_Limit"));
 
                 checkCount = Convert.ToInt32(configFile.readConfig("Check_Count"));
-
-                comment =configFile.readConfig("Comment");
-
-                testVersion = configFile.readConfig("Version");
 
                 if (null == sourceDir)
                 {
@@ -257,6 +247,10 @@ namespace QuickTradeTest
             conclusionReport = new TradeFile(conclusionReportFileName);
 
             conclusionReport.prepareWriter();
+
+            conclusionMsg("程式版本 :" + Version);
+
+            conclusionMsg("說明 :" + Comment);
 
             conclusionMsg("使用核心:" + coreMethod);
 
@@ -350,7 +344,7 @@ namespace QuickTradeTest
 
                             for (j = 1; j <= winLine.Count; j++)
                             {
-                                tmpWin = winLine[j] +  rulePeriod;
+                                tmpWin = winLine[j] + rulePeriod;
 
                                 winLine[j] = tmpWin;
                             }    // end winLine
@@ -373,8 +367,10 @@ namespace QuickTradeTest
                                     loseLine[j] = tmpLose;
                                 }
 
-                                startTest( k * 1000 + i);
+                                startTest(k * 1000 + i);
 
+                                reportMsg("程式版本 :" + Version);
+                                reportMsg("說明 :" + Comment);
 
                                 if (winLine != null && loseLine != null)
                                 {
@@ -745,8 +741,6 @@ namespace QuickTradeTest
 
                 totalLoseCountRunManyTimes += loseCountInOneDayTradeRunManyTimes;
 
-                reportMsg("單日設定最大停損" + Convert.ToString(oneDayMaxLossSetting));
-
                 reportMsg(oFileList[j].getFullPath() + "交易結束，單日交易平均利潤 : " + ((oneDayRunManyTimesTotalProfit * valuePerPoint) - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * cost) / runCount);
 
                 reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利口數 : " + winCountInOneDayTradeRunManyTimes);
@@ -761,6 +755,8 @@ namespace QuickTradeTest
 
             }//end for fileList
 
+            reportMsg("程式版本 :" + Version);
+            reportMsg("說明 :" + Comment);
 
             reportMsg(" 測試編號 : " + guid);
             reportMsg(" 每個交易日的測試次數 : " + runCount);
@@ -850,8 +846,6 @@ namespace QuickTradeTest
             if (pureProfit > 500 || winDayRate > 0.5)
             {
                 conclusionMsg("----------------------------------------------------------------------------------------------");
-
-                conclusionMsg("程式版本 :" + testVersion);
 
                 conclusionMsg("交易結束，獲利口數的總比率 : " + Convert.ToDouble(totalWinCountRumManyTimes) / ((Convert.ToDouble(totalWinCountRumManyTimes) + Convert.ToDouble(totalLoseCountRunManyTimes))) * 100 + " %");
 
