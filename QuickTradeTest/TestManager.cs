@@ -13,9 +13,9 @@ namespace QuickTradeTest
 
         const Boolean DEBUG = false;
 
-        public const string Version = "V1.11.6";
+        public const string Version = "V1.11.6-2";
 
-        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。獲利後反方向。";        
+        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。獲利後反方向。隨時監控有沒有超出當日停損點。";        
 
         public const string Core_Method_1 = "Core_Method_1";//獲利加碼
 
