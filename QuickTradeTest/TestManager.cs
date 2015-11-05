@@ -13,9 +13,9 @@ namespace QuickTradeTest
 
         const Boolean DEBUG = false;
 
-        public const string Version = "V1.11.5";
+        public const string Version = "V1.11.5-3";
 
-        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。";
+        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。停利範圍可以設定不同數值。";
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
 
