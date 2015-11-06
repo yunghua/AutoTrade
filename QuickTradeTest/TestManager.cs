@@ -13,9 +13,9 @@ namespace QuickTradeTest
 
         const Boolean DEBUG = false;
 
-        public const string Version = "V1.11.5-3";
+        public const string Version = "V1.11.5-4";
 
-        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。停利範圍可以設定不同數值。";
+        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。停利範圍可以設定不同數值。reverseLine前三個跑迴圈測試。";
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
 
@@ -75,7 +75,7 @@ namespace QuickTradeTest
 
         int ruleCountWin;//停利跑幾種規則
         int ruleCountLose;//停損跑幾種規則
-        int ruleCountReverse;//反轉動態停利跑幾種規則
+        int[] ruleCountReverse = new int[10];//反轉動態停利跑幾種規則
 
         int runCount;//每種規則跑幾次測試
         int rulePeriod;//每次規則增加幅度
@@ -109,6 +109,8 @@ namespace QuickTradeTest
         string appDir = "";//主程式的目錄
 
         int lotLimit = 8;//可以下單口數的上限        
+
+        double reversePeriod = 0.0;//反轉規則每次增加的幅度
 
         public TestManager()
         {
@@ -160,9 +162,19 @@ namespace QuickTradeTest
                 coreMethod = configFile.readConfig("Core_Method");
                 ruleCountWin = Convert.ToInt32(configFile.readConfig("Rule_Count_Win"));
                 ruleCountLose = Convert.ToInt32(configFile.readConfig("Rule_Count_Lose"));
-                ruleCountReverse = Convert.ToInt32(configFile.readConfig("Rule_Count_Reverse"));
+
+                string strRuleCountReverse = "Rule_Count_Reverse_";
+
+                for (int i = 1; i <= 10; i++)
+                {
+
+                    ruleCountReverse[i - 1] = Convert.ToInt32(configFile.readConfig(strRuleCountReverse + Convert.ToString(i)));
+
+                }
+
                 runCount = Convert.ToInt32(configFile.readConfig("Run_Count"));
                 rulePeriod = Convert.ToInt32(configFile.readConfig("Rule_Period"));
+
                 maxLoss = configFile.readConfig("Max_Loss");
                 sourceDir = configFile.readConfig("Source_Dir");
                 ratio = Convert.ToDouble(configFile.readConfig("Ratio"));
@@ -170,14 +182,19 @@ namespace QuickTradeTest
 
                 checkCount = Convert.ToInt32(configFile.readConfig("Check_Count"));
 
+                reversePeriod = Convert.ToDouble(configFile.readConfig("Reverse_Period"));
+
                 if (null == sourceDir)
                 {
                     sourceDir = Source_Dir;
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.Source);
+                Console.WriteLine(e.StackTrace);
                 return false;
             }
 
@@ -318,98 +335,145 @@ namespace QuickTradeTest
                         initialWinLine[xx] = winLine[xx];
                     }
 
-                    //---------------------------------------------------------------------------
+                    Dictionary<int, double> initialReverseLine = new Dictionary<int, double>();
 
-                    //for (int qq = 1; qq <= ruleCountReverse; qq++)
+                    for (int xx = 1; xx <= reverseLine.Count; xx++)
                     {
+                        initialReverseLine[xx] = reverseLine[xx];
+                    }
 
-                        //j = 0;
+                    //---------------------------------------------------------------------------
+                    for (int aa = 1; aa <= ruleCountReverse[0]; aa++)
+                    {
+                        reverseLine[1] = reverseLine[1] + reversePeriod;
 
-
-                        //int tmpReverse = 0;
-
-                        //for (j = 1; j <= reverseLine.Count; j++)
-                        //{
-                        //    tmpReverse = reverseLine[j] + rulePeriod;
-
-                        //    reverseLine[j] = tmpReverse;
-                        //}    // end reverseLine
-
-
-                        for (int k = 1; k <= ruleCountWin; k++)
+                        for (int bb = 1; bb <= ruleCountReverse[1]; bb++)
                         {
-                            j = 0;
+                            reverseLine[2] = reverseLine[2] + reversePeriod;
 
-                            int tmpWin = 0;
-
-                            for (j = 1; j <= winLine.Count; j++)
+                            for (int cc = 1; cc <= ruleCountReverse[2]; cc++)
                             {
-                                tmpWin = winLine[j] + rulePeriod;
+                                reverseLine[3] = reverseLine[3] + reversePeriod;
 
-                                winLine[j] = tmpWin;
-                            }    // end winLine
-
-
-
-
-                            for (int i = 1; i <= ruleCountLose; i++)
-                            {
-
-                                j = 0;
-
-                                int tmpLose = 0;
-
-                                for (j = 1; j <= loseLine.Count; j++)
+                                for (int dd = 1; dd <= ruleCountReverse[3]; dd++)
                                 {
+                                    reverseLine[4] = reverseLine[4] + reversePeriod;
 
-                                    tmpLose = loseLine[j] + rulePeriod;
-
-                                    loseLine[j] = tmpLose;
-                                }
-
-                                startTest(k * 1000 + i);
-
-                                reportMsg("程式版本 :" + Version);
-                                reportMsg("說明 :" + Comment);
-
-                                if (winLine != null && loseLine != null)
-                                {
-
-                                    for (int z = 1; z <= winLine.Count; z++)
+                                    for (int ee = 1; ee <= ruleCountReverse[4]; ee++)
                                     {
-                                        reportMsg("測試規則LOSE  00" + z + ":" + loseLine[z]);
-                                    }
+                                        reverseLine[5] = reverseLine[5] + reversePeriod;
 
-                                    for (int s = 1; s <= winLine.Count; s++)
-                                    {
-                                        reportMsg("測試規則WIN   00" + s + ":" + winLine[s]);
-                                    }
+                                        for (int ff = 1; ff <= ruleCountReverse[5]; ff++)
+                                        {
+                                            reverseLine[6] = reverseLine[6] + reversePeriod;
 
-                                }
+                                            for (int gg = 1; gg <= ruleCountReverse[6]; gg++)
+                                            {
+                                                reverseLine[7] = reverseLine[7] + reversePeriod;
 
-                                if (reverseLine != null)
-                                {
-                                    for (int y = 1; y <= reverseLine.Count; y++)
-                                    {
-                                        reportMsg("測試規則REVERSE  00" + y + ":" + reverseLine[y]);
-                                    }
-                                }
+                                                for (int hh = 1; hh <= ruleCountReverse[7]; hh++)
+                                                {
+                                                    reverseLine[8] = reverseLine[8] + reversePeriod;
 
-                            }//end for i
+                                                    for (int ii = 1; ii <= ruleCountReverse[8]; ii++)
+                                                    {
+                                                        reverseLine[9] = reverseLine[9] + reversePeriod;
 
-                            for (int i = 1; i <= loseLine.Count; i++)
-                            {
-                                loseLine[i] = initialLoseLine[i];
-                            }
+                                                        for (int jj = 1; jj <= ruleCountReverse[9]; jj++)
+                                                        {
+                                                            reverseLine[10] = reverseLine[10] + reversePeriod;
 
-                        }//end for k
+                                                            for (int k = 1; k <= ruleCountWin; k++)
+                                                            {
+                                                                j = 0;
 
-                        for (int i = 1; i <= winLine.Count; i++)
-                        {
-                            winLine[i] = initialWinLine[i];
-                        }
+                                                                int tmpWin = 0;
 
-                    }//end for qq
+                                                                for (j = 1; j <= winLine.Count; j++)
+                                                                {
+                                                                    tmpWin = winLine[j] + rulePeriod;
+
+                                                                    winLine[j] = tmpWin;
+                                                                }    // end winLine
+
+                                                                for (int i = 1; i <= ruleCountLose; i++)
+                                                                {
+
+                                                                    j = 0;
+
+                                                                    int tmpLose = 0;
+
+                                                                    for (j = 1; j <= loseLine.Count; j++)
+                                                                    {
+
+                                                                        tmpLose = loseLine[j] + rulePeriod;
+
+                                                                        loseLine[j] = tmpLose;
+                                                                    }
+
+                                                                    startTest( k * 1000 + i);
+
+                                                                    reportMsg("程式版本 :" + Version);
+                                                                    reportMsg("說明 :" + Comment);
+
+                                                                    if (winLine != null && loseLine != null)
+                                                                    {
+
+                                                                        for (int z = 1; z <= winLine.Count; z++)
+                                                                        {
+                                                                            reportMsg("測試規則LOSE  00" + z + ":" + loseLine[z]);
+                                                                        }
+
+                                                                        for (int s = 1; s <= winLine.Count; s++)
+                                                                        {
+                                                                            reportMsg("測試規則WIN   00" + s + ":" + winLine[s]);
+                                                                        }
+
+                                                                    }
+
+                                                                    if (reverseLine != null)
+                                                                    {
+                                                                        for (int y = 1; y <= reverseLine.Count; y++)
+                                                                        {
+                                                                            reportMsg("測試規則REVERSE  00" + y + ":" + reverseLine[y]);
+                                                                        }
+                                                                    }
+
+                                                                }//end for i
+
+                                                                for (int i = 1; i <= loseLine.Count; i++)
+                                                                {
+                                                                    loseLine[i] = initialLoseLine[i];
+                                                                }
+
+                                                            }//end for k
+
+                                                            for (int i = 1; i <= winLine.Count; i++)
+                                                            {
+                                                                winLine[i] = initialWinLine[i];
+                                                            }
+
+                                                        }//end for jj
+                                                        reverseLine[10] = initialReverseLine[10];
+                                                    }//end for ii
+                                                    reverseLine[9] = initialReverseLine[9];
+                                                }//end for hh
+                                                reverseLine[8] = initialReverseLine[8];
+                                            }//end for gg
+                                            reverseLine[7] = initialReverseLine[7];
+                                        }//end for ff
+                                        reverseLine[6] = initialReverseLine[6];
+                                    }//end for ee
+                                    reverseLine[5] = initialReverseLine[5];
+                                }//end for dd
+                                reverseLine[4] = initialReverseLine[4];
+                            }//end for cc
+                            reverseLine[3] = initialReverseLine[3];
+                        }//end for bb
+                        reverseLine[2] = initialReverseLine[2];
+                    }//end for aa
+                    reverseLine[1] = initialReverseLine[1];
+
 
                 }
                 catch (Exception e)
@@ -447,7 +511,10 @@ namespace QuickTradeTest
 
                 if (reverseLine != null)
                 {
-                    testReportFileName += reverseLine[1] + "_";
+                    for (int i = 1; i <= reverseLine.Count; i++)
+                    {
+                        testReportFileName += reverseLine[i] + "_";
+                    }
                 }
 
                 testReportFileName += guid + ".rpt";
@@ -460,6 +527,9 @@ namespace QuickTradeTest
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.Source);
+                Console.WriteLine(ex.StackTrace);
                 reportMsg(ex.Source + ex.Message + ex.StackTrace);
             }
 

@@ -98,7 +98,7 @@ namespace QuickTradeTest
 
         string coreMethod = "";//核心方法
 
-        List<double> orderPointList = new List<double>();//動態停利機制中，每達到停利階段就下一次單時，下單的點數
+        List<OriginalRecord> orderPointList = new List<OriginalRecord>();//動態停利機制中，每達到停利階段就下一次單時，下單的點數
 
         int activeOrderIndex = 0;//第幾次動態停利下單
 
@@ -663,6 +663,8 @@ namespace QuickTradeTest
 
                             orderPriceList.Add(orderPrice);
 
+                            orderPointList.Add(record);
+
                             if (nowTradeType == TradeType.BUY.GetHashCode())
                             {
                                 debugMsg("交易方式---->" + TradeType.BUY);
@@ -761,6 +763,9 @@ namespace QuickTradeTest
                                 for (int i = 0; i < orderPriceList.Count; i++)
                                 {
                                     debugMsg("加碼價位:" + orderPriceList[i]);
+
+                                    debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
+
                                 }
 
 
@@ -825,6 +830,8 @@ namespace QuickTradeTest
 
                                             orderPriceList.Add(record.TradePrice);
 
+                                            orderPointList.Add(record);
+
                                             continue;
                                         }
                                     }
@@ -836,6 +843,8 @@ namespace QuickTradeTest
                                             addList.Add(1);//實際加碼的次數
 
                                             orderPriceList.Add(record.TradePrice);
+
+                                            orderPointList.Add(record);
 
                                             continue;
                                         }
@@ -998,6 +1007,8 @@ namespace QuickTradeTest
                                 for (int i = 0; i < orderPriceList.Count; i++)
                                 {
                                     debugMsg("加碼價位:" + orderPriceList[i]);
+
+                                    debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
                                 }
 
                                 debugMsg("平倉前最低價:" + minTradePoint.TradePrice);
@@ -1063,6 +1074,8 @@ namespace QuickTradeTest
 
                                             orderPriceList.Add(record.TradePrice);
 
+                                            orderPointList.Add(record);                                            
+
                                             continue;
                                         }
                                     }
@@ -1075,6 +1088,8 @@ namespace QuickTradeTest
                                             addList.Add(1);//實際加碼的次數
 
                                             orderPriceList.Add(record.TradePrice);
+
+                                            orderPointList.Add(record);
 
                                             continue;
                                         }
@@ -1251,6 +1266,8 @@ namespace QuickTradeTest
                             for (int i = 0; i < orderPriceList.Count; i++)
                             {
                                 debugMsg("加碼價位:" + orderPriceList[i]);
+
+                                debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
                             }
 
                             debugMsg("平倉前最低價:" + minTradePoint.TradePrice);
