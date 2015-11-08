@@ -13,9 +13,9 @@ namespace QuickTradeTest
 
         const Boolean DEBUG = false;
 
-        public const string Version = "V1.11.5-4";
+        public const string Version = "V1.11.5-5";
 
-        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。停利範圍可以設定不同數值。reverseLine前三個跑迴圈測試。";
+        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。停利範圍可以設定不同數值。reverseLine前三個跑迴圈測試。改reveseLine的迴圈順序，從reverseLine[1]開始。";
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
 
@@ -343,45 +343,45 @@ namespace QuickTradeTest
                     }
 
                     //---------------------------------------------------------------------------
-                    for (int aa = 1; aa <= ruleCountReverse[0]; aa++)
+                    for (int aa = 1; aa <= ruleCountReverse[9]; aa++)
                     {
-                        reverseLine[1] = reverseLine[1] + reversePeriod;
+                        reverseLine[10] = reverseLine[10] + reversePeriod;
 
-                        for (int bb = 1; bb <= ruleCountReverse[1]; bb++)
+                        for (int bb = 1; bb <= ruleCountReverse[8]; bb++)
                         {
-                            reverseLine[2] = reverseLine[2] + reversePeriod;
+                            reverseLine[9] = reverseLine[9] + reversePeriod;
 
-                            for (int cc = 1; cc <= ruleCountReverse[2]; cc++)
+                            for (int cc = 1; cc <= ruleCountReverse[7]; cc++)
                             {
-                                reverseLine[3] = reverseLine[3] + reversePeriod;
+                                reverseLine[8] = reverseLine[8] + reversePeriod;
 
-                                for (int dd = 1; dd <= ruleCountReverse[3]; dd++)
+                                for (int dd = 1; dd <= ruleCountReverse[6]; dd++)
                                 {
-                                    reverseLine[4] = reverseLine[4] + reversePeriod;
+                                    reverseLine[7] = reverseLine[7] + reversePeriod;
 
-                                    for (int ee = 1; ee <= ruleCountReverse[4]; ee++)
+                                    for (int ee = 1; ee <= ruleCountReverse[5]; ee++)
                                     {
-                                        reverseLine[5] = reverseLine[5] + reversePeriod;
+                                        reverseLine[6] = reverseLine[6] + reversePeriod;
 
-                                        for (int ff = 1; ff <= ruleCountReverse[5]; ff++)
+                                        for (int ff = 1; ff <= ruleCountReverse[4]; ff++)
                                         {
-                                            reverseLine[6] = reverseLine[6] + reversePeriod;
+                                            reverseLine[5] = reverseLine[5] + reversePeriod;
 
-                                            for (int gg = 1; gg <= ruleCountReverse[6]; gg++)
+                                            for (int gg = 1; gg <= ruleCountReverse[3]; gg++)
                                             {
-                                                reverseLine[7] = reverseLine[7] + reversePeriod;
+                                                reverseLine[4] = reverseLine[4] + reversePeriod;
 
-                                                for (int hh = 1; hh <= ruleCountReverse[7]; hh++)
+                                                for (int hh = 1; hh <= ruleCountReverse[2]; hh++)
                                                 {
-                                                    reverseLine[8] = reverseLine[8] + reversePeriod;
+                                                    reverseLine[3] = reverseLine[3] + reversePeriod;
 
-                                                    for (int ii = 1; ii <= ruleCountReverse[8]; ii++)
+                                                    for (int ii = 1; ii <= ruleCountReverse[1]; ii++)
                                                     {
-                                                        reverseLine[9] = reverseLine[9] + reversePeriod;
+                                                        reverseLine[2] = reverseLine[2] + reversePeriod;
 
-                                                        for (int jj = 1; jj <= ruleCountReverse[9]; jj++)
+                                                        for (int jj = 1; jj <= ruleCountReverse[0]; jj++)
                                                         {
-                                                            reverseLine[10] = reverseLine[10] + reversePeriod;
+                                                            reverseLine[1] = reverseLine[1] + reversePeriod;
 
                                                             for (int k = 1; k <= ruleCountWin; k++)
                                                             {
@@ -454,25 +454,25 @@ namespace QuickTradeTest
                                                             }
 
                                                         }//end for jj
-                                                        reverseLine[10] = initialReverseLine[10];
+                                                        reverseLine[1] = initialReverseLine[1];
                                                     }//end for ii
-                                                    reverseLine[9] = initialReverseLine[9];
+                                                    reverseLine[2] = initialReverseLine[2];
                                                 }//end for hh
-                                                reverseLine[8] = initialReverseLine[8];
+                                                reverseLine[3] = initialReverseLine[3];
                                             }//end for gg
-                                            reverseLine[7] = initialReverseLine[7];
+                                            reverseLine[4] = initialReverseLine[4];
                                         }//end for ff
-                                        reverseLine[6] = initialReverseLine[6];
+                                        reverseLine[5] = initialReverseLine[5];
                                     }//end for ee
-                                    reverseLine[5] = initialReverseLine[5];
+                                    reverseLine[6] = initialReverseLine[6];
                                 }//end for dd
-                                reverseLine[4] = initialReverseLine[4];
+                                reverseLine[7] = initialReverseLine[7];
                             }//end for cc
-                            reverseLine[3] = initialReverseLine[3];
+                            reverseLine[8] = initialReverseLine[8];
                         }//end for bb
-                        reverseLine[2] = initialReverseLine[2];
+                        reverseLine[9] = initialReverseLine[9];
                     }//end for aa
-                    reverseLine[1] = initialReverseLine[1];
+                    reverseLine[10] = initialReverseLine[10];
 
 
                 }
