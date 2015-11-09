@@ -726,6 +726,11 @@ namespace QuickTradeTest
 
                                 oneProfit = 0;
 
+                                if (orderPriceList.Count > maxLot) //最大交易口數
+                                {
+                                    maxLot = orderPriceList.Count;
+                                }
+
                                 for (int i = 0; i < orderPriceList.Count; i++)
                                 {
                                     oneProfit += evenPrice - orderPriceList[i];
@@ -968,6 +973,11 @@ namespace QuickTradeTest
 
                                 oneProfit = 0;
 
+                                if (orderPriceList.Count > maxLot) //最大交易口數
+                                {
+                                    maxLot = orderPriceList.Count;
+                                }
+
                                 for (int i = 0; i < orderPriceList.Count; i++)
                                 {
                                     oneProfit += orderPriceList[i] - evenPrice;
@@ -1074,7 +1084,7 @@ namespace QuickTradeTest
 
                                             orderPriceList.Add(record.TradePrice);
 
-                                            orderPointList.Add(record);                                            
+                                            orderPointList.Add(record);
 
                                             continue;
                                         }
