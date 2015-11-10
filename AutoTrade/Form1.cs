@@ -53,6 +53,8 @@ namespace AutoTrade
 
         string futuresCode = "";//期貨代碼，大台指TX，小台指MTX
 
+        string  lotLimit  = "";//最大加碼限制
+
         public Form1()
         {
             InitializeComponent();
@@ -276,10 +278,14 @@ namespace AutoTrade
 
             futuresCode = configFile.readConfig("Futures_Code");
 
+            lotLimit = configFile.readConfig("Lot_Limit");
+
             try
             {
 
                 master = new TradeMaster();
+
+                master.setLotLimit(Convert.ToInt16(lotLimit));
 
                 master.setFuturesCode(futuresCode);
 
