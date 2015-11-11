@@ -13,11 +13,13 @@ namespace QuickTradeTest
 
         const Boolean DEBUG = false;
 
-        public const string Version = "V1.11.5-6";
+
+        public const string Version = "V1.11.8";
 
         public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。停利範圍可以設定不同數值。reverseLine跑迴圈測試。改reveseLine的迴圈順序，從reverseLine[1]開始。統計最大交易口數。";
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
+
 
         public const string Core_Method_1 = "Core_Method_1";//獲利加碼
 
