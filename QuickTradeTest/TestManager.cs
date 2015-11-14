@@ -11,12 +11,12 @@ namespace QuickTradeTest
 
 
 
-        const Boolean DEBUG = false;
+        const Boolean DEBUG = true;
 
 
-        public const string Version = "V1.11.8";
+        public const string Version = "V1.11.8-3";
 
-        public const string Comment = "獲利動態加碼，用 reverseLine反轉。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。停利範圍可以設定不同數值。reverseLine跑迴圈測試。改reveseLine的迴圈順序，從reverseLine[1]開始。統計最大交易口數。";
+        public const string Comment = "顯示最大連續賠錢。不再用 reverseLine反轉，獲利動態加碼。停損用賠錢次數去取得loseLine。修正時間到的利潤計算。停利範圍可以設定不同數值。統計最大交易口數。";
 
         //const string Core_Method = TradeManager.Core_Method_2; //1=獲利後下次加碼，2=動態停利
 
@@ -113,6 +113,15 @@ namespace QuickTradeTest
         int lotLimit = 8;//可以下單口數的上限        
 
         double reversePeriod = 0.0;//反轉規則每次增加的幅度
+
+        double maxContinueLossMoney = 0.0;//連續最大賠錢
+
+        DateTime maxContinueLossMoneyTime;
+
+        double maxContinueWinMoney = 0.0;//連續最大贏錢
+
+        DateTime maxContinueWinMoneyTime;
+
 
         public TestManager()
         {
@@ -578,7 +587,7 @@ namespace QuickTradeTest
                 return;
             }
 
-            for (int j = 0; j < oFileList.Count; j++)
+            //for (int j = 0; j < oFileList.Count; j++)
             {
 
                 double oneDayRunManyTimesTotalProfit = 0;//某日跑了XX次之後的總利潤
@@ -622,7 +631,9 @@ namespace QuickTradeTest
 
                     manager.setReverseLine(reverseLine);
 
-                    manager.setSourceFile(oFileList[j]);
+                    //manager.setSourceFile(oFileList[j]);
+
+                    manager.setSourceFileList(oFileList);
 
                     oneDayProfit = manager.startTrade();
 
@@ -632,6 +643,11 @@ namespace QuickTradeTest
                     {
                         maxLot = tmpMaxLot;
                     }
+
+                    maxContinueLossMoney = manager.MaxContinueLossMoney;
+                    maxContinueLossMoneyTime = manager.MaxContinueLossMoneyTime;
+                    maxContinueWinMoney = manager.MaxContinueWinMoney;
+                    maxContinueWinMoneyTime = manager.MaxContinueWinMoneyTime;
 
                     winCountInOneDayTradeRunManyTimes += manager.WinVolume;
 
@@ -653,14 +669,14 @@ namespace QuickTradeTest
                     {
                         maxWinPureProfit = oneDayPureProfit;
 
-                        maxWinPureProfitFileName = oFileList[j].getFileName();
+                        //maxWinPureProfitFileName = oFileList[j].getFileName();
                     }
 
                     if (oneDayPureProfit < maxLosePureProfit)
                     {
                         maxLosePureProfit = oneDayPureProfit;
 
-                        maxLosePureProfitFileName = oFileList[j].getFileName();
+                        //maxLosePureProfitFileName = oFileList[j].getFileName();
                     }
 
                     if (oneDayPureProfit > 0 && oneDayPureProfit < 2000)
@@ -813,14 +829,26 @@ namespace QuickTradeTest
 
                 totalLoseCountRunManyTimes += loseCountInOneDayTradeRunManyTimes;
 
-                reportMsg(oFileList[j].getFullPath() + "交易結束，單日交易平均利潤 : " + ((oneDayRunManyTimesTotalProfit * valuePerPoint) - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * cost) / runCount);
+                reportMsg(//oFileList[j].getFullPath() +
+                    
+                    "交易結束，單日交易平均利潤 : " + ((oneDayRunManyTimesTotalProfit * valuePerPoint) - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * cost) / runCount);
 
-                reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利口數 : " + winCountInOneDayTradeRunManyTimes);
+                reportMsg(//oFileList[j].getFullPath() + 
+                    "交易結束，單日獲利口數 : " + winCountInOneDayTradeRunManyTimes);
 
-                reportMsg(oFileList[j].getFullPath() + "交易結束，單日賠錢口數 : " + loseCountInOneDayTradeRunManyTimes);
+                reportMsg(//oFileList[j].getFullPath() +
+                    "交易結束，單日賠錢口數 : " + loseCountInOneDayTradeRunManyTimes);
 
-                reportMsg(oFileList[j].getFullPath() + "交易結束，單日獲利口數的總比率 : " + Convert.ToDouble(winCountInOneDayTradeRunManyTimes) / ((Convert.ToDouble(winCountInOneDayTradeRunManyTimes) + Convert.ToDouble(loseCountInOneDayTradeRunManyTimes))) * 100 + " %");
+                reportMsg(//oFileList[j].getFullPath() +
+                    "交易結束，單日獲利口數的總比率 : " + Convert.ToDouble(winCountInOneDayTradeRunManyTimes) / ((Convert.ToDouble(winCountInOneDayTradeRunManyTimes) + Convert.ToDouble(loseCountInOneDayTradeRunManyTimes))) * 100 + " %");
 
+                reportMsg("最大連續贏錢" + maxContinueWinMoney);
+                reportMsg("最大連續贏錢日" + maxContinueWinMoneyTime);
+                 
+
+                reportMsg("最大連續賠錢" + maxContinueLossMoney);
+                reportMsg("最大連續賠錢日" + maxContinueLossMoneyTime);
+                
                 reportMsg("----------------------------------------------------------------------------------------------");
                 reportMsg("----------------------------------------------------------------------------------------------");
                 reportMsg("----------------------------------------------------------------------------------------------");
