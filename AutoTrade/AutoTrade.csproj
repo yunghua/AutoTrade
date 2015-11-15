@@ -51,11 +51,11 @@
   <ItemGroup>
     <Reference Include="AxInterop.YuantaQuoteLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\AxInterop.YuantaQuoteLib.dll</HintPath>
+      <HintPath>C:\TraderProgram\AxInterop.YuantaQuoteLib.dll</HintPath>
     </Reference>
     <Reference Include="Interop.YuantaQuoteLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Interop.YuantaQuoteLib.dll</HintPath>
+      <HintPath>C:\TraderProgram\Interop.YuantaQuoteLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -74,7 +74,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="YuantaOrdLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Yuanta\API\YuantaOrdLib.dll</HintPath>
+      <HintPath>C:\TraderProgram\YuantaOrdLib.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

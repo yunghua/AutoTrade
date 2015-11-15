@@ -13,6 +13,8 @@ namespace AutoTrade
 {
     public partial class Form1 : Form
     {
+        List<ConfigFile> trackFileList;//軌跡檔案列表
+
         Boolean isOrderAPIReady = false;
 
         string tradeMasterMessage = "";//來自TradeMaster的訊息
@@ -20,6 +22,8 @@ namespace AutoTrade
         string appDir = "";//應用程式所在目錄
 
         const string Config_Dir = "Config";//設定檔目錄
+
+        const string Track_Dir = "Track";//往日交易檔目錄        
 
         const string Config_File_Name = "TradeConfig.txt";//設定檔案名
 
@@ -53,7 +57,9 @@ namespace AutoTrade
 
         string futuresCode = "";//期貨代碼，大台指TX，小台指MTX
 
-        string  lotLimit  = "";//最大加碼限制
+        string lotLimit = "";//最大加碼限制
+
+        string trackFileDir = "";//往日交易檔案的完整目錄路徑
 
         public Form1()
         {
@@ -205,6 +211,84 @@ namespace AutoTrade
             textBox_status2.Text = e.errCode.ToString();
         }
 
+
+        private void readTrackFile(TradeMaster master)
+        {
+            if (trackFileList != null && trackFileList.Count > 0)
+            {
+
+                ConfigFile trackFile = trackFileList[trackFileList.Count - 1];
+
+                List<string> contexList = new List<string>();
+
+                if (trackFile != null)
+                {
+
+                    contexList = trackFile.readMultiLineConfig("NewTrade", "EndTrade");
+
+                    if (contexList != null && contexList.Count >= 1)
+                    {
+                        master.IsStartOrder = true;
+
+                        contexList.Clear();
+                    }
+
+
+
+                    contexList = trackFile.readMultiLineConfig("OrderPrice", "EndTrade");
+
+                    if (contexList != null && contexList.Count >= 1)
+                    {
+                        for (int i = 0; i < contexList.Count; i++)
+                        {
+                            //orderPriceList.Add(Convert.ToDouble(contexList[i]));
+                            if (i == 0)
+                            {
+                                master.OrderPrice = Convert.ToDouble(contexList[0]);
+                            }
+                            else
+                            {
+                                master.AddList.Add(Convert.ToInt16(contexList[i]));
+                            }
+
+                            master.OrderNewPriceList.Add(Convert.ToInt16(contexList[i]));
+                            
+                        }
+
+                        contexList.Clear();
+                    }
+
+                    contexList = trackFile.readMultiLineConfig("BuyOrSell", "EndTrade");
+
+                    if (contexList != null && contexList.Count >= 1)
+                    {
+                        master.OrderDircetion = contexList[contexList.Count - 1];
+
+                        contexList.Clear();
+                    }
+
+                    contexList = trackFile.readMultiLineConfig("MaxPrice", "EndTrade");
+
+                    if (contexList != null && contexList.Count >= 1)
+                    {
+                        master.MaxTradePointLastDay = Convert.ToInt16(contexList[contexList.Count - 1]);
+
+                        contexList.Clear();
+                    }
+
+                    contexList = trackFile.readMultiLineConfig("MinPrice", "EndTrade");
+
+                    if (contexList != null && contexList.Count >= 1)
+                    {
+                        master.MinTradePointLastDay = Convert.ToInt16(contexList[contexList.Count - 1]);
+
+                        contexList.Clear();
+                    }
+
+                }
+            }
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             button_Reverse.Enabled = false;
@@ -225,6 +309,12 @@ namespace AutoTrade
             label_Version.Text = TradeUtility.TradeUtility.version;
 
             appDir = System.Windows.Forms.Application.StartupPath;
+
+            trackFileDir = appDir + "\\" + Track_Dir + "\\";
+
+            FileManager fm = new FileManager();
+
+            trackFileList = fm.getConfigFileList(trackFileDir);
 
             configFilePath = appDir + "\\" + Config_Dir + "\\" + Config_File_Name;
 
@@ -307,10 +397,10 @@ namespace AutoTrade
 
                 master.setTradeCode(tradeCode);
 
+                readTrackFile(master);
+
                 master.prepareReady();
-
-
-
+                
             }
             catch (Exception ez)
             {
@@ -324,7 +414,7 @@ namespace AutoTrade
             textBox1_winLine.Text = Convert.ToString(master.getWinLine()[1]);
 
             textBox_reverseLine.Text = Convert.ToString(master.getReverseLine()[1]);
-            
+
             loginQuote();
 
             loginOrder();
