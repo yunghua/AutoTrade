@@ -18,29 +18,29 @@ namespace AutoTrade
 
         const double valuePerPoint = 50;//每點價值，小台50元/點，大台200元/點        
 
-        const int Stage_Last_Day = 0;//承接上一個交易日
-        const int Stage_New = 1;//初始化
-        const int Stage_Order_Login_Start = 2;//登入下單API開始
-        const int Stage_Order_Login_Success = 3;//登入下單API成功
-        const int Stage_Order_New_Start = 4;//新倉開始下單
-        const int Stage_Order_New_Success = 5;//新倉回報下單成功        
-        const int Stage_Order_New_Fail = 6;//新倉回報下單失敗  
-        const int Stage_Order_Not_Process = 7;//無法下單，可能是尚未登入完成
-        const int Stage_Order_Even_Start = 8;//平倉倉開始下單
-        const int Stage_Order_Even_Success = 9;//平倉回報下單成功
-        const int Stage_Order_Even_Partial = 10;//平倉回報部分下單成功，部分失敗             
-        const int Stage_Order_Even_Fail = 11;//平倉回報下單失敗  
-        const int Stage_Order_Fail = 12;//回報下單失敗  
-        const int Stage_Order_Time_Up = 13;//時間到停止下單
-        const int Stage_End = 14;//結束
+        public const int Stage_Last_Day = 0;//承接上一個交易日
+        public const int Stage_New = 1;//初始化
+        public const int Stage_Order_Login_Start = 2;//登入下單API開始
+        public const int Stage_Order_Login_Success = 3;//登入下單API成功
+        public const int Stage_Order_New_Start = 4;//新倉開始下單
+        public const int Stage_Order_New_Success = 5;//新倉回報下單成功        
+        public const int Stage_Order_New_Fail = 6;//新倉回報下單失敗  
+        public const int Stage_Order_Not_Process = 7;//無法下單，可能是尚未登入完成
+        public const int Stage_Order_Even_Start = 8;//平倉倉開始下單
+        public const int Stage_Order_Even_Success = 9;//平倉回報下單成功
+        public const int Stage_Order_Even_Partial = 10;//平倉回報部分下單成功，部分失敗             
+        public const int Stage_Order_Even_Fail = 11;//平倉回報下單失敗  
+        public const int Stage_Order_Fail = 12;//回報下單失敗  
+        public const int Stage_Order_Time_Up = 13;//時間到停止下單
+        public const int Stage_End = 14;//結束
 
-        const int Out_Not_Out = 0;//尚未平倉出場
-        const int Out_Active_Profit = 1;//動態停利出場
-        const int Out_Win_Sell = 2;//賣出停利
-        const int Out_Win_Buy = 3;//買入停利
-        const int Out_Loss_Sell = 4;//賣出停損
-        const int Out_Loss_Buy = 5;//買入停損
-        const int Out_Time_Up = 6;//時間到出場
+        public const int Out_Not_Out = 0;//尚未平倉出場
+        public const int Out_Active_Profit = 1;//動態停利出場
+        public const int Out_Win_Sell = 2;//賣出停利
+        public const int Out_Win_Buy = 3;//買入停利
+        public const int Out_Loss_Sell = 4;//賣出停損
+        public const int Out_Loss_Buy = 5;//買入停損
+        public const int Out_Time_Up = 6;//時間到出場
 
         const int Array_Begin_Index = 0;//獲利加碼的口數陣列初始值
 
@@ -81,6 +81,14 @@ namespace AutoTrade
 
         Boolean isStartOrder = false;//是否開始下單
 
+        private Boolean isStartOrderLastDay = false;
+
+        public Boolean IsStartOrderLastDay
+        {
+            get { return isStartOrderLastDay; }
+            set { isStartOrderLastDay = value; }
+        }
+
         public Boolean IsStartOrder
         {
             get { return isStartOrder; }
@@ -99,7 +107,7 @@ namespace AutoTrade
         /// <summary>
         /// 變數。
         /// </summary>
-        ///         
+        ///                 
 
         int minTradePoint = 99999;//市場最低價
 
@@ -169,7 +177,7 @@ namespace AutoTrade
 
         OriginalRecord record = new OriginalRecord();//檔案的一行紀錄     
 
-        DateTime now = System.DateTime.Now;        
+        DateTime now = System.DateTime.Now;
 
         DateTime[] minuteBeforeTradeTime;//交易前X秒，判斷買或賣       
 
@@ -485,9 +493,7 @@ namespace AutoTrade
 
             this.loseLine = strategyFile.getLoseLine();
 
-            this.reverseLine = strategyFile.getReverseLine();
-
-            isStartOrder = false;//是否開始下單
+            this.reverseLine = strategyFile.getReverseLine();            
 
             isPrevWin = false;//上一次交易是否獲利
 
@@ -500,6 +506,8 @@ namespace AutoTrade
             trackFile = new TradeFile(trackFileName);
 
             trackFile.prepareWriter();
+
+            trackMsg("TradeCode = " + tradeCode);
 
             fileName = appDir + "\\" + Output_Dir + "\\" + "NEW_Daily_" + now.Year + "_" + now.Month + "_" + nowDay + ".rpt";
 
@@ -524,6 +532,17 @@ namespace AutoTrade
             showParameters();
 
             prepareOrderAPI();
+
+            if (stage == Stage_Last_Day)//承接上一個交易日
+            {
+
+                maxTradePoint = maxTradePointLastDay;
+
+                minTradePoint = minTradePointLastDay;
+
+                isStartOrder = isStartOrderLastDay;
+
+            }
 
         }
 
@@ -834,7 +853,23 @@ namespace AutoTrade
 
         private void coreLogic()
         {
-            if (record.TradeMoment.Hour >= 13 && record.TradeMoment.Minute >= 44 && record.TradeMoment.Second>=59)
+
+            if (stage == Stage_Order_New_Fail)//下單失敗
+            {
+                isStartOrder = false;
+            }
+
+            parentForm.textBox_OrderStart.Text = Convert.ToString(isStartOrder);
+
+            parentForm.textBox_B_S.Text = orderDircetion;
+
+            parentForm.textBox_MaxPrice.Text =Convert.ToString(maxTradePoint);
+
+            parentForm.textBox_MinPrice.Text =Convert.ToString(minTradePoint);
+
+            parentForm.textBox_OrderPrice.Text = Convert.ToString(orderPrice);         
+
+            if (record.TradeMoment.Hour >= 13 && record.TradeMoment.Minute >= 44 && record.TradeMoment.Second >= 59)
             {
                 trackMsg("MaxPrice = " + maxTradePoint);
 
@@ -843,21 +878,7 @@ namespace AutoTrade
                 trackMsg("MinPrice = " + minTradePoint);
 
                 trackMsg("");
-            }
-
-            if (stage == Stage_Order_New_Fail)//下單失敗
-            {
-                isStartOrder = false;
-            }
-
-            if (stage == Stage_Last_Day)
-            {//承接上一個交易日
-
-                maxTradePoint = maxTradePointLastDay;
-
-                minTradePoint = minTradePointLastDay;
-
-            }
+            }          
 
             if (isStartOrder == false && stage != Stage_Order_New_Start && stage != Stage_Order_Time_Up && stage != Stage_End && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //下單版本
             //if (isStartOrder == false && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //測試版本

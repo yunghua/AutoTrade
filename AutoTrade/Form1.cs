@@ -61,6 +61,8 @@ namespace AutoTrade
 
         string trackFileDir = "";//往日交易檔案的完整目錄路徑
 
+        string tradeCodeLastDay = "";//上一個交易日的交易月份 
+
         public Form1()
         {
             InitializeComponent();
@@ -224,11 +226,29 @@ namespace AutoTrade
                 if (trackFile != null)
                 {
 
+                    tradeCodeLastDay = trackFile.readConfig("TradeCode");
+
+                    textBox_tradeCodeLastDay.Text = tradeCodeLastDay;
+
+                    if (tradeCode != null && tradeCodeLastDay != null && !tradeCodeLastDay.Trim().Equals(""))
+                    {
+                        if (!tradeCode.Trim().Equals(tradeCodeLastDay))//交易月份不同
+                        {
+                            return;
+                        }
+                        else//交易月份相同
+                        {
+                            master.Stage = TradeMaster.Stage_Last_Day;
+                        }
+                    }
+
+
+
                     contexList = trackFile.readMultiLineConfig("NewTrade", "EndTrade");
 
                     if (contexList != null && contexList.Count >= 1)
                     {
-                        master.IsStartOrder = true;
+                        master.IsStartOrderLastDay = true;
 
                         contexList.Clear();
                     }
@@ -375,7 +395,7 @@ namespace AutoTrade
             try
             {
 
-                master = new TradeMaster();
+                master = new TradeMaster(this);
 
                 master.setLotLimit(Convert.ToInt16(lotLimit));
 
@@ -424,6 +444,8 @@ namespace AutoTrade
             textBox_MinPrice.Text = Convert.ToString(master.MinTradePointLastDay);
 
             textBox_OrderPrice.Text = Convert.ToString(master.OrderPrice);
+
+            textBox_OrderStart.Text = Convert.ToString(master.IsStartOrder);
 
             if (master.AddList != null)
             {
