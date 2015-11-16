@@ -30,16 +30,16 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.checkBox_enableTrade = new System.Windows.Forms.CheckBox();
             this.textBox_reverseLine = new System.Windows.Forms.TextBox();
@@ -76,8 +76,16 @@
             this.textBox_status_order = new System.Windows.Forms.TextBox();
             this.textBox_status_ready = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.button_Reverse = new System.Windows.Forms.Button();
-            this.button_Enable = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.textBox_B_S = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.textBox_MaxPrice = new System.Windows.Forms.TextBox();
+            this.textBox_MinPrice = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.textBox_OrderPrice = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.textBox_AddList = new System.Windows.Forms.TextBox();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
@@ -110,6 +118,8 @@
             // checkBox_enableTrade
             // 
             this.checkBox_enableTrade.AutoSize = true;
+            this.checkBox_enableTrade.Checked = true;
+            this.checkBox_enableTrade.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_enableTrade.Location = new System.Drawing.Point(289, 36);
             this.checkBox_enableTrade.Name = "checkBox_enableTrade";
             this.checkBox_enableTrade.Size = new System.Drawing.Size(92, 24);
@@ -250,7 +260,6 @@
             this.textBox_sym.Name = "textBox_sym";
             this.textBox_sym.Size = new System.Drawing.Size(294, 29);
             this.textBox_sym.TabIndex = 6;
-            this.textBox_sym.Text = "TXFJ4";
             this.textBox_sym.Click += new System.EventHandler(this.textBox_sym_Click);
             // 
             // label6
@@ -286,8 +295,8 @@
             // RefPri
             // 
             this.RefPri.DataPropertyName = "參考價";
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.RefPri.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.RefPri.DefaultCellStyle = dataGridViewCellStyle21;
             this.RefPri.HeaderText = "參考價";
             this.RefPri.Name = "RefPri";
             this.RefPri.ReadOnly = true;
@@ -296,8 +305,8 @@
             // OpenPri
             // 
             this.OpenPri.DataPropertyName = "開盤價";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.OpenPri.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.OpenPri.DefaultCellStyle = dataGridViewCellStyle22;
             this.OpenPri.HeaderText = "開盤價";
             this.OpenPri.Name = "OpenPri";
             this.OpenPri.ReadOnly = true;
@@ -306,8 +315,8 @@
             // HighPri
             // 
             this.HighPri.DataPropertyName = "最高價";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.HighPri.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.HighPri.DefaultCellStyle = dataGridViewCellStyle23;
             this.HighPri.HeaderText = "最高價";
             this.HighPri.Name = "HighPri";
             this.HighPri.ReadOnly = true;
@@ -315,8 +324,8 @@
             // LowPri
             // 
             this.LowPri.DataPropertyName = "最低價";
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.LowPri.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.LowPri.DefaultCellStyle = dataGridViewCellStyle24;
             this.LowPri.HeaderText = "最低價";
             this.LowPri.Name = "LowPri";
             this.LowPri.ReadOnly = true;
@@ -324,8 +333,8 @@
             // UpPri
             // 
             this.UpPri.DataPropertyName = "漲停價";
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UpPri.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UpPri.DefaultCellStyle = dataGridViewCellStyle25;
             this.UpPri.HeaderText = "漲停價";
             this.UpPri.Name = "UpPri";
             this.UpPri.ReadOnly = true;
@@ -333,8 +342,8 @@
             // DnPri
             // 
             this.DnPri.DataPropertyName = "跌停價";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.DnPri.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.DnPri.DefaultCellStyle = dataGridViewCellStyle26;
             this.DnPri.HeaderText = "跌停價";
             this.DnPri.Name = "DnPri";
             this.DnPri.ReadOnly = true;
@@ -342,8 +351,8 @@
             // MatchTim
             // 
             this.MatchTim.DataPropertyName = "成交時間";
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.MatchTim.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.MatchTim.DefaultCellStyle = dataGridViewCellStyle27;
             this.MatchTim.HeaderText = "成交時間";
             this.MatchTim.Name = "MatchTim";
             this.MatchTim.ReadOnly = true;
@@ -352,8 +361,8 @@
             // MatchPri
             // 
             this.MatchPri.DataPropertyName = "成交價位";
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.MatchPri.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.MatchPri.DefaultCellStyle = dataGridViewCellStyle28;
             this.MatchPri.HeaderText = "成交價位";
             this.MatchPri.Name = "MatchPri";
             this.MatchPri.ReadOnly = true;
@@ -361,8 +370,8 @@
             // MatchQty
             // 
             this.MatchQty.DataPropertyName = "成交數量";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.MatchQty.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.MatchQty.DefaultCellStyle = dataGridViewCellStyle29;
             this.MatchQty.HeaderText = "成交數量";
             this.MatchQty.Name = "MatchQty";
             this.MatchQty.ReadOnly = true;
@@ -370,8 +379,8 @@
             // TolMatchQty
             // 
             this.TolMatchQty.DataPropertyName = "總成交量";
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.TolMatchQty.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.TolMatchQty.DefaultCellStyle = dataGridViewCellStyle30;
             this.TolMatchQty.HeaderText = "總成交量";
             this.TolMatchQty.Name = "TolMatchQty";
             this.TolMatchQty.ReadOnly = true;
@@ -422,35 +431,112 @@
             this.label2.TabIndex = 26;
             this.label2.Text = "Ready:";
             // 
-            // button_Reverse
+            // label5
             // 
-            this.button_Reverse.Font = new System.Drawing.Font("Microsoft JhengHei", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.button_Reverse.ForeColor = System.Drawing.Color.Red;
-            this.button_Reverse.Location = new System.Drawing.Point(238, 302);
-            this.button_Reverse.Name = "button_Reverse";
-            this.button_Reverse.Size = new System.Drawing.Size(423, 70);
-            this.button_Reverse.TabIndex = 27;
-            this.button_Reverse.Text = "Reverse";
-            this.button_Reverse.UseVisualStyleBackColor = true;
-            this.button_Reverse.Click += new System.EventHandler(this.button_Reverse_Click);
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label5.Location = new System.Drawing.Point(8, 306);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(87, 20);
+            this.label5.TabIndex = 27;
+            this.label5.Text = "Buy or Sell";
             // 
-            // button_Enable
+            // textBox_B_S
             // 
-            this.button_Enable.Location = new System.Drawing.Point(730, 328);
-            this.button_Enable.Name = "button_Enable";
-            this.button_Enable.Size = new System.Drawing.Size(75, 44);
-            this.button_Enable.TabIndex = 28;
-            this.button_Enable.Text = "enable";
-            this.button_Enable.UseVisualStyleBackColor = true;
-            this.button_Enable.Click += new System.EventHandler(this.button_Enable_Click);
+            this.textBox_B_S.Location = new System.Drawing.Point(103, 297);
+            this.textBox_B_S.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_B_S.Name = "textBox_B_S";
+            this.textBox_B_S.Size = new System.Drawing.Size(294, 29);
+            this.textBox_B_S.TabIndex = 28;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label8.Location = new System.Drawing.Point(10, 381);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(82, 20);
+            this.label8.TabIndex = 29;
+            this.label8.Text = "Max Price";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label9.Location = new System.Drawing.Point(446, 381);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(79, 20);
+            this.label9.TabIndex = 30;
+            this.label9.Text = "Min Price";
+            // 
+            // textBox_MaxPrice
+            // 
+            this.textBox_MaxPrice.Location = new System.Drawing.Point(104, 372);
+            this.textBox_MaxPrice.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_MaxPrice.Name = "textBox_MaxPrice";
+            this.textBox_MaxPrice.Size = new System.Drawing.Size(294, 29);
+            this.textBox_MaxPrice.TabIndex = 31;
+            // 
+            // textBox_MinPrice
+            // 
+            this.textBox_MinPrice.Location = new System.Drawing.Point(571, 372);
+            this.textBox_MinPrice.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_MinPrice.Name = "textBox_MinPrice";
+            this.textBox_MinPrice.Size = new System.Drawing.Size(294, 29);
+            this.textBox_MinPrice.TabIndex = 32;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label10.Location = new System.Drawing.Point(434, 306);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(94, 20);
+            this.label10.TabIndex = 33;
+            this.label10.Text = "Order Price";
+            // 
+            // textBox_OrderPrice
+            // 
+            this.textBox_OrderPrice.Location = new System.Drawing.Point(571, 297);
+            this.textBox_OrderPrice.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_OrderPrice.Name = "textBox_OrderPrice";
+            this.textBox_OrderPrice.Size = new System.Drawing.Size(294, 29);
+            this.textBox_OrderPrice.TabIndex = 34;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label11.Location = new System.Drawing.Point(31, 455);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(114, 20);
+            this.label11.TabIndex = 35;
+            this.label11.Text = "Add Price List ";
+            // 
+            // textBox_AddList
+            // 
+            this.textBox_AddList.Location = new System.Drawing.Point(175, 452);
+            this.textBox_AddList.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_AddList.Multiline = true;
+            this.textBox_AddList.Name = "textBox_AddList";
+            this.textBox_AddList.Size = new System.Drawing.Size(257, 251);
+            this.textBox_AddList.TabIndex = 36;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(891, 411);
-            this.Controls.Add(this.button_Enable);
-            this.Controls.Add(this.button_Reverse);
+            this.ClientSize = new System.Drawing.Size(891, 734);
+            this.Controls.Add(this.textBox_AddList);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.textBox_OrderPrice);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.textBox_MinPrice);
+            this.Controls.Add(this.textBox_MaxPrice);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.textBox_B_S);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox_status_ready);
             this.Controls.Add(this.textBox_status_order);
@@ -461,7 +547,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.11.9  # # # # # ";
+            this.Text = " # # # # # 自動下單機V1.11.10  # # # # # ";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -511,11 +597,19 @@
         private System.Windows.Forms.TextBox textBox_status_order;
         private System.Windows.Forms.TextBox textBox_status_ready;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button_Reverse;
-        private System.Windows.Forms.Button button_Enable;
         private System.Windows.Forms.TextBox textBox_reverseLine;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox checkBox_enableTrade;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox textBox_B_S;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox textBox_MaxPrice;
+        private System.Windows.Forms.TextBox textBox_MinPrice;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox textBox_OrderPrice;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox textBox_AddList;
     }
 }
 

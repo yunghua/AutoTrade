@@ -252,7 +252,7 @@ namespace AutoTrade
                             }
 
                             master.OrderNewPriceList.Add(Convert.ToInt16(contexList[i]));
-                            
+
                         }
 
                         contexList.Clear();
@@ -285,13 +285,15 @@ namespace AutoTrade
                         contexList.Clear();
                     }
 
+
+                    trackFile.close();
                 }
             }
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            button_Reverse.Enabled = false;
+
 
             this.yuantaOrderAPI = new YuantaOrdClass();
 
@@ -400,7 +402,7 @@ namespace AutoTrade
                 readTrackFile(master);
 
                 master.prepareReady();
-                
+
             }
             catch (Exception ez)
             {
@@ -414,6 +416,25 @@ namespace AutoTrade
             textBox1_winLine.Text = Convert.ToString(master.getWinLine()[1]);
 
             textBox_reverseLine.Text = Convert.ToString(master.getReverseLine()[1]);
+
+            textBox_B_S.Text = master.OrderDircetion;
+
+            textBox_MaxPrice.Text = Convert.ToString(master.MaxTradePointLastDay);
+
+            textBox_MinPrice.Text = Convert.ToString(master.MinTradePointLastDay);
+
+            textBox_OrderPrice.Text = Convert.ToString(master.OrderPrice);
+
+            if (master.AddList != null)
+            {
+                for (int i = 0; i < master.AddList.Count; i++)
+                {
+
+                    textBox_AddList.Text += master.AddList[i] + Environment.NewLine;
+                }
+            }
+
+
 
             loginQuote();
 
@@ -458,15 +479,7 @@ namespace AutoTrade
             textBox_sym.SelectAll();
         }
 
-        private void button_Enable_Click(object sender, EventArgs e)
-        {
-            button_Reverse.Enabled = true;
-        }
 
-        private void button_Reverse_Click(object sender, EventArgs e)
-        {
-            button_Reverse.Enabled = false;
-        }
 
         private void checkBox_enableTrade_CheckedChanged(object sender, EventArgs e)
         {

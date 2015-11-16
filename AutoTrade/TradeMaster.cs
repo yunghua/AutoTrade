@@ -18,6 +18,7 @@ namespace AutoTrade
 
         const double valuePerPoint = 50;//每點價值，小台50元/點，大台200元/點        
 
+        const int Stage_Last_Day = 0;//承接上一個交易日
         const int Stage_New = 1;//初始化
         const int Stage_Order_Login_Start = 2;//登入下單API開始
         const int Stage_Order_Login_Success = 3;//登入下單API成功
@@ -71,12 +72,20 @@ namespace AutoTrade
 
         const int ActiveProfitPoint = 30;//動態停利的啟動條件
 
+        const string Track_Dir = "Track";//往日交易檔目錄        
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// Boolean變數。
         /// </summary>      
 
         Boolean isStartOrder = false;//是否開始下單
+
+        public Boolean IsStartOrder
+        {
+            get { return isStartOrder; }
+            set { isStartOrder = value; }
+        }
 
         Boolean isPrevWin = false;
 
@@ -108,6 +117,12 @@ namespace AutoTrade
 
         double orderPrice = 0;//下單交易價格
 
+        public double OrderPrice
+        {
+            get { return orderPrice; }
+            set { orderPrice = value; }
+        }
+
         double evenPrice = 0;//平倉交易價格             
 
         int winCount = 0;//獲利次數
@@ -137,6 +152,8 @@ namespace AutoTrade
         string nowDay = "";//今天日期
         string nowMonth = "";//今天月份
 
+        string trackFileName = "";  ////跨天數交易軌跡檔檔名
+
         //-------------------------------------------------------------------------------------------------------------
         //          物件區
         //-------------------------------------------------------------------------------------------------------------    
@@ -146,12 +163,13 @@ namespace AutoTrade
         TradeFile allTradeOutputFile;          //當天所有交易紀錄
         StrategyFile strategyFile;                        //策略檔
         TradeFile tradeRecordFile;                //自動交易紀錄檔
+        TradeFile trackFile;                            //跨天數交易軌跡檔
 
         OriginalRecord befofeRecord;
 
         OriginalRecord record = new OriginalRecord();//檔案的一行紀錄     
 
-        DateTime now = System.DateTime.Now;
+        DateTime now = System.DateTime.Now;        
 
         DateTime[] minuteBeforeTradeTime;//交易前X秒，判斷買或賣       
 
@@ -163,7 +181,8 @@ namespace AutoTrade
         Dictionary<int, int> winLine;  //停利的底線
         Dictionary<int, double> reverseLine;  //動態停利反轉的底線
 
-        DateTime stopTradeTime;//今日交易結束時間
+        //DateTime stopTradeTime;//今日交易結束時間
+
         //-------------------------------------------------------------------------------------------------------------        
         //        下單區
         //-------------------------------------------------------------------------------------------------------------
@@ -235,7 +254,19 @@ namespace AutoTrade
 
         int stage = Stage_New;//下單階段
 
+        public int Stage
+        {
+            get { return stage; }
+            set { stage = value; }
+        }
+
         string orderDircetion;//下單方向，買或賣
+
+        public string OrderDircetion
+        {
+            get { return orderDircetion; }
+            set { orderDircetion = value; }
+        }
 
         int orderNewPrice;//新倉成交均價
         int orderEvenPrice;//平倉成交均價
@@ -246,9 +277,21 @@ namespace AutoTrade
 
         List<int> orderNewPriceList = new List<int>();//下單價位的LIST
 
+        public List<int> OrderNewPriceList
+        {
+            get { return orderNewPriceList; }
+            set { orderNewPriceList = value; }
+        }
+
         int lotLimit = 7;//最大加碼口數        
 
         List<int> addList = new List<int>();//加碼的LIST
+
+        public List<int> AddList
+        {
+            get { return addList; }
+            set { addList = value; }
+        }
 
         int[] sellOrBuyCheckPeriod = null;//交易買賣方向的檢查時間間隔
 
@@ -428,8 +471,6 @@ namespace AutoTrade
 
             string appDir = System.Windows.Forms.Application.StartupPath;
 
-            stage = Stage_New;
-
             loseLine = new Dictionary<int, int>();
 
             winLine = new Dictionary<int, int>();
@@ -445,22 +486,28 @@ namespace AutoTrade
             this.loseLine = strategyFile.getLoseLine();
 
             this.reverseLine = strategyFile.getReverseLine();
-     
+
             isStartOrder = false;//是否開始下單
 
             isPrevWin = false;//上一次交易是否獲利
 
-            stopTradeTime = new DateTime(now.Year, now.Month, now.Day, 13, 44, 0);
+            //stopTradeTime = new DateTime(now.Year, now.Month, now.Day, 13, 44, 0);
 
             appDir = System.Windows.Forms.Application.StartupPath;
 
-            fileName = appDir + "\\" + Output_Dir + "\\" + "NEW_Daily_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
+            trackFileName = appDir + "\\" + Track_Dir + "\\" + "Track_" + now.Year + "_" + now.Month + "_" + nowDay + ".txt";
+
+            trackFile = new TradeFile(trackFileName);
+
+            trackFile.prepareWriter();
+
+            fileName = appDir + "\\" + Output_Dir + "\\" + "NEW_Daily_" + now.Year + "_" + now.Month + "_" + nowDay + ".rpt";
 
             allTradeOutputFile = new TradeFile(fileName);
 
             allTradeOutputFile.prepareWriter();
 
-            tradeRecordFileName = appDir + "\\" + Output_Dir + "\\" + "TradeRecord_" + now.Year + "_" + now.Month + "_" + now.Day + ".rpt";
+            tradeRecordFileName = appDir + "\\" + Output_Dir + "\\" + "TradeRecord_" + now.Year + "_" + now.Month + "_" + nowDay + ".rpt";
 
             tradeRecordFile = new TradeFile(tradeRecordFileName);
 
@@ -579,6 +626,14 @@ namespace AutoTrade
 
                 debugMsg("orderNewPrice:" + orderNewPrice);
 
+                trackMsg("OrderPrice = " + orderNewPrice);
+
+                trackMsg("");
+
+                trackMsg("NewTrade");
+
+                trackMsg("");
+
                 isStartOrder = true;//下單啦    
 
             }
@@ -589,6 +644,14 @@ namespace AutoTrade
                 orderEvenPrice = dealPrice;
 
                 debugMsg("orderEvenPrice:" + orderEvenPrice);
+
+                trackMsg("OrderPrice = " + orderNewPrice);
+
+                trackMsg("");
+
+                trackMsg("EndTrade");
+
+                trackMsg("");
 
                 orderEvenTime = D_Time.Trim();//成交時間
 
@@ -653,7 +716,9 @@ namespace AutoTrade
             {
                 orderPrice = "";//市價下單
 
-                dealOrder(tradeCode, orderPrice, orderLot, orderDirection, Trade_Type_ONEDAY);
+                dealOrder(tradeCode, orderPrice, orderLot, orderDirection, Trade_Type_NEW);
+
+                trackMsg("BuyOrSell = " + orderDirection);
             }
             catch (Exception e)
             {
@@ -673,6 +738,8 @@ namespace AutoTrade
                 orderPrice = "";//市價下單
 
                 dealOrder(tradeCode, orderPrice, orderLot, orderDirection, Trade_Type_EVEN);
+
+                trackMsg("BuyOrSell = " + orderDirection);
             }
             catch (Exception e)
             {
@@ -749,12 +816,49 @@ namespace AutoTrade
 
         }
 
+        int maxTradePointLastDay = 0;//上一個交易日，最後一次交易的最高點
+
+        public int MaxTradePointLastDay
+        {
+            get { return maxTradePointLastDay; }
+            set { maxTradePointLastDay = value; }
+        }
+
+        int minTradePointLastDay = 0;
+
+        public int MinTradePointLastDay
+        {
+            get { return minTradePointLastDay; }
+            set { minTradePointLastDay = value; }
+        }
+
         private void coreLogic()
         {
+            if (record.TradeMoment.Hour >= 13 && record.TradeMoment.Minute >= 44 && record.TradeMoment.Second>=59)
+            {
+                trackMsg("MaxPrice = " + maxTradePoint);
+
+                trackMsg("");
+
+                trackMsg("MinPrice = " + minTradePoint);
+
+                trackMsg("");
+            }
+
             if (stage == Stage_Order_New_Fail)//下單失敗
             {
                 isStartOrder = false;
             }
+
+            if (stage == Stage_Last_Day)
+            {//承接上一個交易日
+
+                maxTradePoint = maxTradePointLastDay;
+
+                minTradePoint = minTradePointLastDay;
+
+            }
+
             if (isStartOrder == false && stage != Stage_Order_New_Start && stage != Stage_Order_Time_Up && stage != Stage_End && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //下單版本
             //if (isStartOrder == false && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //測試版本
             {
@@ -1232,7 +1336,23 @@ namespace AutoTrade
 
             isPrevLose = true;
 
-        }        
+        }
+
+        private void trackMsg(String msg)
+        {
+            if (DEBUG)
+            {
+
+                try
+                {
+                    trackFile.writeLine(msg);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("寫入軌跡檔失敗，請檢查是否有Track這個目錄。" + e.StackTrace);
+                }
+            }
+        }
 
         private void debugMsg(String msg)
         {
