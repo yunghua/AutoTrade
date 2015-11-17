@@ -221,7 +221,7 @@ namespace AutoTrade
 
                 ConfigFile trackFile = trackFileList[trackFileList.Count - 1];
 
-                List<string> contexList = new List<string>();
+                List<string> contextList = new List<string>();
 
                 if (trackFile != null)
                 {
@@ -242,67 +242,79 @@ namespace AutoTrade
                         }
                     }
 
+                    
+                    while(trackFile.hasNext()){//把上一個交易日的軌跡檔寫進今天的軌跡檔內
+
+                        master.trackMsg(trackFile.getLine().Trim());
+
+                    }
 
 
-                    contexList = trackFile.readMultiLineConfig("NewTrade", "EndTrade");
+                    contextList = trackFile.readMultiLineConfig("NewTrade", "EndTrade");
 
-                    if (contexList != null && contexList.Count >= 1)
+                    if (contextList != null && contextList.Count >= 1)
                     {
                         master.IsStartOrderLastDay = true;
 
-                        contexList.Clear();
+                        contextList.Clear();
                     }
 
 
 
-                    contexList = trackFile.readMultiLineConfig("OrderPrice", "EndTrade");
+                    contextList = trackFile.readMultiLineConfig("OrderPrice", "EndTrade");
 
-                    if (contexList != null && contexList.Count >= 1)
+                    if (contextList != null && contextList.Count >= 1)
                     {
-                        for (int i = 0; i < contexList.Count; i++)
+                        for (int i = 0; i < contextList.Count; i++)
                         {
                             //orderPriceList.Add(Convert.ToDouble(contexList[i]));
                             if (i == 0)
                             {
-                                master.OrderPrice = Convert.ToDouble(contexList[0]);
+                                master.OrderPrice = Convert.ToInt16(contextList[0]);
                             }
                             else
                             {
-                                master.AddList.Add(Convert.ToInt16(contexList[i]));
+                                master.AddList.Add(Convert.ToInt16(contextList[i]));
                             }
 
-                            master.OrderNewPriceList.Add(Convert.ToInt16(contexList[i]));
+                            master.OrderNewPriceList.Add(Convert.ToInt16(contextList[i]));
+
+                            master.OrderNewPrice = Convert.ToInt16(contextList[i]);
 
                         }
 
-                        contexList.Clear();
+                        contextList.Clear();
                     }
 
-                    contexList = trackFile.readMultiLineConfig("BuyOrSell", "EndTrade");
+                    contextList = trackFile.readMultiLineConfig("BuyOrSell", "EndTrade");
 
-                    if (contexList != null && contexList.Count >= 1)
+                    if (contextList != null && contextList.Count >= 1)
                     {
-                        master.OrderDircetion = contexList[contexList.Count - 1];
+                        master.OrderDircetion = contextList[contextList.Count - 1];
 
-                        contexList.Clear();
+
+                        master.NowTradeType = contextList[contextList.Count - 1];
+
+
+                        contextList.Clear();
                     }
 
-                    contexList = trackFile.readMultiLineConfig("MaxPrice", "EndTrade");
+                    contextList = trackFile.readMultiLineConfig("MaxPrice", "EndTrade");
 
-                    if (contexList != null && contexList.Count >= 1)
+                    if (contextList != null && contextList.Count >= 1)
                     {
-                        master.MaxTradePointLastDay = Convert.ToInt16(contexList[contexList.Count - 1]);
+                        master.MaxTradePointLastDay = Convert.ToInt16(contextList[contextList.Count - 1]);
 
-                        contexList.Clear();
+                        contextList.Clear();
                     }
 
-                    contexList = trackFile.readMultiLineConfig("MinPrice", "EndTrade");
+                    contextList = trackFile.readMultiLineConfig("MinPrice", "EndTrade");
 
-                    if (contexList != null && contexList.Count >= 1)
+                    if (contextList != null && contextList.Count >= 1)
                     {
-                        master.MinTradePointLastDay = Convert.ToInt16(contexList[contexList.Count - 1]);
+                        master.MinTradePointLastDay = Convert.ToInt16(contextList[contextList.Count - 1]);
 
-                        contexList.Clear();
+                        contextList.Clear();
                     }
 
 
@@ -419,9 +431,13 @@ namespace AutoTrade
 
                 master.setTradeCode(tradeCode);
 
+                master.prepareReady();
+
+                master.prepareTrackFile();
+
                 readTrackFile(master);
 
-                master.prepareReady();
+                master.prepareDataFromLastTradeDay();                
 
             }
             catch (Exception ez)
@@ -447,12 +463,11 @@ namespace AutoTrade
 
             textBox_OrderStart.Text = Convert.ToString(master.IsStartOrder);
 
-            if (master.AddList != null)
+            if (master.OrderNewPriceList != null)
             {
-                for (int i = 0; i < master.AddList.Count; i++)
+                for (int i = 0; i < master.OrderNewPriceList.Count; i++)
                 {
-
-                    textBox_AddList.Text += master.AddList[i] + Environment.NewLine;
+                    textBox_OrderNewPriceList.Text += master.OrderNewPriceList[i] + Environment.NewLine;
                 }
             }
 
