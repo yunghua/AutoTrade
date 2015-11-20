@@ -13,11 +13,17 @@
         /// <param name="disposing">如果應該處置 Managed 資源則為 true，否則為 false。</param>
         protected override void Dispose(bool disposing)
         {
+
+
+
             if (disposing && (components != null))
             {
+                Form1_Close();
+
                 components.Dispose();                
             }
             base.Dispose(disposing);
+
         }
 
         #region Windows Form 設計工具產生的程式碼
@@ -657,7 +663,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.11.20  # # # # # ";
+            this.Text = " # # # # # 自動下單機V1.11.22  # # # # #        可以讀取當天的軌跡檔案，取消AddList";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();

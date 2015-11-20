@@ -78,6 +78,10 @@ namespace AutoTrade
         /// <summary>
         /// Boolean變數。
         /// </summary>      
+        /// 
+
+
+        Boolean hasWriteMaxAndMinPrice = false;
 
         Boolean isStartOrder = false;//是否開始下單
 
@@ -164,6 +168,13 @@ namespace AutoTrade
         int stopPrice = 0;//獲利反轉的目標點位        
 
         string nowDay = "";//今天日期
+
+        public string NowDay
+        {
+            get { return nowDay; }
+            set { nowDay = value; }
+        }
+
         string nowMonth = "";//今天月份
 
         string trackFileName = "";  ////跨天數交易軌跡檔檔名
@@ -184,6 +195,12 @@ namespace AutoTrade
         OriginalRecord record = new OriginalRecord();//檔案的一行紀錄     
 
         DateTime now = System.DateTime.Now;
+
+        public DateTime Now
+        {
+            get { return now; }
+            set { now = value; }
+        }
 
         DateTime[] minuteBeforeTradeTime;//交易前X秒，判斷買或賣       
 
@@ -311,13 +328,13 @@ namespace AutoTrade
 
         int lotLimit = 7;//最大加碼口數        
 
-        List<int> addList = new List<int>();//加碼的LIST
+        //List<int> addList = new List<int>();//加碼的LIST
 
-        public List<int> AddList
-        {
-            get { return addList; }
-            set { addList = value; }
-        }
+        //public List<int> AddList
+        //{
+        //    get { return addList; }
+        //    set { addList = value; }
+        //}
 
         int[] sellOrBuyCheckPeriod = null;//交易買賣方向的檢查時間間隔
 
@@ -495,7 +512,7 @@ namespace AutoTrade
 
                 parentForm.textBox_Stage.Text = Convert.ToString(stage);
 
-                parentForm.textBox_OrderStart.Text = Convert.ToString(isStartOrder);
+                parentForm.textBox_NowTradeType.Text = Convert.ToString(nowTradeType);
 
             }
         }
@@ -514,7 +531,7 @@ namespace AutoTrade
 
         }
 
-        public void prepareReady()
+        public void prepareFirst()
         {
             if (now.Day <= 9)
             {
@@ -592,6 +609,10 @@ namespace AutoTrade
         {
             try
             {
+                if (trackFile != null)
+                {
+                    trackFile.close();
+                }
                 if (allTradeOutputFile != null)
                 {
                     allTradeOutputFile.close();
@@ -684,6 +705,13 @@ namespace AutoTrade
                 orderNewPrice = dealPrice;
 
                 orderNewPriceList.Add(orderNewPrice);
+
+                parentForm.textBox_OrderNewPriceList.Text = "";
+
+                for (int i = 0; i < orderNewPriceList.Count;i++ )
+                {
+                    parentForm.textBox_OrderNewPriceList.Text += orderNewPriceList[i] + Environment.NewLine;
+                }                
 
                 debugMsg("orderNewPrice:" + orderNewPrice);
 
@@ -917,7 +945,7 @@ namespace AutoTrade
 
             parentForm.textBox_NowTradeType.Text = Convert.ToString(nowTradeType);
 
-            if (record.TradeMoment.Hour >= 13 && record.TradeMoment.Minute >= 44 && record.TradeMoment.Second >= 59)
+            if (record.TradeMoment.Hour >= 13 && record.TradeMoment.Minute >= 44 && record.TradeMoment.Second >= 59 && hasWriteMaxAndMinPrice == false)
             {
                 trackMsg("MaxPrice = " + maxTradePoint);
 
@@ -926,6 +954,8 @@ namespace AutoTrade
                 trackMsg("MinPrice = " + minTradePoint);
 
                 trackMsg("");
+
+                hasWriteMaxAndMinPrice = true;
             }
 
             if (isStartOrder == false && stage != Stage_Order_New_Start && stage != Stage_Order_Time_Up && stage != Stage_End && (isPrevLose == true || isPrevWin == true || Dice.run(Random_Seed))) //下單版本
@@ -1013,15 +1043,15 @@ namespace AutoTrade
                 if (nowTradeType == BS_Type_B)
                 {
 
-                    if (addList.Count >= 1)
+                    if (orderNewPriceList.Count > 1)//有加碼
                     {
-                        stopPeriod = winLine[addList.Count] * reverseLine[addList.Count];
+                        stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count-1];
 
                         stopPrice = maxTradePoint - Convert.ToInt16(stopPeriod);
                     }
 
                     if (
-                                  (addList.Count >= 1 && record.TradePrice <= stopPrice) ||//反轉
+                                  (orderNewPriceList.Count > 1 && record.TradePrice <= stopPrice) ||//反轉
                                  (orderPrice - record.TradePrice) > loseLine[1]
                      )
                     {//賠了XX點，認賠殺出
@@ -1042,7 +1072,7 @@ namespace AutoTrade
 
                             outStyle = Out_Loss_Buy;
                         }
-                        else if (addList.Count >= 1 && record.TradePrice <= stopPrice)
+                        else if (orderNewPriceList.Count > 1 && record.TradePrice <= stopPrice)
                         {
                             debugMsg("outStyle = Out_Win_Buy");
 
@@ -1062,10 +1092,7 @@ namespace AutoTrade
                         {
 
                             if (orderNewPriceList.Count < lotLimit)
-                            {
-                                addList.Add(1);//實際加碼的次數
-
-                                orderNewPriceList.Add(record.TradePrice);
+                            {                                                                
 
                                 orderDircetion = BS_Type_B;//繼續買
 
@@ -1083,15 +1110,15 @@ namespace AutoTrade
                 else if (nowTradeType == BS_Type_S)
                 {
 
-                    if (addList.Count >= 1)
+                    if (orderNewPriceList.Count > 1)
                     {
-                        stopPeriod = winLine[addList.Count] * reverseLine[addList.Count];
+                        stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count-1];
 
                         stopPrice = minTradePoint + Convert.ToInt16(stopPeriod);
                     }
 
                     if (
-                                (addList.Count >= 1 && record.TradePrice >= stopPrice) || //反轉
+                                (orderNewPriceList.Count > 1 && record.TradePrice >= stopPrice) || //反轉
                                 (record.TradePrice - orderPrice) > loseLine[1])
                     {
                         //賠了XX點，認賠殺出
@@ -1113,7 +1140,7 @@ namespace AutoTrade
 
                             outStyle = Out_Loss_Sell;
                         }
-                        else if (addList.Count >= 1 && record.TradePrice >= stopPrice)
+                        else if (orderNewPriceList.Count > 1 && record.TradePrice >= stopPrice)
                         {
                             debugMsg("outStyle = Out_Win_Sell");
 
@@ -1132,13 +1159,8 @@ namespace AutoTrade
                         if (Convert.ToInt16(orderNewPriceList[orderNewPriceList.Count - 1] - record.TradePrice) > winLine[orderNewPriceList.Count])
                         {
 
-
                             if (orderNewPriceList.Count < lotLimit)
-                            {
-
-                                addList.Add(1);//實際加碼的次數
-
-                                orderNewPriceList.Add(record.TradePrice);
+                            {                                                                
 
                                 orderDircetion = BS_Type_S;//繼續賣
 
@@ -1176,6 +1198,8 @@ namespace AutoTrade
         {
             try
             {
+                parentForm.textBox_OrderNewPriceList.Text = "";
+
                 if (outStyle == Out_Win_Sell)
                 {
                     dealOutWinSell();
@@ -1267,9 +1291,9 @@ namespace AutoTrade
 
             debugMsg("停利策略 : " + winLine[orderNewPriceList.Count]);
 
-            if (addList.Count >= 1)
+            if (orderNewPriceList.Count > 1)
             {
-                debugMsg("反轉策略 : " + reverseLine[addList.Count]);
+                debugMsg("反轉策略 : " + reverseLine[orderNewPriceList.Count-1]);
             }
 
             debugMsg("----------------------------------------------------------------------------------------------");
@@ -1278,9 +1302,7 @@ namespace AutoTrade
 
             befofeRecord = null;
 
-            orderNewPriceList.Clear();//平倉後，把新倉(包括加碼的新倉)列表清空。
-
-            addList.Clear();//平倉後，把加碼的列表清空。
+            orderNewPriceList.Clear();//平倉後，把新倉(包括加碼的新倉)列表清空。            
 
             minTradePoint = 99999;//新倉後最低價
 

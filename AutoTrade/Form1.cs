@@ -219,6 +219,8 @@ namespace AutoTrade
             if (trackFileList != null && trackFileList.Count > 0)
             {
 
+                string trackFileName = "Track_" + master.Now.Year + "_" + master.Now.Month + "_" + master.NowDay + ".txt";
+
                 ConfigFile trackFile = trackFileList[trackFileList.Count - 1];
 
                 List<string> contextList = new List<string>();
@@ -242,11 +244,14 @@ namespace AutoTrade
                         }
                     }
 
-                    
-                    while(trackFile.hasNext()){//把上一個交易日的軌跡檔寫進今天的軌跡檔內
+                    if (!trackFileName.Trim().Equals(trackFile.getFileName().Trim()))//不是今天的檔案
+                    {
+                        while (trackFile.hasNext())
+                        {//把上一個交易日的軌跡檔寫進今天的軌跡檔內
 
-                        master.trackMsg(trackFile.getLine().Trim());
+                            master.trackMsg(trackFile.getLine().Trim());
 
+                        }
                     }
 
 
@@ -271,11 +276,7 @@ namespace AutoTrade
                             if (i == 0)
                             {
                                 master.OrderPrice = Convert.ToInt16(contextList[0]);
-                            }
-                            else
-                            {
-                                master.AddList.Add(Convert.ToInt16(contextList[i]));
-                            }
+                            }                            
 
                             master.OrderNewPriceList.Add(Convert.ToInt16(contextList[i]));
 
@@ -319,6 +320,7 @@ namespace AutoTrade
 
 
                     trackFile.close();
+                    trackFile = null;
                 }
             }
         }
@@ -352,10 +354,11 @@ namespace AutoTrade
 
             configFilePath = appDir + "\\" + Config_Dir + "\\" + Config_File_Name;
 
-            configFile = new ConfigFile(configFilePath);
             try
             {
-                configFile.prepareReader();
+
+                configFile = new ConfigFile(configFilePath);
+
             }
             catch (Exception ex)
             {
@@ -431,13 +434,13 @@ namespace AutoTrade
 
                 master.setTradeCode(tradeCode);
 
-                master.prepareReady();
+                master.prepareFirst();
 
                 master.prepareTrackFile();
 
                 readTrackFile(master);
 
-                master.prepareDataFromLastTradeDay();                
+                master.prepareDataFromLastTradeDay();
 
             }
             catch (Exception ez)
@@ -463,6 +466,8 @@ namespace AutoTrade
 
             textBox_OrderStart.Text = Convert.ToString(master.IsStartOrder);
 
+            textBox_NowTradeType.Text = master.NowTradeType;
+
             if (master.OrderNewPriceList != null)
             {
                 for (int i = 0; i < master.OrderNewPriceList.Count; i++)
@@ -479,7 +484,7 @@ namespace AutoTrade
 
         }
 
-        private void Form1_Close(object sender, EventArgs e)
+        private void Form1_Close()
         {
             if (configFile != null)
             {
@@ -489,6 +494,14 @@ namespace AutoTrade
             if (master != null)
             {
                 master.stop();
+            }
+
+            if (trackFileList != null)
+            {
+                for (int i = 0; i < trackFileList.Count; i++)
+                {
+                    trackFileList[i].close();
+                }
             }
 
             if (yuantaOrderAPI != null)
