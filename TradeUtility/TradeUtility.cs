@@ -86,9 +86,7 @@ namespace TradeUtility
         {
             try
             {
-                monthFile = new ConfigFile(monthFilePath);
-
-                monthFile.prepareReader();
+                monthFile = new ConfigFile(monthFilePath);                
             }
             catch (Exception e)
             {

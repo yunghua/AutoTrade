@@ -663,7 +663,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.11.22  # # # # #        可以讀取當天的軌跡檔案，取消AddList";
+            this.Text = " # # # # # 自動下單機V1.11.23  # # # # #        前一個交易日如果EndTrade，就不複製到今日的軌跡檔。";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();

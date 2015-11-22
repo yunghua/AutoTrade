@@ -8,19 +8,38 @@ namespace TradeUtility
 {
     public class TradeFile
     {
+        
         String fullPath;//完整路徑
 
         String fileName;//檔案名稱
 
         StreamReader reader;
 
+        public StreamReader Reader
+        {
+            get { return reader; }
+            set { reader = value; }
+        }
+
         StreamWriter writer;
+
+        public StreamWriter Writer
+        {
+            get { return writer; }
+            set { writer = value; }
+        }
 
         String currentLine = "";
 
         Boolean isFileExist = false;
 
         FileStream fs;
+
+        public FileStream Fs
+        {
+            get { return fs; }
+            set { fs = value; }
+        }
 
         public String CurrentLine
         {
@@ -63,6 +82,8 @@ namespace TradeUtility
         public TradeFile(String fullPath)
         {
             this.fullPath = fullPath;
+
+            
         }
 
         public Boolean isExist()
@@ -84,7 +105,11 @@ namespace TradeUtility
 
             try
             {
-                reader = new StreamReader(fullPath);
+                //reader = new StreamReader(fullPath);
+
+                FileStream fs = new FileStream(fullPath, FileMode.Open);
+
+                reader = new StreamReader(fs);
             }
             catch (IOException e)
             {
@@ -119,7 +144,7 @@ namespace TradeUtility
 
                 if (isFileExist)
                 {
-                    fs = new FileStream(fullPath, FileMode.Append);
+                    fs = new FileStream(fullPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
                 }
                 else
                 {
@@ -135,7 +160,7 @@ namespace TradeUtility
             }
         }
 
-        
+
 
         public Boolean hasNext()
         {
@@ -196,6 +221,7 @@ namespace TradeUtility
                 {
                     reader.Close();
                     reader.Dispose();
+                    reader = null;
                 }
 
             }
@@ -212,6 +238,7 @@ namespace TradeUtility
                 {
                     writer.Close();
                     writer.Dispose();
+                    writer = null;
                 }
 
             }

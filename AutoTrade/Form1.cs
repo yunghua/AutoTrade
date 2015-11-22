@@ -246,11 +246,15 @@ namespace AutoTrade
 
                     if (!trackFileName.Trim().Equals(trackFile.getFileName().Trim()))//不是今天的檔案
                     {
-                        while (trackFile.hasNext())
-                        {//把上一個交易日的軌跡檔寫進今天的軌跡檔內
+                        if (!trackFile.isEndTrade())
+                        {
 
-                            master.trackMsg(trackFile.getLine().Trim());
+                            while (trackFile.hasNext())
+                            {//把上一個交易日的軌跡檔寫進今天的軌跡檔內
 
+                                master.trackMsg(trackFile.getLine().Trim());
+
+                            }
                         }
                     }
 
