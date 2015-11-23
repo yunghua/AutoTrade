@@ -36,16 +36,16 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.checkBox_enableTrade = new System.Windows.Forms.CheckBox();
             this.textBox_reverseLine = new System.Windows.Forms.TextBox();
@@ -311,8 +311,8 @@
             // RefPri
             // 
             this.RefPri.DataPropertyName = "參考價";
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.RefPri.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.RefPri.DefaultCellStyle = dataGridViewCellStyle21;
             this.RefPri.HeaderText = "參考價";
             this.RefPri.Name = "RefPri";
             this.RefPri.ReadOnly = true;
@@ -321,8 +321,8 @@
             // OpenPri
             // 
             this.OpenPri.DataPropertyName = "開盤價";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.OpenPri.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.OpenPri.DefaultCellStyle = dataGridViewCellStyle22;
             this.OpenPri.HeaderText = "開盤價";
             this.OpenPri.Name = "OpenPri";
             this.OpenPri.ReadOnly = true;
@@ -331,8 +331,8 @@
             // HighPri
             // 
             this.HighPri.DataPropertyName = "最高價";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.HighPri.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.HighPri.DefaultCellStyle = dataGridViewCellStyle23;
             this.HighPri.HeaderText = "最高價";
             this.HighPri.Name = "HighPri";
             this.HighPri.ReadOnly = true;
@@ -340,8 +340,8 @@
             // LowPri
             // 
             this.LowPri.DataPropertyName = "最低價";
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.LowPri.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.LowPri.DefaultCellStyle = dataGridViewCellStyle24;
             this.LowPri.HeaderText = "最低價";
             this.LowPri.Name = "LowPri";
             this.LowPri.ReadOnly = true;
@@ -349,8 +349,8 @@
             // UpPri
             // 
             this.UpPri.DataPropertyName = "漲停價";
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UpPri.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UpPri.DefaultCellStyle = dataGridViewCellStyle25;
             this.UpPri.HeaderText = "漲停價";
             this.UpPri.Name = "UpPri";
             this.UpPri.ReadOnly = true;
@@ -358,8 +358,8 @@
             // DnPri
             // 
             this.DnPri.DataPropertyName = "跌停價";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.DnPri.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle26.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.DnPri.DefaultCellStyle = dataGridViewCellStyle26;
             this.DnPri.HeaderText = "跌停價";
             this.DnPri.Name = "DnPri";
             this.DnPri.ReadOnly = true;
@@ -367,8 +367,8 @@
             // MatchTim
             // 
             this.MatchTim.DataPropertyName = "成交時間";
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.MatchTim.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.MatchTim.DefaultCellStyle = dataGridViewCellStyle27;
             this.MatchTim.HeaderText = "成交時間";
             this.MatchTim.Name = "MatchTim";
             this.MatchTim.ReadOnly = true;
@@ -377,8 +377,8 @@
             // MatchPri
             // 
             this.MatchPri.DataPropertyName = "成交價位";
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.MatchPri.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.MatchPri.DefaultCellStyle = dataGridViewCellStyle28;
             this.MatchPri.HeaderText = "成交價位";
             this.MatchPri.Name = "MatchPri";
             this.MatchPri.ReadOnly = true;
@@ -386,8 +386,8 @@
             // MatchQty
             // 
             this.MatchQty.DataPropertyName = "成交數量";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.MatchQty.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.MatchQty.DefaultCellStyle = dataGridViewCellStyle29;
             this.MatchQty.HeaderText = "成交數量";
             this.MatchQty.Name = "MatchQty";
             this.MatchQty.ReadOnly = true;
@@ -395,8 +395,8 @@
             // TolMatchQty
             // 
             this.TolMatchQty.DataPropertyName = "總成交量";
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.TolMatchQty.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.TolMatchQty.DefaultCellStyle = dataGridViewCellStyle30;
             this.TolMatchQty.HeaderText = "總成交量";
             this.TolMatchQty.Name = "TolMatchQty";
             this.TolMatchQty.ReadOnly = true;
@@ -663,7 +663,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.11.23  # # # # #        前一個交易日如果EndTrade，就不複製到今日的軌跡檔。";
+            this.Text = " # # # # # 自動下單機V1.11.25  # # # # #        前一個交易日EndTrade之前的紀錄，不複製到今日的軌跡檔。";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();

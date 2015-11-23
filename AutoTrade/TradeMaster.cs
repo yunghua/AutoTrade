@@ -576,7 +576,7 @@ namespace AutoTrade
 
             //stopTradeTime = new DateTime(now.Year, now.Month, now.Day, 13, 44, 0);
 
-            
+
             fileName = appDir + "\\" + Output_Dir + "\\" + "NEW_Daily_" + now.Year + "_" + now.Month + "_" + nowDay + ".rpt";
 
             allTradeOutputFile = new TradeFile(fileName);
@@ -601,7 +601,7 @@ namespace AutoTrade
 
             prepareOrderAPI();
 
-           
+
 
         }
 
@@ -708,10 +708,10 @@ namespace AutoTrade
 
                 parentForm.textBox_OrderNewPriceList.Text = "";
 
-                for (int i = 0; i < orderNewPriceList.Count;i++ )
+                for (int i = 0; i < orderNewPriceList.Count; i++)
                 {
                     parentForm.textBox_OrderNewPriceList.Text += orderNewPriceList[i] + Environment.NewLine;
-                }                
+                }
 
                 debugMsg("orderNewPrice:" + orderNewPrice);
 
@@ -1045,7 +1045,7 @@ namespace AutoTrade
 
                     if (orderNewPriceList.Count > 1)//有加碼
                     {
-                        stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count-1];
+                        stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count - 1];
 
                         stopPrice = maxTradePoint - Convert.ToInt16(stopPeriod);
                     }
@@ -1079,8 +1079,8 @@ namespace AutoTrade
                             outStyle = Out_Win_Buy;
                         }
                     }
-                    else if ((record.TradePrice - orderNewPrice) > winLine[orderNewPriceList.Count])
-                    {//目前獲利
+                    else if ((record.TradePrice - orderNewPrice) >= winLine[orderNewPriceList.Count])
+                    {
 
                         //--------------------------------------------------------------------------------------------------------------------------------
                         //  加碼部分
@@ -1088,22 +1088,19 @@ namespace AutoTrade
 
                         //賺了XX點，加碼
 
-                        if (Convert.ToInt16(record.TradePrice - orderNewPriceList[orderNewPriceList.Count - 1]) > winLine[orderNewPriceList.Count])
+                        if (orderNewPriceList.Count < lotLimit)
                         {
 
-                            if (orderNewPriceList.Count < lotLimit)
-                            {                                                                
+                            orderDircetion = BS_Type_B;//繼續買
 
-                                orderDircetion = BS_Type_B;//繼續買
-
-                                if (stage == Stage_Order_New_Success || stage == Stage_Last_Day)
-                                {
-                                    stage = this.dealOrderNew(tradeCode, Convert.ToString(record.TradePrice), lotArray[lotIndex], orderDircetion);
-                                }
-
-                                return;
+                            if (stage == Stage_Order_New_Success || stage == Stage_Last_Day)
+                            {
+                                stage = this.dealOrderNew(tradeCode, Convert.ToString(record.TradePrice), lotArray[lotIndex], orderDircetion);
                             }
+
+                            return;
                         }
+
                     }
 
                 }
@@ -1112,7 +1109,7 @@ namespace AutoTrade
 
                     if (orderNewPriceList.Count > 1)
                     {
-                        stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count-1];
+                        stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count - 1];
 
                         stopPrice = minTradePoint + Convert.ToInt16(stopPeriod);
                     }
@@ -1147,7 +1144,7 @@ namespace AutoTrade
                             outStyle = Out_Win_Sell;
                         }
                     }
-                    else if ((orderPrice - record.TradePrice) > winLine[orderNewPriceList.Count])
+                    else if ((orderNewPrice - record.TradePrice) > winLine[orderNewPriceList.Count])
                     {
 
                         //賺了XX點，加碼
@@ -1156,22 +1153,20 @@ namespace AutoTrade
                         //  加碼部分
                         //--------------------------------------------------------------------------------------------------------------------------------
 
-                        if (Convert.ToInt16(orderNewPriceList[orderNewPriceList.Count - 1] - record.TradePrice) > winLine[orderNewPriceList.Count])
+
+                        if (orderNewPriceList.Count < lotLimit)
                         {
 
-                            if (orderNewPriceList.Count < lotLimit)
-                            {                                                                
+                            orderDircetion = BS_Type_S;//繼續賣
 
-                                orderDircetion = BS_Type_S;//繼續賣
-
-                                if (stage == Stage_Order_New_Success || stage == Stage_Last_Day)
-                                {
-                                    stage = this.dealOrderNew(tradeCode, Convert.ToString(record.TradePrice), lotArray[lotIndex], orderDircetion);
-                                }
-
-                                return;
+                            if (stage == Stage_Order_New_Success || stage == Stage_Last_Day)
+                            {
+                                stage = this.dealOrderNew(tradeCode, Convert.ToString(record.TradePrice), lotArray[lotIndex], orderDircetion);
                             }
+
+                            return;
                         }
+
                     }
                 }
 
@@ -1293,7 +1288,7 @@ namespace AutoTrade
 
             if (orderNewPriceList.Count > 1)
             {
-                debugMsg("反轉策略 : " + reverseLine[orderNewPriceList.Count-1]);
+                debugMsg("反轉策略 : " + reverseLine[orderNewPriceList.Count - 1]);
             }
 
             debugMsg("----------------------------------------------------------------------------------------------");

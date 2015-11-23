@@ -246,14 +246,35 @@ namespace AutoTrade
 
                     if (!trackFileName.Trim().Equals(trackFile.getFileName().Trim()))//不是今天的檔案
                     {
+                        
+
                         if (!trackFile.isEndTrade())
                         {
+
+                            List<string> trackLines = new List<string>();
+
+                            String tmpStr = "";
 
                             while (trackFile.hasNext())
                             {//把上一個交易日的軌跡檔寫進今天的軌跡檔內
 
-                                master.trackMsg(trackFile.getLine().Trim());
+                                tmpStr = trackFile.getLine().Trim();
 
+                                if (null != tmpStr)
+                                {
+
+                                    trackLines.Add(tmpStr);
+
+                                    if (tmpStr.Equals("EndTrade"))
+                                    {
+                                        trackLines.Clear();
+                                    }
+                                }
+                            }
+
+                            for (int i = 0; i < trackLines.Count; i++)
+                            {
+                                master.trackMsg(trackLines[i]);
                             }
                         }
                     }
@@ -280,7 +301,7 @@ namespace AutoTrade
                             if (i == 0)
                             {
                                 master.OrderPrice = Convert.ToInt16(contextList[0]);
-                            }                            
+                            }
 
                             master.OrderNewPriceList.Add(Convert.ToInt16(contextList[i]));
 
