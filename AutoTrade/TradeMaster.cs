@@ -734,7 +734,15 @@ namespace AutoTrade
 
                 debugMsg("orderEvenPrice:" + orderEvenPrice);
 
-                trackMsg("OrderPrice = " + orderNewPrice);
+                trackMsg("OrderPrice = " + orderEvenPrice);
+
+                trackMsg("");
+
+                trackMsg("MaxPrice = " + maxTradePoint);
+
+                trackMsg("");
+
+                trackMsg("MinPrice = " + minTradePoint);
 
                 trackMsg("");
 
@@ -808,6 +816,8 @@ namespace AutoTrade
                 dealOrder(tradeCode, orderPrice, orderLot, orderDirection, Trade_Type_NEW);
 
                 trackMsg("BuyOrSell = " + orderDirection);
+
+                trackMsg("");
             }
             catch (Exception e)
             {
@@ -829,6 +839,8 @@ namespace AutoTrade
                 dealOrder(tradeCode, orderPrice, orderLot, orderDirection, Trade_Type_EVEN);
 
                 trackMsg("BuyOrSell = " + orderDirection);
+
+                trackMsg("");
             }
             catch (Exception e)
             {
@@ -944,6 +956,8 @@ namespace AutoTrade
             parentForm.textBox_OrderStart.Text = Convert.ToString(isStartOrder);
 
             parentForm.textBox_NowTradeType.Text = Convert.ToString(nowTradeType);
+
+            parentForm.textBox_TradePrice.Text = Convert.ToString(record.TradePrice);
 
             if (record.TradeMoment.Hour >= 13 && record.TradeMoment.Minute >= 44 && record.TradeMoment.Second >= 59 && hasWriteMaxAndMinPrice == false)
             {

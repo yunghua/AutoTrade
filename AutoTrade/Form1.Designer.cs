@@ -102,6 +102,8 @@
             this.textBox_NowTradeType = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.textBox_OrderPriceNew = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.textBox_TradePrice = new System.Windows.Forms.TextBox();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
@@ -451,7 +453,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label5.Location = new System.Drawing.Point(8, 306);
+            this.label5.Location = new System.Drawing.Point(9, 286);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(87, 20);
             this.label5.TabIndex = 27;
@@ -459,7 +461,7 @@
             // 
             // textBox_B_S
             // 
-            this.textBox_B_S.Location = new System.Drawing.Point(103, 297);
+            this.textBox_B_S.Location = new System.Drawing.Point(104, 277);
             this.textBox_B_S.Margin = new System.Windows.Forms.Padding(5);
             this.textBox_B_S.Name = "textBox_B_S";
             this.textBox_B_S.Size = new System.Drawing.Size(294, 29);
@@ -469,7 +471,7 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label8.Location = new System.Drawing.Point(10, 381);
+            this.label8.Location = new System.Drawing.Point(10, 339);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(82, 20);
             this.label8.TabIndex = 29;
@@ -487,7 +489,7 @@
             // 
             // textBox_MaxPrice
             // 
-            this.textBox_MaxPrice.Location = new System.Drawing.Point(104, 372);
+            this.textBox_MaxPrice.Location = new System.Drawing.Point(104, 330);
             this.textBox_MaxPrice.Margin = new System.Windows.Forms.Padding(5);
             this.textBox_MaxPrice.Name = "textBox_MaxPrice";
             this.textBox_MaxPrice.Size = new System.Drawing.Size(294, 29);
@@ -523,7 +525,7 @@
             // 
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label11.Location = new System.Drawing.Point(31, 455);
+            this.label11.Location = new System.Drawing.Point(12, 578);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(127, 20);
             this.label11.TabIndex = 35;
@@ -531,11 +533,11 @@
             // 
             // textBox_OrderNewPriceList
             // 
-            this.textBox_OrderNewPriceList.Location = new System.Drawing.Point(175, 452);
+            this.textBox_OrderNewPriceList.Location = new System.Drawing.Point(175, 455);
             this.textBox_OrderNewPriceList.Margin = new System.Windows.Forms.Padding(5);
             this.textBox_OrderNewPriceList.Multiline = true;
             this.textBox_OrderNewPriceList.Name = "textBox_OrderNewPriceList";
-            this.textBox_OrderNewPriceList.Size = new System.Drawing.Size(222, 251);
+            this.textBox_OrderNewPriceList.Size = new System.Drawing.Size(222, 248);
             this.textBox_OrderNewPriceList.TabIndex = 36;
             // 
             // textBox_OrderStart
@@ -628,11 +630,32 @@
             this.textBox_OrderPriceNew.Size = new System.Drawing.Size(294, 29);
             this.textBox_OrderPriceNew.TabIndex = 46;
             // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label17.Location = new System.Drawing.Point(8, 395);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(73, 20);
+            this.label17.TabIndex = 47;
+            this.label17.Text = "目前行情";
+            // 
+            // textBox_TradePrice
+            // 
+            this.textBox_TradePrice.ForeColor = System.Drawing.Color.Red;
+            this.textBox_TradePrice.Location = new System.Drawing.Point(104, 386);
+            this.textBox_TradePrice.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_TradePrice.Name = "textBox_TradePrice";
+            this.textBox_TradePrice.Size = new System.Drawing.Size(294, 29);
+            this.textBox_TradePrice.TabIndex = 48;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(891, 734);
+            this.Controls.Add(this.textBox_TradePrice);
+            this.Controls.Add(this.label17);
             this.Controls.Add(this.textBox_OrderPriceNew);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.textBox_NowTradeType);
@@ -663,7 +686,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.11.25  # # # # #        前一個交易日EndTrade之前的紀錄，不複製到今日的軌跡檔。";
+            this.Text = " # # # # # 自動下單機V1.11.27  # # # # #       修正平倉時記錄的價位。平倉時記錄最大最小價位。立即顯示目前行情。";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -736,6 +759,8 @@
         public System.Windows.Forms.TextBox textBox_NowTradeType;
         private System.Windows.Forms.Label label16;
         public System.Windows.Forms.TextBox textBox_OrderPriceNew;
+        private System.Windows.Forms.Label label17;
+        public System.Windows.Forms.TextBox textBox_TradePrice;
     }
 }
 
