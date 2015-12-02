@@ -81,6 +81,22 @@ namespace AutoTrade
         /// 
 
 
+        Boolean isWinReverse = false;//獲利後，買賣方向是否反轉
+
+        public Boolean IsWinReverse
+        {
+            get { return isWinReverse; }
+            set { isWinReverse = value; }
+        }
+
+        Boolean isLoseReverse = true;//賠錢後，買賣方向是否反轉
+
+        public Boolean IsLoseReverse
+        {
+            get { return isLoseReverse; }
+            set { isLoseReverse = value; }
+        }
+
         Boolean hasWriteMaxAndMinPrice = false;
 
         Boolean isStartOrder = false;//是否開始下單
@@ -111,7 +127,7 @@ namespace AutoTrade
         /// <summary>
         /// 變數。
         /// </summary>
-        ///                 
+        ///                         
 
         int minTradePoint = 99999;//市場最低價
 
@@ -326,7 +342,7 @@ namespace AutoTrade
             set { orderNewPriceList = value; }
         }
 
-        int lotLimit = 7;//最大加碼口數        
+        int lotLimit = 3;//最大加碼口數        
 
         //List<int> addList = new List<int>();//加碼的LIST
 
@@ -339,6 +355,14 @@ namespace AutoTrade
         int[] sellOrBuyCheckPeriod = null;//交易買賣方向的檢查時間間隔
 
         int checkCount = 5;//檢查幾個時間間隔，來決定買或是賣
+
+        string initialDirection = "";//初始買賣方向
+
+        public string InitialDirection
+        {
+            get { return initialDirection; }
+            set { initialDirection = value; }
+        }
 
         //-------------------------------------------------------------------------------------------------------------
         // 程式區
@@ -755,6 +779,11 @@ namespace AutoTrade
                 isStartOrder = false;//此次交易結束，準備下一次交易                 
 
                 dealOut();//處理交易結束後，寫紀錄檔，以及相關參數
+
+                if (orderNewPriceList != null && orderNewPriceList.Count == lotLimit)
+                {
+                    isWinReverse = true;
+                }
             }
 
         }
@@ -988,28 +1017,68 @@ namespace AutoTrade
                 {
                     if (prevTradeType == BS_Type_B)
                     {
-                        nowTradeType = prevTradeType = BS_Type_S;
+                        if (isLoseReverse)
+                        {
+                            nowTradeType = prevTradeType = BS_Type_S;
+                        }
+                        else
+                        {
+                            nowTradeType = prevTradeType = BS_Type_B;
+                        }
                     }
                     else
                     {
-                        nowTradeType = prevTradeType = BS_Type_B;
+                        if (isLoseReverse)
+                        {
+                            nowTradeType = prevTradeType = BS_Type_B;
+                        }
+                        else
+                        {
+                            nowTradeType = prevTradeType = BS_Type_S;
+                        }
                     }
                 }
                 else if (isPrevWin == true)
                 {
                     if (prevTradeType == BS_Type_B)
                     {
-                        nowTradeType = prevTradeType = BS_Type_B;
+                        if (isWinReverse)
+                        {
+                            nowTradeType = prevTradeType = BS_Type_S;
+                        }
+                        else
+                        {
+                            nowTradeType = prevTradeType = BS_Type_B;
+                        }
                     }
                     else
                     {
-                        nowTradeType = prevTradeType = BS_Type_S;
+                        if (isWinReverse)
+                        {
+                            nowTradeType = prevTradeType = BS_Type_B;
+                        }
+                        else
+                        {
+                            nowTradeType = prevTradeType = BS_Type_S;
+                        }
                     }
                 }
-                else if (!dealSellOrBuy(record, tradeDateTime))
+                else  //還沒有交易過
                 {
-                    return;//五個時間的的方向不同，下次繼續
+                    if (initialDirection.Trim().Equals(BS_Type_B))
+                    {
+                        nowTradeType = BS_Type_B;
+                    }
+                    else if (initialDirection.Trim().Equals(BS_Type_S))
+                    {
+                        nowTradeType = BS_Type_S;
+                    }
+                    else if (!dealSellOrBuy(record, tradeDateTime))
+                    {
+                        return;//五個時間的的方向不同，下次繼續
+                    }
                 }
+
 
                 orderPrice = record.TradePrice;
 

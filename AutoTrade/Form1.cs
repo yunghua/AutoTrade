@@ -246,7 +246,7 @@ namespace AutoTrade
 
                     if (!trackFileName.Trim().Equals(trackFile.getFileName().Trim()))//不是今天的檔案
                     {
-                        
+
 
                         if (!trackFile.isEndTrade())
                         {
@@ -566,6 +566,44 @@ namespace AutoTrade
             {
                 master.setEnableTrade(false);
             }
+        }
+
+        private void comboBox_initial_direction_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+
+            if ("BUY".Equals(comboBox_initial_direction.Text))
+            {
+                master.InitialDirection = TradeMaster.BS_Type_B;
+            }
+            else if ("SELL".Equals(comboBox_initial_direction.Text))
+            {
+                master.InitialDirection = TradeMaster.BS_Type_S;
+            }
+            else
+            {
+                master.InitialDirection = comboBox_initial_direction.Text;
+            }
+        }
+
+        private void radioButton_win_reverse_CheckedChanged(object sender, EventArgs e)
+        {
+            master.IsWinReverse = true;
+        }
+
+        private void radioButton_win_not_reverse_CheckedChanged(object sender, EventArgs e)
+        {
+            master.IsWinReverse = false;
+        }
+
+        private void radioButton_lose_reverse_CheckedChanged(object sender, EventArgs e)
+        {
+            master.IsLoseReverse = true;
+        }
+
+        private void radioButton_lose_not_reverse_CheckedChanged(object sender, EventArgs e)
+        {
+            master.IsLoseReverse = false;
         }
 
 
