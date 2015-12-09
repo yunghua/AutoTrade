@@ -100,9 +100,9 @@
             this.label17 = new System.Windows.Forms.Label();
             this.textBox_TradePrice = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.label18 = new System.Windows.Forms.Label();
             this.comboBox_initial_direction = new System.Windows.Forms.ComboBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.label18 = new System.Windows.Forms.Label();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -151,8 +151,6 @@
             // checkBox_enableTrade
             // 
             this.checkBox_enableTrade.AutoSize = true;
-            this.checkBox_enableTrade.Checked = true;
-            this.checkBox_enableTrade.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_enableTrade.Location = new System.Drawing.Point(289, 36);
             this.checkBox_enableTrade.Name = "checkBox_enableTrade";
             this.checkBox_enableTrade.Size = new System.Drawing.Size(92, 24);
@@ -677,6 +675,16 @@
             this.panel2.Size = new System.Drawing.Size(877, 87);
             this.panel2.TabIndex = 49;
             // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(562, 31);
+            this.label18.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(105, 20);
+            this.label18.TabIndex = 31;
+            this.label18.Text = "初始買賣方向";
+            // 
             // comboBox_initial_direction
             // 
             this.comboBox_initial_direction.FormattingEnabled = true;
@@ -700,16 +708,6 @@
             this.groupBox4.TabIndex = 29;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "賠錢";
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(562, 31);
-            this.label18.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(105, 20);
-            this.label18.TabIndex = 31;
-            this.label18.Text = "初始買賣方向";
             // 
             // Form1
             // 
@@ -744,8 +742,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.12.1  # # # # #       增加賺錢及賠錢是否反轉的手動設定。初始買賣方向的手動設定。達到最大交易口數時，固" +
-                "定會反轉買賣方向。";
+            this.Text = " # # # # # 自動下單機V1.12.3  # # # # #     反轉點從最高最低點減去winLine，改為由最後一個買賣點減去winLine";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();

@@ -8,11 +8,7 @@ namespace TradeUtility
 {
     public class Indicator
     {
-        Boolean isInPoint = false;
-        Boolean isOutPoint = false;
-
-        Boolean isSellPoint = false;
-        Boolean isBuyPoint = false;
+   
 
         private static int getMaxClosePrice(int kBarCount, int currentKBarNumber, Hashtable htKBar)
         {

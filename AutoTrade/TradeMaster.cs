@@ -121,7 +121,7 @@ namespace AutoTrade
 
         Boolean isStopTodayTrade = false; //是否停止今日交易
 
-        Boolean enableTrade = true;//是否可以交易
+        Boolean enableTrade = false;//是否可以交易
 
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
@@ -1130,7 +1130,7 @@ namespace AutoTrade
                     {
                         stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count - 1];
 
-                        stopPrice = maxTradePoint - Convert.ToInt16(stopPeriod);
+                        stopPrice = orderNewPriceList[orderNewPriceList.Count-1] - Convert.ToInt16(stopPeriod);
                     }
 
                     if (
@@ -1194,7 +1194,7 @@ namespace AutoTrade
                     {
                         stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count - 1];
 
-                        stopPrice = minTradePoint + Convert.ToInt16(stopPeriod);
+                        stopPrice = orderNewPriceList[orderNewPriceList.Count-1] + Convert.ToInt16(stopPeriod);
                     }
 
                     if (

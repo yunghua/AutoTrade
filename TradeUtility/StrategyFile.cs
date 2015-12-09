@@ -184,9 +184,9 @@ namespace TradeUtility
                     {
                         reversePoint = double.Parse(tmpData[2]);
                     }
-                    catch (Exception e)
+                    catch (Exception )
                     {
-                        reversePoint = 10;
+                        reversePoint = 1;
                     }
 
                     loseLine.Add(strategyCount, losePoint);
