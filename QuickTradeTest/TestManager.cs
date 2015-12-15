@@ -9,9 +9,9 @@ namespace QuickTradeTest
     class TestManager
     {
 
+        List<OriginalRecord> recordList = null;//所有交易紀錄
 
-
-        const Boolean DEBUG = true;
+        const Boolean DEBUG = false;
 
 
         public const string Version = "V1.11.8-3";
@@ -422,7 +422,7 @@ namespace QuickTradeTest
                                                                         loseLine[j] = tmpLose;
                                                                     }
 
-                                                                    startTest( k * 1000 + i);
+                                                                    startTest(k * 1000 + i);
 
                                                                     reportMsg("程式版本 :" + Version);
                                                                     reportMsg("說明 :" + Comment);
@@ -552,9 +552,9 @@ namespace QuickTradeTest
 
             int loseDayCount = 0;//賠錢日數
 
-            int winCountInOneDayTradeRunManyTimes;//一日交易中有幾次獲利，執行數次測試之後的結果
+            int winCountInOneDayTradeRunManyTimes = 0;//一日交易中有幾次獲利，執行數次測試之後的結果
 
-            int loseCountInOneDayTradeRunManyTimes;//一日交易中有幾次賠錢，執行數次測試之後的結果
+            int loseCountInOneDayTradeRunManyTimes = 0;//一日交易中有幾次賠錢，執行數次測試之後的結果
 
             int totalWinCountRumManyTimes = 0;//總獲利次數
 
@@ -587,21 +587,37 @@ namespace QuickTradeTest
                 return;
             }
 
-            //for (int j = 0; j < oFileList.Count; j++)
+            for (int j = 0; j < oFileList.Count; j++)
             {
 
-                double oneDayRunManyTimesTotalProfit = 0;//某日跑了XX次之後的總利潤
-
-                winCountInOneDayTradeRunManyTimes = 0;//一日交易中有幾次獲利
-
-                loseCountInOneDayTradeRunManyTimes = 0;//一日交易中有幾次賠錢               
+                double oneDayRunManyTimesTotalProfit = 0;
 
                 double oneDayMaxLossSetting = -9999999;//單日最大停損設定
+
+                TradeManager manager = new TradeManager();
+
+                List<TradeFile> fileList = new List<TradeFile>();
+
+                fileList.Add(oFileList[j]);
+
+                manager.setSourceFileList(fileList);
+
+                recordList = manager.prepareRecordList();
 
                 for (int i = 0; i < runCount; i++)
                 {
 
-                    TradeManager manager = new TradeManager();
+                    oneDayRunManyTimesTotalProfit = 0;//某日跑了XX次之後的總利潤
+
+                    winCountInOneDayTradeRunManyTimes = 0;//一日交易中有幾次獲利
+
+                    loseCountInOneDayTradeRunManyTimes = 0;//一日交易中有幾次賠錢      
+
+                    manager = new TradeManager();
+
+                    manager.RecordList = recordList;
+
+                    manager.ReportFile = testReportFile;
 
                     if (maxLoss != null && !maxLoss.Equals(""))
                     {
@@ -631,11 +647,11 @@ namespace QuickTradeTest
 
                     manager.setReverseLine(reverseLine);
 
-                    //manager.setSourceFile(oFileList[j]);
-
-                    manager.setSourceFileList(oFileList);
+                    manager.setSourceFile(oFileList[j]);
 
                     oneDayProfit = manager.startTrade();
+
+                    recordList.Clear();//當沖
 
                     int tmpMaxLot = manager.getMaxLot();
 
@@ -669,14 +685,14 @@ namespace QuickTradeTest
                     {
                         maxWinPureProfit = oneDayPureProfit;
 
-                        //maxWinPureProfitFileName = oFileList[j].getFileName();
+                        maxWinPureProfitFileName = oFileList[j].getFileName();
                     }
 
                     if (oneDayPureProfit < maxLosePureProfit)
                     {
                         maxLosePureProfit = oneDayPureProfit;
 
-                        //maxLosePureProfitFileName = oFileList[j].getFileName();
+                        maxLosePureProfitFileName = oFileList[j].getFileName();
                     }
 
                     if (oneDayPureProfit > 0 && oneDayPureProfit < 2000)
@@ -821,7 +837,7 @@ namespace QuickTradeTest
 
                     oneDayMaxLossSetting = manager.getMaxProfitLoss();
 
-                    //Console.WriteLine("交易結束，單日交易總利潤 : " + oneTimeProfit * valuePerPoint);
+                    Console.WriteLine("交易結束，單日交易總利潤 : " + oneDayPureProfit);
 
                 }
 
@@ -830,7 +846,7 @@ namespace QuickTradeTest
                 totalLoseCountRunManyTimes += loseCountInOneDayTradeRunManyTimes;
 
                 reportMsg(//oFileList[j].getFullPath() +
-                    
+
                     "交易結束，單日交易平均利潤 : " + ((oneDayRunManyTimesTotalProfit * valuePerPoint) - (winCountInOneDayTradeRunManyTimes + loseCountInOneDayTradeRunManyTimes) * cost) / runCount);
 
                 reportMsg(//oFileList[j].getFullPath() + 
@@ -844,11 +860,11 @@ namespace QuickTradeTest
 
                 reportMsg("最大連續贏錢" + maxContinueWinMoney);
                 reportMsg("最大連續贏錢日" + maxContinueWinMoneyTime);
-                 
+
 
                 reportMsg("最大連續賠錢" + maxContinueLossMoney);
                 reportMsg("最大連續賠錢日" + maxContinueLossMoneyTime);
-                
+
                 reportMsg("----------------------------------------------------------------------------------------------");
                 reportMsg("----------------------------------------------------------------------------------------------");
                 reportMsg("----------------------------------------------------------------------------------------------");

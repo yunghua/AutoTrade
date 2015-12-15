@@ -88,6 +88,10 @@ namespace QuickTradeTest
 
         Boolean winOutEnabled = false;//是否要停利
 
+        Boolean isReport = true;
+
+        Boolean hasAdd = false;//有加碼過
+
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 變數。
@@ -190,6 +194,12 @@ namespace QuickTradeTest
 
         List<OriginalRecord> recordList = null;//所有交易紀錄
 
+        public List<OriginalRecord> RecordList
+        {
+            get { return recordList; }
+            set { recordList = value; }
+        }
+
         Dictionary<int, int> loseLine;  //認賠的底線
 
         Dictionary<int, int> winLine;  //停利的底線
@@ -266,6 +276,14 @@ namespace QuickTradeTest
 
         List<TradeFile> sourceFileList = new List<TradeFile>();
 
+
+        TradeFile reportFile = null;
+
+        public TradeFile ReportFile
+        {
+            get { return reportFile; }
+            set { reportFile = value; }
+        }
         //-------------------------------------------------------------------------------------------------------------
         /// <summary>
         /// 程式區。
@@ -437,8 +455,10 @@ namespace QuickTradeTest
         }
 
 
-        private void prepareRecordList()
+        public List<OriginalRecord> prepareRecordList()
         {
+            recordList = new List<OriginalRecord>();
+
             try
             {
                 for (int i = 0; i < sourceFileList.Count; i++)
@@ -457,33 +477,38 @@ namespace QuickTradeTest
 
                         recordList.Add(record);
 
+
+
                     }//end while
 
                     sourceFile.close();
 
-                }//end for
+                }//end for              
 
-                Console.WriteLine("GO");
+                return recordList;
 
             }
             catch (Exception e)
             {
 
                 Console.WriteLine(e.StackTrace);
+
+                return null;
             }
 
         }
 
         public double startTrade()
         {
-
-            recordList = new List<OriginalRecord>();
-
+            if (recordList == null)
+            {
+                recordList = new List<OriginalRecord>();
+            }
             RecordScanner.setRecordList(recordList);
 
             if (this.coreMethod.Equals(Core_Method_1))
             {
-                prepareRecordList();
+
                 return coreLogic();
             }
             else
@@ -652,9 +677,9 @@ namespace QuickTradeTest
 
         private double coreLogic()//獲利動態加碼
         {
-            double stopPeriod = 0;//獲利反轉的間隔
+            int stopPeriod = 0;//獲利反轉的間隔
 
-            double stopPrice = 0;//獲利反轉的目標點位
+            int stopPrice = 0;//獲利反轉的目標點位
 
             totalPureProfit = 0;
 
@@ -666,6 +691,15 @@ namespace QuickTradeTest
 
                 try
                 {
+                    if (recordList[z].TradePrice == 0)
+                    {
+                        recordList[z].TradePrice = recordList[z - 1].TradePrice;
+                    }
+
+                    if (recordList[z].TradePrice == 99999)
+                    {
+                        recordList[z].TradePrice = recordList[z - 1].TradePrice;
+                    }
 
 
                     //nowLine = sourceFile.getLine();
@@ -678,9 +712,9 @@ namespace QuickTradeTest
 
                     if (isStartOrder == false)
                     {
-                        maxTradePoint.TradePrice = 0;
+                        //maxTradePoint.TradePrice = 0;
 
-                        minTradePoint.TradePrice = 99999;
+                        //minTradePoint.TradePrice = 99999;
 
                         if (isPrevLose == true ||
                             isPrevWin == true ||
@@ -755,6 +789,8 @@ namespace QuickTradeTest
 
                             orderPrice = record.TradePrice;
 
+                            stopPrice = orderPrice;
+
                             orderPriceList.Add(orderPrice);
 
                             orderPointList.Add(record);
@@ -782,17 +818,29 @@ namespace QuickTradeTest
 
                     else if (isStartOrder == true)//已經開始下單
                     {
-                        if (record.TradePrice < minTradePoint.TradePrice)
-                        {
-                            minTradePoint = record;
-                        }
-
-                        if (record.TradePrice > maxTradePoint.TradePrice)
-                        {
-                            maxTradePoint = record;
-                        }
 
 
+                        record.TradePrice = recordList[z].TradePrice;
+
+                        //if (record.TradePrice >= 99999)
+                        //{
+                        //    record.TradePrice = recordList[z - 1].TradePrice;
+                        //}
+
+                        //if (record.TradePrice < minTradePoint.TradePrice)
+                        //{
+                        //    minTradePoint = record;
+                        //}
+
+                        //if (record.TradePrice > maxTradePoint.TradePrice)
+                        //{
+                        //    maxTradePoint = record;
+                        //}
+
+                        //if (maxTradePoint.TradePrice > 9999)
+                        //{
+                        //    debugMsg("9999---->" + maxTradePoint.TradeMoment);
+                        //}
 
 
 
@@ -803,35 +851,29 @@ namespace QuickTradeTest
 
                             oneProfit = 0;
 
-                            for (int i = 0; i < orderPriceList.Count; i++)
+
+
+
+                            if (record.TradePrice <= (stopPrice - reverseLine[1]))//反轉
                             {
-                                oneProfit += evenPrice - orderPriceList[i];
-                            }
 
-                            pureProfit = oneProfit * valuePerPoint - orderPriceList.Count * cost;
+                                for (int i = 0; i < orderPriceList.Count; i++)
+                                {
+                                    debugMsg("加碼價位:" + orderPriceList[i]);
+
+                                    debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
+
+                                }
+
+                                stopPrice = record.TradePrice;
+
+                                oneProfit += evenPrice - orderPriceList[0];
 
 
-                            if (
-                                //(orderPriceList.Count == 2 && (maxTradePoint.TradePrice - orderPriceList[orderPriceList.Count - 1]) > 8 && pureProfit <= 100) ||
-                                // (orderPriceList.Count == 3 && (maxTradePoint.TradePrice - orderPriceList[orderPriceList.Count - 1]) > 7 && pureProfit <= 100) ||
-                                //(orderPriceList.Count >= 8) || 
-                                //(orderPriceList.Count == 7 && record.TradePrice < maxTradePoint.TradePrice - 10) ||
-                                // (orderPriceList.Count == 6 && record.TradePrice < maxTradePoint.TradePrice - 12) ||
-                                //  (orderPriceList.Count == 5 && record.TradePrice < maxTradePoint.TradePrice - 14) ||
-                                //   (orderPriceList.Count == 4 && record.TradePrice < maxTradePoint.TradePrice - 16) ||
-                                //    (orderPriceList.Count == 3 && record.TradePrice < maxTradePoint.TradePrice - 18) ||
-                                //     (orderPriceList.Count == 2 && record.TradePrice < maxTradePoint.TradePrice - 20) ||                                      
-                                // (orderPriceList.Count > 3 && orderPriceList.Count < 6 && record.TradePrice <= orderPriceList[orderPriceList.Count - 2]) ||
-                                // (orderPriceList.Count >= 2 && orderPriceList.Count <= 3 && record.TradePrice <= orderPriceList[0]) ||
-                                //(orderPriceList.Count == 4 && record.TradePrice > orderPriceList[orderPriceList.Count-1] + 5) ||
-                                //(orderPriceList.Count >= 3 && pureProfit <= 100) ||
-                                //(orderPriceList.Count == 1 && (oneProfit < (0 - loseLine[1]) ) ) ||
-                                //totalPureProfit + pureProfit < 
+                                orderPriceList.RemoveAt(0);
 
-                                (orderPriceList.Count >= 2 && record.TradePrice <= maxTradePoint.TradePrice - winLine[1]) ||
-                                (orderPriceList.Count == 1 && (oneProfit < (0 - loseLine[1])))
-                                )//超過今日最大停損金額
-                            {
+                                pureProfit = oneProfit * valuePerPoint - cost;
+
 
                                 if (oneProfit < 0 - loseLine[1])
                                 {
@@ -899,13 +941,7 @@ namespace QuickTradeTest
 
                                 debugMsg("平倉時間---->" + record.TradeMoment);
 
-                                for (int i = 0; i < orderPriceList.Count; i++)
-                                {
-                                    debugMsg("加碼價位:" + orderPriceList[i]);
-
-                                    debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
-
-                                }
+                               
 
 
                                 debugMsg("平倉前最低價:" + minTradePoint.TradePrice);
@@ -916,16 +952,15 @@ namespace QuickTradeTest
 
                                 debugMsg("平倉前最高價的時間:" + maxTradePoint.TradeMoment);
 
-                                if (addList.Count >= 1)
+                                if (hasAdd)//有加碼過
                                 {
-                                    reverseEnabled = false;//獲利後，同方向
+                                    reverseEnabled = true;//獲利後，反方向
 
                                     continueLossMoney = 0;
                                 }
                                 else
                                 {
-                                    reverseEnabled = true;//一開始就賠錢，反方向
-
+                                    reverseEnabled = false;//一開始就賠錢，同方向
 
                                 }
 
@@ -935,12 +970,12 @@ namespace QuickTradeTest
 
                                 //debugMsg("停損策略:" + loseLine[nowLoseLineIndex]);
 
-                                if (addList.Count >= 1)
-                                {
-                                    debugMsg("停利策略:" + winLine[addList.Count]);
+                                //if (addList.Count >= 1)
+                                //{
+                                //    debugMsg("停利策略:" + winLine[addList.Count]);
 
-                                    debugMsg("反轉策略:" + reverseLine[addList.Count]);
-                                }
+                                //    debugMsg("反轉策略:" + reverseLine[addList.Count]);
+                                //}
 
                                 debugMsg("停損次數:" + loseCount);
 
@@ -952,7 +987,7 @@ namespace QuickTradeTest
 
 
                             }
-                            else if ((record.TradePrice - orderPrice) > winLine[orderPriceList.Count])
+                            else if ((record.TradePrice - orderPriceList[orderPriceList.Count-1]) >= winLine[1])  //加碼
                             {
 
                                 //賺了XX點，加碼
@@ -962,37 +997,26 @@ namespace QuickTradeTest
                                 //--------------------------------------------------------------------------------------------------------------------------------
 
 
-                                if (Convert.ToInt16(record.TradePrice - orderPriceList[orderPriceList.Count - 1]) > winLine[orderPriceList.Count])
+                                //if (Convert.ToInt16(record.TradePrice - orderPriceList[orderPriceList.Count - 1]) >= winLine[orderPriceList.Count])
                                 {
-                                    if (addList.Count == 0)//還沒加碼過
+
+                                    if (orderPriceList.Count < lotLimit)
                                     {
-                                        if (orderPriceList.Count < lotLimit)
-                                        {
 
-                                            addList.Add(1);//實際加碼的次數
+                                        hasAdd = true;
 
-                                            orderPriceList.Add(record.TradePrice);
+                                        addList.Add(1);//實際加碼的次數                                        
 
-                                            orderPointList.Add(record);
+                                        orderPriceList.Add(record.TradePrice);
 
-                                            continue;
-                                        }
+                                        orderPointList.Add(record);
+
+                                        stopPrice = record.TradePrice;
+
+                                        continue;
                                     }
-                                    else
-                                    {
-                                        if (orderPriceList.Count < lotLimit)
-                                        {
 
-                                            addList.Add(1);//實際加碼的次數
 
-                                            orderPriceList.Add(record.TradePrice);
-
-                                            orderPointList.Add(record);
-
-                                            continue;
-                                        }
-
-                                    }
                                 }
 
                             }
@@ -1004,37 +1028,26 @@ namespace QuickTradeTest
 
                             oneProfit = 0;
 
-                            for (int i = 0; i < orderPriceList.Count; i++)
+
+
+
+                            if (record.TradePrice >= stopPrice + reverseLine[1])  //反轉
                             {
-                                oneProfit += orderPriceList[i] - evenPrice;
-                            }
+                                for (int i = 0; i < orderPriceList.Count; i++)
+                                {
+                                    debugMsg("加碼價位:" + orderPriceList[i]);
 
-                            pureProfit = oneProfit * valuePerPoint - orderPriceList.Count * cost;
+                                    debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
+                                }
+
+                                oneProfit += orderPriceList[0] - evenPrice;
 
 
-                            if (
-                                //(orderPriceList.Count == 2 && ((orderPriceList[orderPriceList.Count - 1] - minTradePoint.TradePrice) > 8) && pureProfit <= 100) ||
-                                //(orderPriceList.Count == 3 && ((orderPriceList[orderPriceList.Count - 1] - minTradePoint.TradePrice) > 7) && pureProfit <= 100) ||
-                                //(orderPriceList.Count >= 8 )|| 
-                                //(orderPriceList.Count == 7 && record.TradePrice > (minTradePoint.TradePrice + 10)) ||
-                                //(orderPriceList.Count == 6 && record.TradePrice > (minTradePoint.TradePrice + 12)) ||
-                                //(orderPriceList.Count == 5 && record.TradePrice > (minTradePoint.TradePrice + 14)) ||
-                                //(orderPriceList.Count == 4 && record.TradePrice > (minTradePoint.TradePrice + 16)) ||
-                                //(orderPriceList.Count == 3 && record.TradePrice > (minTradePoint.TradePrice + 18)) ||
-                                //(orderPriceList.Count == 2 && record.TradePrice > (minTradePoint.TradePrice + 20)) ||
-                                //(orderPriceList.Count > 3 && orderPriceList.Count < 6 && record.TradePrice >= orderPriceList[orderPriceList.Count - 2]) ||
-                                // (orderPriceList.Count >= 2 && orderPriceList.Count <= 3 && record.TradePrice >= orderPriceList[0]) ||
+                                stopPrice = record.TradePrice;
 
-                               // (orderPriceList.Count == 4 && record.TradePrice < orderPriceList[orderPriceList.Count-1] - 5) ||
+                                orderPriceList.RemoveAt(0);
 
-                               //(orderPriceList.Count >= 3 && pureProfit <= 100) ||
-                                //(orderPriceList.Count == 1 && oneProfit < (0 - loseLine[1]))
-                                // || totalPureProfit + pureProfit < maxProfitLoss
-
-                                (orderPriceList.Count >= 2 && record.TradePrice >= minTradePoint.TradePrice + winLine[1]) ||
-                                 (orderPriceList.Count == 1 && (oneProfit < (0 - loseLine[1])))
-                                )
-                            {
+                                pureProfit = oneProfit * valuePerPoint - cost;
 
                                 if (oneProfit < 0 - loseLine[1])
                                 {
@@ -1108,12 +1121,7 @@ namespace QuickTradeTest
 
                                 debugMsg("平倉時間---->" + record.TradeMoment);
 
-                                for (int i = 0; i < orderPriceList.Count; i++)
-                                {
-                                    debugMsg("加碼價位:" + orderPriceList[i]);
-
-                                    debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
-                                }
+                              
 
                                 debugMsg("平倉前最低價:" + minTradePoint.TradePrice);
 
@@ -1124,13 +1132,13 @@ namespace QuickTradeTest
                                 debugMsg("平倉前最高價的時間:" + maxTradePoint.TradeMoment);
 
 
-                                if (addList.Count >= 1)
+                                if (hasAdd)//有加碼過
                                 {
-                                    reverseEnabled = false;//獲利後，同方向
+                                    reverseEnabled = true;//獲利後，反方向
                                 }
                                 else
                                 {
-                                    reverseEnabled = true;//一開始就賠錢，反方向                                    
+                                    reverseEnabled = false;//一開始就賠錢，同方向                                    
                                 }
 
                                 debugMsg("純利:" + pureProfit);
@@ -1139,12 +1147,12 @@ namespace QuickTradeTest
 
                                 // debugMsg("停損策略:" + loseLine[nowLoseLineIndex]);
 
-                                if (addList.Count >= 1)
-                                {
-                                    debugMsg("停利策略:" + winLine[addList.Count]);
+                                //if (addList.Count >= 1)
+                                //{
+                                //    debugMsg("停利策略:" + winLine[addList.Count]);
 
-                                    debugMsg("反轉策略:" + reverseLine[addList.Count]);
-                                }
+                                //    debugMsg("反轉策略:" + reverseLine[addList.Count]);
+                                //}
                                 debugMsg("停損次數:" + loseCount);
 
                                 debugMsg("----------------------------------------------------------------------------------------------");
@@ -1154,7 +1162,7 @@ namespace QuickTradeTest
                                 loseOut();
 
                             }
-                            else if ((orderPrice - record.TradePrice) > winLine[orderPriceList.Count])
+                            else if ((orderPriceList[orderPriceList.Count-1] - record.TradePrice) >= winLine[1]) //加碼
                             {
 
                                 //賺了XX點，加碼
@@ -1163,41 +1171,26 @@ namespace QuickTradeTest
                                 //  加碼部分
                                 //--------------------------------------------------------------------------------------------------------------------------------
 
-
-
-                                if (Convert.ToInt16(orderPriceList[orderPriceList.Count - 1] - record.TradePrice) > winLine[orderPriceList.Count])
                                 {
 
-                                    if (addList.Count == 0)//還沒加碼過
+
+                                    if (orderPriceList.Count < lotLimit)
                                     {
-                                        if (orderPriceList.Count < lotLimit)
-                                        {
 
-                                            addList.Add(1);//實際加碼的次數
+                                        hasAdd = true;
 
-                                            orderPriceList.Add(record.TradePrice);
+                                        addList.Add(1);//實際加碼的次數
 
-                                            orderPointList.Add(record);
+                                        orderPriceList.Add(record.TradePrice);
 
-                                            continue;
-                                        }
+                                        orderPointList.Add(record);
+
+                                        stopPrice = record.TradePrice;
+
+                                        continue;
                                     }
 
-                                    else
-                                    {
-                                        if (orderPriceList.Count < lotLimit)
-                                        {
 
-                                            addList.Add(1);//實際加碼的次數
-
-                                            orderPriceList.Add(record.TradePrice);
-
-                                            orderPointList.Add(record);
-
-                                            continue;
-                                        }
-
-                                    }
                                 }
 
                             }
@@ -1219,111 +1212,111 @@ namespace QuickTradeTest
                     //}
 
 
-                    //if (record.TradeHour >= 13 && record.TradeMinute >= 30)//交易時間截止
-                    //{
-                    //    if (isStartOrder == true)
-                    //    {
-                    //        oneProfit = 0;
+                    if (record.TradeHour >= 13 && record.TradeMinute >= 30)//交易時間截止
+                    {
+                        if (isStartOrder == true)
+                        {
+                            oneProfit = 0;
 
-                    //        evenPrice = record.TradePrice;
+                            evenPrice = record.TradePrice;
 
-                    //        if (nowTradeType == TradeType.BUY.GetHashCode())
-                    //        {
-                    //            for (int i = 0; i < orderPriceList.Count; i++)
-                    //            {
-                    //                oneProfit += evenPrice - orderPriceList[i];
-                    //            }
-                    //        }
-                    //        else if (nowTradeType == TradeType.SELL.GetHashCode())
-                    //        {
-                    //            for (int i = 0; i < orderPriceList.Count; i++)
-                    //            {
-                    //                oneProfit += orderPriceList[i] - evenPrice;
-                    //            }
+                            if (nowTradeType == TradeType.BUY.GetHashCode())
+                            {
+                                for (int i = 0; i < orderPriceList.Count; i++)
+                                {
+                                    oneProfit += evenPrice - orderPriceList[i];
+                                }
+                            }
+                            else if (nowTradeType == TradeType.SELL.GetHashCode())
+                            {
+                                for (int i = 0; i < orderPriceList.Count; i++)
+                                {
+                                    oneProfit += orderPriceList[i] - evenPrice;
+                                }
 
-                    //        }
+                            }
 
-                    //        totalProfit += oneProfit;
+                            totalProfit += oneProfit;
 
-                    //        isStartOrder = false;
+                            isStartOrder = false;
 
-                    //        tradeCount++;
+                            tradeCount++;
 
-                    //        if (oneProfit > 0)
-                    //        {
+                            if (oneProfit > 0)
+                            {
 
-                    //            winVolume += orderPriceList.Count;
+                                winVolume += orderPriceList.Count;
 
-                    //            winCount++;
-                    //        }
-                    //        else
-                    //        {
-                    //            loseVolume += orderPriceList.Count;
+                                winCount++;
+                            }
+                            else
+                            {
+                                loseVolume += orderPriceList.Count;
 
-                    //            loseCount++;
+                                loseCount++;
 
-                    //        }
+                            }
 
-                    //        if (nowTradeType == TradeType.BUY.GetHashCode())
-                    //        {
-                    //            debugMsg("時間到買入平倉");
-                    //        }
-                    //        else if (nowTradeType == TradeType.SELL.GetHashCode())
-                    //        {
-                    //            debugMsg("時間到賣出平倉");
-                    //        }
+                            if (nowTradeType == TradeType.BUY.GetHashCode())
+                            {
+                                debugMsg("時間到買入平倉");
+                            }
+                            else if (nowTradeType == TradeType.SELL.GetHashCode())
+                            {
+                                debugMsg("時間到賣出平倉");
+                            }
 
-                    //        debugMsg("平倉點數---->" + evenPrice);
+                            debugMsg("平倉點數---->" + evenPrice);
 
-                    //        debugMsg("平倉時間---->" + record.TradeMoment);
+                            debugMsg("平倉時間---->" + record.TradeMoment);
 
-                    //        debugMsg(" addTimes---->" + addList.Count);
+                            debugMsg(" addTimes---->" + addList.Count);
 
-                    //        debugMsg(" 平倉口數---->" + orderPriceList.Count);
+                            debugMsg(" 平倉口數---->" + orderPriceList.Count);
 
-                    //        for (int i = 0; i < orderPriceList.Count; i++)
-                    //        {
-                    //            debugMsg("加碼價位:" + orderPriceList[i]);
+                            for (int i = 0; i < orderPriceList.Count; i++)
+                            {
+                                debugMsg("加碼價位:" + orderPriceList[i]);
 
-                    //            debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
-                    //        }
+                                debugMsg("加碼時間:" + orderPointList[i].TradeMoment);
+                            }
 
-                    //        debugMsg("平倉前最低價:" + minTradePoint.TradePrice);
+                            //debugMsg("平倉前最低價:" + minTradePoint.TradePrice);
 
-                    //        debugMsg("平倉前最低價的時間:" + minTradePoint.TradeMoment);
+                            //debugMsg("平倉前最低價的時間:" + minTradePoint.TradeMoment);
 
-                    //        debugMsg("平倉前最高價:" + maxTradePoint.TradePrice);
+                            //debugMsg("平倉前最高價:" + maxTradePoint.TradePrice);
 
-                    //        debugMsg("平倉前最高價的時間:" + maxTradePoint.TradeMoment);
+                            //debugMsg("平倉前最高價的時間:" + maxTradePoint.TradeMoment);
 
-                    //        pureProfit = oneProfit * valuePerPoint - (orderPriceList.Count) * cost;
+                            pureProfit = oneProfit * valuePerPoint - (orderPriceList.Count) * cost;
 
-                    //        totalPureProfit += pureProfit;
+                            totalPureProfit += pureProfit;
 
-                    //        debugMsg("純利:" + pureProfit);
+                            debugMsg("純利:" + pureProfit);
 
-                    //        debugMsg("總純利:" + totalPureProfit);
+                            debugMsg("總純利:" + totalPureProfit);
 
-                    //        //debugMsg("停損策略:" + loseLine[nowLoseLineIndex]);
+                            //debugMsg("停損策略:" + loseLine[nowLoseLineIndex]);
 
-                    //        if (addList.Count >= 1)
-                    //        {
-                    //            debugMsg("停利策略:" + winLine[addList.Count]);
+                            //if (addList.Count >= 1)
+                            //{
+                            //    debugMsg("停利策略:" + winLine[addList.Count]);
 
-                    //            debugMsg("反轉策略:" + reverseLine[addList.Count]);
-                    //        }
-                    //        debugMsg("停利次數:" + winCount);
+                            //    debugMsg("反轉策略:" + reverseLine[addList.Count]);
+                            //}
+                            debugMsg("停利次數:" + winCount);
 
-                    //        debugMsg("----------------------------------------------------------------------------------------------");
+                            debugMsg("----------------------------------------------------------------------------------------------");
 
 
 
-                    //        return totalProfit;
+                            return totalProfit;
 
-                    //    } 
+                        }
 
-                    //    return totalProfit;
-                    //}//end 交易時間截止
+                        return totalProfit;
+                    }//end 交易時間截止
 
                 }
                 catch (Exception ex)
@@ -1365,12 +1358,29 @@ namespace QuickTradeTest
             isPrevLose = true;
 
             tradeOut();
+
+            if (orderPriceList.Count < 1)
+            {
+                orderPriceList.Clear();
+
+                orderPrice = 0;
+
+                orderPointList.Clear();
+
+                addList.Clear();
+
+                isStartOrder = false;
+
+                hasAdd = false;
+            }
+
+
         }
 
         private void tradeOut()//結束單筆交易的動作
         {
 
-            isStartOrder = false;
+
 
             tradeCount++;
 
@@ -1379,12 +1389,6 @@ namespace QuickTradeTest
             tempOneProfit = 99999;
 
             number = 0;//超過檢查時間的次數
-
-            addList.Clear();
-
-            orderPriceList.Clear();
-
-            orderPointList.Clear();
 
         }
 
@@ -1425,6 +1429,11 @@ namespace QuickTradeTest
             if (debugEnabled)
             {
                 Console.WriteLine(msg);
+            }
+
+            if (isReport)
+            {
+                reportFile.writeLine(msg);
             }
         }
 
