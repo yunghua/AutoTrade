@@ -11,7 +11,7 @@ namespace QuickTradeTest
 
         List<OriginalRecord> recordList = null;//所有交易紀錄
 
-        const Boolean DEBUG = false;
+        const Boolean DEBUG = true;
 
 
         public const string Version = "V1.11.8-3";
@@ -587,7 +587,7 @@ namespace QuickTradeTest
                 return;
             }
 
-            for (int j = 0; j < oFileList.Count; j++)
+            //for (int j = 0; j < oFileList.Count; j++)
             {
 
                 double oneDayRunManyTimesTotalProfit = 0;
@@ -596,11 +596,13 @@ namespace QuickTradeTest
 
                 TradeManager manager = new TradeManager();
 
-                List<TradeFile> fileList = new List<TradeFile>();
+                //List<TradeFile> fileList = new List<TradeFile>();
 
-                fileList.Add(oFileList[j]);
+                //fileList.Add(oFileList[j]);
 
-                manager.setSourceFileList(fileList);
+                //manager.setSourceFileList(fileList);
+
+                manager.setSourceFileList(oFileList);
 
                 recordList = manager.prepareRecordList();
 
@@ -647,11 +649,11 @@ namespace QuickTradeTest
 
                     manager.setReverseLine(reverseLine);
 
-                    manager.setSourceFile(oFileList[j]);
+                    //manager.setSourceFile(oFileList[j]);//當沖
 
                     oneDayProfit = manager.startTrade();
 
-                    recordList.Clear();//當沖
+                    //recordList.Clear();//當沖
 
                     int tmpMaxLot = manager.getMaxLot();
 
@@ -685,14 +687,14 @@ namespace QuickTradeTest
                     {
                         maxWinPureProfit = oneDayPureProfit;
 
-                        maxWinPureProfitFileName = oFileList[j].getFileName();
+                        //maxWinPureProfitFileName = oFileList[j].getFileName();
                     }
 
                     if (oneDayPureProfit < maxLosePureProfit)
                     {
                         maxLosePureProfit = oneDayPureProfit;
 
-                        maxLosePureProfitFileName = oFileList[j].getFileName();
+                        //maxLosePureProfitFileName = oFileList[j].getFileName();
                     }
 
                     if (oneDayPureProfit > 0 && oneDayPureProfit < 2000)
