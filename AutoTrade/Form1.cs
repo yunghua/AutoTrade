@@ -394,12 +394,14 @@ namespace AutoTrade
 
             tradeCode = configFile.readConfig("Trade_Code");
 
+            string tradeMonth = configFile.readConfig("Trade_Month");
+
             string tradeMonthFilePath = appDir + "\\" + Config_Dir + "\\" + Month_File_Name;
 
             try
             {
 
-                tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeMonthFilePath, tradeCode);
+                tradeCode = TradeUtility.TradeUtility.getInstance().dealTradeCode(tradeMonthFilePath, tradeCode, tradeMonth);
 
             }
             catch (Exception ex)
@@ -606,7 +608,8 @@ namespace AutoTrade
             master.IsLoseReverse = false;
         }
 
+        
 
-
+      
     }
 }

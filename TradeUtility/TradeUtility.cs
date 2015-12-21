@@ -9,13 +9,13 @@ namespace TradeUtility
     {
         private static TradeUtility utility = null;
 
-        public static string version = "TradeUtility Version 0.0.0.5";        
+        public static string version = "TradeUtility Version 0.0.0.6";
 
         static ConfigFile monthFile;//月份代碼設定檔
 
         private TradeUtility()
         {
-                        
+
         }
 
         ~TradeUtility()
@@ -82,34 +82,50 @@ namespace TradeUtility
             return monthFile.readConfig(tradeMonth);
         }
 
-        public string dealTradeCode(string monthFilePath,string code)//自動計算當天的商品代碼
+        public string dealTradeCode(string monthFilePath, string code, string month)//計算當天的商品代碼
         {
             try
             {
-                monthFile = new ConfigFile(monthFilePath);                
+                monthFile = new ConfigFile(monthFilePath);
             }
             catch (Exception e)
             {
                 throw e;
             }
 
-            return dealTradeCode(code);
+            return dealTradeCode(code, month);
         }
 
 
 
-        private string dealTradeCode(string code)//自動計算當天的商品代碼
+        private string dealTradeCode(string code, string month)//計算當天的商品代碼
         {
-            
+
             try
             {
                 DateTime now = System.DateTime.Now;
 
                 string tradeMonth = "";
 
-                tradeMonth = dealTradMonth(now);//交易月份
+                if (month == null || month.Trim().Equals(""))
+                {
+
+                    tradeMonth = dealTradMonth(now);//目前交易月份
+
+                }
+                else
+                {
+                    tradeMonth = month;
+                }
 
                 string monthCode = dealMonthCode(tradeMonth);
+
+                if (monthCode == null || monthCode.Trim().Equals(""))
+                {
+                    tradeMonth = dealTradMonth(now);//目前交易月份
+                    monthCode = dealMonthCode(tradeMonth);
+                }
+
                 code += monthCode;
 
                 string yearCode = Convert.ToString(now.Year % 10);

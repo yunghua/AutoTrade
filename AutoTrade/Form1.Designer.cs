@@ -47,6 +47,8 @@
             this.label_winLine = new System.Windows.Forms.Label();
             this.textBox_status = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBox_status_order = new System.Windows.Forms.TextBox();
             this.label_Version = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.textBox_status2 = new System.Windows.Forms.TextBox();
@@ -79,8 +81,6 @@
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.timer2 = new System.Windows.Forms.Timer(this.components);
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox_status_order = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.textBox_B_S = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
@@ -126,12 +126,14 @@
             this.groupBox3.Controls.Add(this.label_winLine);
             this.groupBox3.Controls.Add(this.textBox_status);
             this.groupBox3.Controls.Add(this.label4);
+            this.groupBox3.Controls.Add(this.label1);
+            this.groupBox3.Controls.Add(this.textBox_status_order);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox3.Location = new System.Drawing.Point(0, 0);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(5);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(5);
-            this.groupBox3.Size = new System.Drawing.Size(408, 270);
+            this.groupBox3.Size = new System.Drawing.Size(418, 270);
             this.groupBox3.TabIndex = 15;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Yuanta Quote API 連線資訊";
@@ -212,7 +214,7 @@
             // 
             // textBox_status
             // 
-            this.textBox_status.Location = new System.Drawing.Point(104, 166);
+            this.textBox_status.Location = new System.Drawing.Point(114, 168);
             this.textBox_status.Margin = new System.Windows.Forms.Padding(5);
             this.textBox_status.Name = "textBox_status";
             this.textBox_status.Size = new System.Drawing.Size(294, 29);
@@ -221,12 +223,30 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 171);
+            this.label4.Location = new System.Drawing.Point(15, 177);
             this.label4.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(89, 20);
             this.label4.TabIndex = 18;
             this.label4.Text = "Quote狀態";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(19, 223);
+            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(85, 20);
+            this.label1.TabIndex = 25;
+            this.label1.Text = "Order狀態";
+            // 
+            // textBox_status_order
+            // 
+            this.textBox_status_order.Location = new System.Drawing.Point(114, 214);
+            this.textBox_status_order.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_status_order.Name = "textBox_status_order";
+            this.textBox_status_order.Size = new System.Drawing.Size(294, 29);
+            this.textBox_status_order.TabIndex = 25;
             // 
             // label_Version
             // 
@@ -250,7 +270,7 @@
             this.groupBox1.Controls.Add(this.label13);
             this.groupBox1.Controls.Add(this.textBox_tradeCodeLastDay);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.groupBox1.Location = new System.Drawing.Point(408, 0);
+            this.groupBox1.Location = new System.Drawing.Point(418, 0);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(5);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(5);
@@ -481,24 +501,6 @@
             this.timer2.Interval = 5000;
             this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 220);
-            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 20);
-            this.label1.TabIndex = 25;
-            this.label1.Text = "Order狀態";
-            // 
-            // textBox_status_order
-            // 
-            this.textBox_status_order.Location = new System.Drawing.Point(104, 211);
-            this.textBox_status_order.Margin = new System.Windows.Forms.Padding(5);
-            this.textBox_status_order.Name = "textBox_status_order";
-            this.textBox_status_order.Size = new System.Drawing.Size(294, 29);
-            this.textBox_status_order.TabIndex = 25;
-            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -713,7 +715,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(891, 753);
+            this.ClientSize = new System.Drawing.Size(891, 750);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.textBox_TradePrice);
             this.Controls.Add(this.label17);
@@ -734,15 +736,13 @@
             this.Controls.Add(this.label8);
             this.Controls.Add(this.textBox_B_S);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.textBox_status_order);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.panel1);
             this.Font = new System.Drawing.Font("Microsoft JhengHei", 12F);
             this.Margin = new System.Windows.Forms.Padding(5);
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.12.3  # # # # #     反轉點從最高最低點減去winLine，改為由最後一個買賣點減去winLine";
+            this.Text = " # # # # # 自動下單機V1.12.4  # # # # #     設定檔手動設定交易月份(如設定檔未設定月份，則自動設定為當月)";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
