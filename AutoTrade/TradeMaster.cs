@@ -89,7 +89,7 @@ namespace AutoTrade
             set { isWinReverse = value; }
         }
 
-        Boolean isLoseReverse = true;//賠錢後，買賣方向是否反轉
+        Boolean isLoseReverse = false;//賠錢後，買賣方向是否反轉
 
         public Boolean IsLoseReverse
         {
@@ -128,6 +128,10 @@ namespace AutoTrade
         /// 變數。
         /// </summary>
         ///                         
+
+        int prevStopPrice = 0;
+
+        int stopPrice = 0;
 
         int minTradePoint = 99999;//市場最低價
 
@@ -1128,7 +1132,7 @@ namespace AutoTrade
 
                     if (orderNewPriceList.Count > 1)//有加碼
                     {
-                        stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count - 1];
+                        stopPeriod = reverseLine[orderNewPriceList.Count - 1];
 
                         stopPrice = orderNewPriceList[orderNewPriceList.Count-1] - Convert.ToInt16(stopPeriod);
                     }
@@ -1145,7 +1149,7 @@ namespace AutoTrade
 
                         if (stage == Stage_Order_New_Success || stage == Stage_Last_Day)
                         {
-                            int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (orderNewPriceList.Count);
+                            int orderLots = Convert.ToInt32(lotArray[lotIndex]);
 
                             stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                         }
@@ -1192,7 +1196,7 @@ namespace AutoTrade
 
                     if (orderNewPriceList.Count > 1)
                     {
-                        stopPeriod = winLine[orderNewPriceList.Count - 1] * reverseLine[orderNewPriceList.Count - 1];
+                        stopPeriod = reverseLine[orderNewPriceList.Count - 1];
 
                         stopPrice = orderNewPriceList[orderNewPriceList.Count-1] + Convert.ToInt16(stopPeriod);
                     }
@@ -1209,7 +1213,7 @@ namespace AutoTrade
 
                         if (stage == Stage_Order_New_Success || stage == Stage_Last_Day)
                         {
-                            int orderLots = Convert.ToInt32(lotArray[lotIndex]) * (orderNewPriceList.Count);
+                            int orderLots = Convert.ToInt32(lotArray[lotIndex]);
 
                             stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                         }

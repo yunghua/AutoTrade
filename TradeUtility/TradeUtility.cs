@@ -82,7 +82,7 @@ namespace TradeUtility
             return monthFile.readConfig(tradeMonth);
         }
 
-        public string dealTradeCode(string monthFilePath, string code, string month)//計算當天的商品代碼
+        public string dealTradeCode(string monthFilePath, string code, string month, string year)//計算當天的商品代碼
         {
             try
             {
@@ -93,12 +93,11 @@ namespace TradeUtility
                 throw e;
             }
 
-            return dealTradeCode(code, month);
+            return dealTradeCode(code, month, year);
         }
 
 
-
-        private string dealTradeCode(string code, string month)//計算當天的商品代碼
+        private string dealTradeCode(string code, string month, string year)//計算當天的商品代碼
         {
 
             try
@@ -128,7 +127,16 @@ namespace TradeUtility
 
                 code += monthCode;
 
-                string yearCode = Convert.ToString(now.Year % 10);
+                string yearCode = "";
+
+                if (year == null || year.Trim().Equals(""))
+                {
+                    yearCode = Convert.ToString(now.Year % 10);
+                }
+                else
+                {
+                    yearCode = year.Substring(year.Length - 1);
+                }
 
                 code += yearCode;
 

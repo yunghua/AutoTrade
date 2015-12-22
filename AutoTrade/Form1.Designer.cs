@@ -373,10 +373,12 @@
             // radioButton_lose_not_reverse
             // 
             this.radioButton_lose_not_reverse.AutoSize = true;
+            this.radioButton_lose_not_reverse.Checked = true;
             this.radioButton_lose_not_reverse.Location = new System.Drawing.Point(138, 28);
             this.radioButton_lose_not_reverse.Name = "radioButton_lose_not_reverse";
             this.radioButton_lose_not_reverse.Size = new System.Drawing.Size(75, 24);
             this.radioButton_lose_not_reverse.TabIndex = 27;
+            this.radioButton_lose_not_reverse.TabStop = true;
             this.radioButton_lose_not_reverse.Text = "不反轉";
             this.radioButton_lose_not_reverse.UseVisualStyleBackColor = true;
             this.radioButton_lose_not_reverse.CheckedChanged += new System.EventHandler(this.radioButton_lose_not_reverse_CheckedChanged);
@@ -384,12 +386,10 @@
             // radioButton_lose_reverse
             // 
             this.radioButton_lose_reverse.AutoSize = true;
-            this.radioButton_lose_reverse.Checked = true;
             this.radioButton_lose_reverse.Location = new System.Drawing.Point(55, 28);
             this.radioButton_lose_reverse.Name = "radioButton_lose_reverse";
             this.radioButton_lose_reverse.Size = new System.Drawing.Size(59, 24);
             this.radioButton_lose_reverse.TabIndex = 25;
-            this.radioButton_lose_reverse.TabStop = true;
             this.radioButton_lose_reverse.Text = "反轉";
             this.radioButton_lose_reverse.UseVisualStyleBackColor = true;
             this.radioButton_lose_reverse.CheckedChanged += new System.EventHandler(this.radioButton_lose_reverse_CheckedChanged);
@@ -742,7 +742,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.12.4  # # # # #     設定檔手動設定交易月份(如設定檔未設定月份，則自動設定為當月)";
+            this.Text = " # # # # # 自動下單機V1.12.5  # # # # #     設定檔手動設定交易月份、年度(如設定檔未設定月份或年度，則自動設定為當年當月)";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
