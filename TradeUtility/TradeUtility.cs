@@ -9,7 +9,7 @@ namespace TradeUtility
     {
         private static TradeUtility utility = null;
 
-        public static string version = "TradeUtility Version 0.0.0.6";
+        public static string version = "TradeUtility Version 0.0.0.7";
 
         static ConfigFile monthFile;//月份代碼設定檔
 

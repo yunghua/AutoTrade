@@ -129,9 +129,29 @@ namespace AutoTrade
         /// </summary>
         ///                         
 
-        int prevStopPrice = 0;
+        int prevStopPrice = 0;//上一個反轉點位
 
-        int stopPrice = 0;
+        public int PrevStopPrice
+        {
+            get { return prevStopPrice; }
+            set { prevStopPrice = value; }
+        }
+
+        int stopPrice = 0;//反轉點位
+
+        public int StopPrice
+        {
+            get { return stopPrice; }
+            set { stopPrice = value; }
+        }
+
+        int continueLoseTimes = 0;//連續反轉的次數
+
+        public int ContinueLoseTimes
+        {
+            get { return continueLoseTimes; }
+            set { continueLoseTimes = value; }
+        }
 
         int minTradePoint = 99999;//市場最低價
 
@@ -181,11 +201,7 @@ namespace AutoTrade
 
         int maxLoss;//單日最大停損
 
-        string futuresCode = "";//期貨代碼，大台指TX，小台指MTX
-
-        double stopPeriod = 0;//獲利反轉的間隔
-
-        int stopPrice = 0;//獲利反轉的目標點位        
+        string futuresCode = "";//期貨代碼，大台指TX，小台指MTX                
 
         string nowDay = "";//今天日期
 
@@ -542,6 +558,12 @@ namespace AutoTrade
 
                 parentForm.textBox_NowTradeType.Text = Convert.ToString(nowTradeType);
 
+                parentForm.textBox_StopPrice.Text = Convert.ToString(stopPrice);
+
+                parentForm.textBox_PrevStopPrice.Text = Convert.ToString(prevStopPrice);
+
+                parentForm.textBox_ContinueLoseTimes.Text = Convert.ToString(continueLoseTimes);
+
             }
         }
 
@@ -747,9 +769,44 @@ namespace AutoTrade
 
                 trackMsg("");
 
+                prevStopPrice = stopPrice;
+
+                debugMsg("PrevStopPrice:" + prevStopPrice);
+
+                trackMsg("PrevStopPrice = " + prevStopPrice);
+
+                trackMsg("");
+
+                stopPrice = dealPrice;
+
+                parentForm.textBox_PrevStopPrice.Text = Convert.ToString(prevStopPrice);
+
+                debugMsg("StopPrice = " + stopPrice);
+
+                trackMsg("StopPrice = " + stopPrice);
+
+                trackMsg("");
+
+                parentForm.textBox_ContinueLoseTimes.Text = Convert.ToString(continueLoseTimes);
+
+                debugMsg("ContinueLoseTimes = " + continueLoseTimes);
+
+                trackMsg("ContinueLoseTimes = " + continueLoseTimes);
+
+                trackMsg("");
+
+                parentForm.textBox_StopPrice.Text = Convert.ToString(stopPrice);
+
                 trackMsg("NewTrade");
 
                 trackMsg("");
+
+                lotIndex++;
+
+                if (lotIndex >= lotArray.Length)
+                {
+                    lotIndex = lotArray.Length - 1;
+                }
 
                 isStartOrder = true;//下單啦    
 
@@ -783,6 +840,18 @@ namespace AutoTrade
                 isStartOrder = false;//此次交易結束，準備下一次交易                 
 
                 dealOut();//處理交易結束後，寫紀錄檔，以及相關參數
+
+                if ((outStyle == Out_Loss_Buy) || (outStyle == Out_Loss_Sell))//只有一筆留倉，賠錢
+                {
+                    prevStopPrice = stopPrice = 0;
+                }
+
+                if ((outStyle == Out_Win_Buy) || (outStyle == Out_Win_Sell))//兩筆以上留倉，趨勢反轉
+                {
+                    prevStopPrice = stopPrice;
+
+                    stopPrice = dealPrice;
+                }
 
                 if (orderNewPriceList != null && orderNewPriceList.Count == lotLimit)
                 {
@@ -1130,18 +1199,21 @@ namespace AutoTrade
                 if (nowTradeType == BS_Type_B)
                 {
 
-                    if (orderNewPriceList.Count > 1)//有加碼
-                    {
-                        stopPeriod = reverseLine[orderNewPriceList.Count - 1];
-
-                        stopPrice = orderNewPriceList[orderNewPriceList.Count-1] - Convert.ToInt16(stopPeriod);
-                    }
 
                     if (
-                                  (orderNewPriceList.Count > 1 && record.TradePrice <= stopPrice) ||//反轉
-                                 (orderPrice - record.TradePrice) > loseLine[1]
-                     )
-                    {//賠了XX點，認賠殺出
+                               (orderNewPriceList.Count > 1 && record.TradePrice <= stopPrice - reverseLine[orderNewPriceList.Count]) ||
+                               (orderNewPriceList.Count == 1 && record.TradePrice <= stopPrice - loseLine[orderNewPriceList.Count])
+                               )
+                    {//反轉
+
+                        stopPrice = record.TradePrice;
+
+                        if (stopPrice > prevStopPrice)//反轉後繼續向上加碼
+                        {
+                            continueLoseTimes = 0;
+                        }
+
+                        prevStopPrice = stopPrice;
 
                         orderDircetion = BS_Type_S;
 
@@ -1149,24 +1221,39 @@ namespace AutoTrade
 
                         if (stage == Stage_Order_New_Success || stage == Stage_Last_Day)
                         {
-                            int orderLots = Convert.ToInt32(lotArray[lotIndex]);
+
+                            int orderLots = 0;
+
+                            if (continueLoseTimes >= 2)//全部平倉
+                            {
+                                orderLots = orderNewPriceList.Count;
+
+                                continueLoseTimes = 0;
+                            }
+                            else
+                            {
+                                orderLots = Convert.ToInt32(lotArray[lotIndex]);
+
+                                continueLoseTimes++;
+                            }
 
                             stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                         }
-                        if ((orderPrice - record.TradePrice) > loseLine[1])
+
+                        if (orderNewPriceList.Count == 1 && record.TradePrice <= stopPrice - loseLine[orderNewPriceList.Count])
                         {
                             debugMsg("outStyle = Out_Loss_Buy");
 
                             outStyle = Out_Loss_Buy;
                         }
-                        else if (orderNewPriceList.Count > 1 && record.TradePrice <= stopPrice)
+                        else if (orderNewPriceList.Count > 1 && record.TradePrice <= stopPrice - reverseLine[orderNewPriceList.Count])
                         {
                             debugMsg("outStyle = Out_Win_Buy");
 
                             outStyle = Out_Win_Buy;
                         }
                     }
-                    else if ((record.TradePrice - orderNewPrice) >= winLine[orderNewPriceList.Count])
+                    else if ((record.TradePrice - orderNewPriceList[orderNewPriceList.Count - 1]) >= winLine[orderNewPriceList.Count])  //加碼
                     {
 
                         //--------------------------------------------------------------------------------------------------------------------------------
@@ -1185,6 +1272,8 @@ namespace AutoTrade
                                 stage = this.dealOrderNew(tradeCode, Convert.ToString(record.TradePrice), lotArray[lotIndex], orderDircetion);
                             }
 
+                            stopPrice = record.TradePrice;
+
                             return;
                         }
 
@@ -1194,18 +1283,28 @@ namespace AutoTrade
                 else if (nowTradeType == BS_Type_S)
                 {
 
-                    if (orderNewPriceList.Count > 1)
-                    {
-                        stopPeriod = reverseLine[orderNewPriceList.Count - 1];
+                    //if (orderNewPriceList.Count > 1)
+                    //{
+                    //    stopPeriod = reverseLine[orderNewPriceList.Count - 1];
 
-                        stopPrice = orderNewPriceList[orderNewPriceList.Count-1] + Convert.ToInt16(stopPeriod);
-                    }
+                    //    stopPrice = orderNewPriceList[orderNewPriceList.Count - 1] + Convert.ToInt16(stopPeriod);
+                    //}
 
                     if (
-                                (orderNewPriceList.Count > 1 && record.TradePrice >= stopPrice) || //反轉
-                                (record.TradePrice - orderPrice) > loseLine[1])
+                                  (orderNewPriceList.Count > 1 && record.TradePrice >= stopPrice + reverseLine[orderNewPriceList.Count]) ||
+                                  (orderNewPriceList.Count == 1 && record.TradePrice >= stopPrice + loseLine[orderNewPriceList.Count])
+                     )
+                    //反轉
                     {
-                        //賠了XX點，認賠殺出
+
+                        stopPrice = record.TradePrice;
+
+                        if (stopPrice < prevStopPrice)//反轉後繼續向下加碼
+                        {
+                            continueLoseTimes = 0;
+                        }
+
+                        prevStopPrice = stopPrice;
 
                         orderDircetion = BS_Type_B;
 
@@ -1213,25 +1312,39 @@ namespace AutoTrade
 
                         if (stage == Stage_Order_New_Success || stage == Stage_Last_Day)
                         {
-                            int orderLots = Convert.ToInt32(lotArray[lotIndex]);
+
+                            int orderLots = 0;
+
+                            if (continueLoseTimes >= 2)//全部平倉
+                            {
+                                orderLots = orderNewPriceList.Count;
+
+                                continueLoseTimes = 0;
+                            }
+                            else
+                            {
+                                orderLots = Convert.ToInt32(lotArray[lotIndex]);
+
+                                continueLoseTimes++;
+                            }
 
                             stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
                         }
 
-                        if ((record.TradePrice - orderPrice) > loseLine[1])
+                        if (orderNewPriceList.Count == 1 && record.TradePrice >= stopPrice + loseLine[orderNewPriceList.Count])
                         {
                             debugMsg("outStyle = Out_Loss_Sell");
 
                             outStyle = Out_Loss_Sell;
                         }
-                        else if (orderNewPriceList.Count > 1 && record.TradePrice >= stopPrice)
+                        else if (orderNewPriceList.Count > 1 && record.TradePrice >= stopPrice + reverseLine[orderNewPriceList.Count])
                         {
                             debugMsg("outStyle = Out_Win_Sell");
 
                             outStyle = Out_Win_Sell;
                         }
                     }
-                    else if ((orderNewPrice - record.TradePrice) > winLine[orderNewPriceList.Count])
+                    else if ((record.TradePrice - orderNewPriceList[orderNewPriceList.Count - 1]) >= winLine[orderNewPriceList.Count])
                     {
 
                         //賺了XX點，加碼
@@ -1250,6 +1363,8 @@ namespace AutoTrade
                             {
                                 stage = this.dealOrderNew(tradeCode, Convert.ToString(record.TradePrice), lotArray[lotIndex], orderDircetion);
                             }
+
+                            stopPrice = record.TradePrice;
 
                             return;
                         }
@@ -1431,16 +1546,11 @@ namespace AutoTrade
         }
 
 
-        private void winOut()//獲利出場
+        private void winOut()//反轉獲利出場
         {
             dealOutCore();
 
-            lotIndex++;
-
-            if (lotIndex >= lotArray.Length)
-            {
-                lotIndex = lotArray.Length - 1;
-            }
+            continueLoseTimes++;
 
             winCount++;
 

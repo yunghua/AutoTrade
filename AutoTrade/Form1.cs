@@ -344,6 +344,34 @@ namespace AutoTrade
                     }
 
 
+                    contextList = trackFile.readMultiLineConfig("PrevStopPrice", "EndTrade");
+
+                    if (contextList != null && contextList.Count >= 1)
+                    {
+                        master.PrevStopPrice = Convert.ToInt16(contextList[contextList.Count - 1]);
+
+                        contextList.Clear();
+                    }
+
+                    contextList = trackFile.readMultiLineConfig("StopPrice", "EndTrade");
+
+                    if (contextList != null && contextList.Count >= 1)
+                    {
+                        master.StopPrice = Convert.ToInt16(contextList[contextList.Count - 1]);
+
+                        contextList.Clear();
+                    }
+
+                    contextList = trackFile.readMultiLineConfig("ContinueLoseTimes", "EndTrade");
+
+                    if (contextList != null && contextList.Count >= 1)
+                    {
+                        master.ContinueLoseTimes = Convert.ToInt16(contextList[contextList.Count - 1]);
+
+                        contextList.Clear();
+                    }
+
+
                     trackFile.close();
                     trackFile = null;
                 }
@@ -608,6 +636,11 @@ namespace AutoTrade
         private void radioButton_lose_not_reverse_CheckedChanged(object sender, EventArgs e)
         {
             master.IsLoseReverse = false;
+        }
+
+        private void textBox_StopPrice_TextChanged(object sender, EventArgs e)
+        {
+
         }
 
 

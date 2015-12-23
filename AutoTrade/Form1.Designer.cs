@@ -103,6 +103,12 @@
             this.label18 = new System.Windows.Forms.Label();
             this.comboBox_initial_direction = new System.Windows.Forms.ComboBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.textBox_StopPrice = new System.Windows.Forms.TextBox();
+            this.textBox_PrevStopPrice = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.textBox_ContinueLoseTimes = new System.Windows.Forms.TextBox();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -251,7 +257,7 @@
             // label_Version
             // 
             this.label_Version.AutoSize = true;
-            this.label_Version.Location = new System.Drawing.Point(183, 700);
+            this.label_Version.Location = new System.Drawing.Point(183, 721);
             this.label_Version.Name = "label_Version";
             this.label_Version.Size = new System.Drawing.Size(105, 20);
             this.label_Version.TabIndex = 20;
@@ -577,7 +583,7 @@
             // 
             this.label11.AutoSize = true;
             this.label11.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label11.Location = new System.Drawing.Point(21, 617);
+            this.label11.Location = new System.Drawing.Point(10, 662);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(127, 20);
             this.label11.TabIndex = 35;
@@ -585,11 +591,11 @@
             // 
             // textBox_OrderNewPriceList
             // 
-            this.textBox_OrderNewPriceList.Location = new System.Drawing.Point(187, 568);
+            this.textBox_OrderNewPriceList.Location = new System.Drawing.Point(145, 552);
             this.textBox_OrderNewPriceList.Margin = new System.Windows.Forms.Padding(5);
             this.textBox_OrderNewPriceList.Multiline = true;
             this.textBox_OrderNewPriceList.Name = "textBox_OrderNewPriceList";
-            this.textBox_OrderNewPriceList.Size = new System.Drawing.Size(687, 102);
+            this.textBox_OrderNewPriceList.Size = new System.Drawing.Size(263, 164);
             this.textBox_OrderNewPriceList.TabIndex = 36;
             // 
             // label14
@@ -711,11 +717,72 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "賠錢";
             // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label19.Location = new System.Drawing.Point(486, 628);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(85, 20);
+            this.label19.TabIndex = 50;
+            this.label19.Text = "Stop Price";
+            // 
+            // textBox_StopPrice
+            // 
+            this.textBox_StopPrice.Location = new System.Drawing.Point(583, 619);
+            this.textBox_StopPrice.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_StopPrice.Name = "textBox_StopPrice";
+            this.textBox_StopPrice.Size = new System.Drawing.Size(294, 29);
+            this.textBox_StopPrice.TabIndex = 51;
+            this.textBox_StopPrice.TextChanged += new System.EventHandler(this.textBox_StopPrice_TextChanged);
+            // 
+            // textBox_PrevStopPrice
+            // 
+            this.textBox_PrevStopPrice.Location = new System.Drawing.Point(580, 568);
+            this.textBox_PrevStopPrice.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_PrevStopPrice.Name = "textBox_PrevStopPrice";
+            this.textBox_PrevStopPrice.Size = new System.Drawing.Size(294, 29);
+            this.textBox_PrevStopPrice.TabIndex = 52;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label20.Location = new System.Drawing.Point(450, 571);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(122, 20);
+            this.label20.TabIndex = 53;
+            this.label20.Text = "Prev Stop Price";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Font = new System.Drawing.Font("Microsoft JhengHei", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label21.Location = new System.Drawing.Point(414, 672);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(157, 20);
+            this.label21.TabIndex = 54;
+            this.label21.Text = "ContinueLoseTimes";
+            // 
+            // textBox_ContinueLoseTimes
+            // 
+            this.textBox_ContinueLoseTimes.Location = new System.Drawing.Point(583, 672);
+            this.textBox_ContinueLoseTimes.Margin = new System.Windows.Forms.Padding(5);
+            this.textBox_ContinueLoseTimes.Name = "textBox_ContinueLoseTimes";
+            this.textBox_ContinueLoseTimes.Size = new System.Drawing.Size(294, 29);
+            this.textBox_ContinueLoseTimes.TabIndex = 55;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(891, 750);
+            this.Controls.Add(this.textBox_ContinueLoseTimes);
+            this.Controls.Add(this.label21);
+            this.Controls.Add(this.label20);
+            this.Controls.Add(this.textBox_PrevStopPrice);
+            this.Controls.Add(this.textBox_StopPrice);
+            this.Controls.Add(this.label19);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.textBox_TradePrice);
             this.Controls.Add(this.label17);
@@ -742,7 +809,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.12.5  # # # # #     設定檔手動設定交易月份、年度(如設定檔未設定月份或年度，則自動設定為當年當月)";
+            this.Text = " # # # # # 自動下單機V1.12.6  # # # # #     逐層反轉機制";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -833,6 +900,12 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.ComboBox comboBox_initial_direction;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label19;
+        public System.Windows.Forms.TextBox textBox_StopPrice;
+        public System.Windows.Forms.TextBox textBox_PrevStopPrice;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label label21;
+        public System.Windows.Forms.TextBox textBox_ContinueLoseTimes;
     }
 }
 
