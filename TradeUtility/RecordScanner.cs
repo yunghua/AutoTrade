@@ -46,9 +46,12 @@ namespace TradeUtility
 
                 OriginalRecord record;
 
-                for (int i = recordList.Count; i > 0; i--)
+                //for (int i = recordList.Count; i > 0; i--)
+                for (int i =0;i< recordList.Count;   i++)
                 {
-                    record = (OriginalRecord)recordList[i - 1];
+                    //record = (OriginalRecord)recordList[i - 1];
+
+                    record = (OriginalRecord)recordList[i];
 
                     if (record.TradeMoment < baseTime)
                     {
