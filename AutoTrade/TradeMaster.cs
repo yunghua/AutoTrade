@@ -835,15 +835,13 @@ namespace AutoTrade
 
                 trackMsg("");
 
-                orderEvenTime = D_Time.Trim();//成交時間
-
-                isStartOrder = false;//此次交易結束，準備下一次交易                 
-
-                dealOut();//處理交易結束後，寫紀錄檔，以及相關參數
+                orderEvenTime = D_Time.Trim();//成交時間                                     
 
                 if ((outStyle == Out_Loss_Buy) || (outStyle == Out_Loss_Sell))//只有一筆留倉，賠錢
                 {
                     prevStopPrice = stopPrice = 0;
+
+                    isStartOrder = false;//此次交易結束，準備下一次交易           
                 }
 
                 if ((outStyle == Out_Win_Buy) || (outStyle == Out_Win_Sell))//兩筆以上留倉，趨勢反轉
@@ -857,6 +855,15 @@ namespace AutoTrade
                 {
                     isWinReverse = true;
                 }
+
+                for (int i = 0; i < Convert.ToInt16(lotArray[lotIndex]); i++)//移除下單列表中被平倉的價位
+                {
+                    orderNewPriceList.RemoveAt(0);
+                }
+
+                dealOut();//處理交易結束後，寫紀錄檔，以及相關參數
+
+
             }
 
         }
@@ -1433,7 +1440,7 @@ namespace AutoTrade
                 {
                     //oneProfitPoint = orderEvenPrice - orderNewPrice;
 
-                    for (int i = 0; i < orderNewPriceList.Count; i++)
+                    for (int i = 0; i < Convert.ToInt32(lotArray[lotIndex]); i++)
                     {
                         oneProfitPoint += orderEvenPrice - orderNewPriceList[i];
                     }
@@ -1443,13 +1450,13 @@ namespace AutoTrade
                 {
                     //oneProfitPoint = orderNewPrice - orderEvenPrice;
 
-                    for (int i = 0; i < orderNewPriceList.Count; i++)
+                    for (int i = 0; i < Convert.ToInt32(lotArray[lotIndex]); i++)
                     {
                         oneProfitPoint += orderNewPriceList[i] - orderEvenPrice;
                     }
                 }
 
-                oneProfitPoint *= Convert.ToInt32(lotArray[lotIndex]);
+
             }
             catch (Exception e)
             {
@@ -1495,15 +1502,29 @@ namespace AutoTrade
 
             debugMsg("----------------------------------------------------------------------------------------------");
 
-            isStartOrder = false;
 
-            befofeRecord = null;
 
-            orderNewPriceList.Clear();//平倉後，把新倉(包括加碼的新倉)列表清空。            
+            if ((outStyle == Out_Loss_Buy) || (outStyle == Out_Loss_Sell))
+            {//認賠停損
 
-            minTradePoint = 99999;//新倉後最低價
+                isStartOrder = false;
 
-            maxTradePoint = 0;//新倉後最高價
+                befofeRecord = null;
+
+                orderNewPriceList.Clear();//平倉後，把新倉(包括加碼的新倉)列表清空。            
+
+                minTradePoint = 99999;//新倉後最低價
+
+                maxTradePoint = 0;//新倉後最高價
+
+            }
+
+            lotIndex--;
+
+            if (lotIndex < 0)
+            {
+                lotIndex = 0;
+            }
 
         }
 
