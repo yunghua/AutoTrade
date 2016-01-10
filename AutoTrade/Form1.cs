@@ -643,6 +643,15 @@ namespace AutoTrade
 
         }
 
+        private void checkBox_AllOut_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox_AllOut.Checked)
+            {//手動全部平倉
+
+                master.IsAllOut = true;
+            }
+        }
+
 
 
 

@@ -109,6 +109,7 @@
             this.label20 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.textBox_ContinueLoseTimes = new System.Windows.Forms.TextBox();
+            this.checkBox_AllOut = new System.Windows.Forms.CheckBox();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -122,6 +123,7 @@
             // groupBox3
             // 
             this.groupBox3.AutoSize = true;
+            this.groupBox3.Controls.Add(this.checkBox_AllOut);
             this.groupBox3.Controls.Add(this.axYuantaQuote1);
             this.groupBox3.Controls.Add(this.checkBox_enableTrade);
             this.groupBox3.Controls.Add(this.textBox_reverseLine);
@@ -772,6 +774,17 @@
             this.textBox_ContinueLoseTimes.Size = new System.Drawing.Size(294, 29);
             this.textBox_ContinueLoseTimes.TabIndex = 55;
             // 
+            // checkBox_AllOut
+            // 
+            this.checkBox_AllOut.AutoSize = true;
+            this.checkBox_AllOut.Location = new System.Drawing.Point(88, 139);
+            this.checkBox_AllOut.Name = "checkBox_AllOut";
+            this.checkBox_AllOut.Size = new System.Drawing.Size(92, 24);
+            this.checkBox_AllOut.TabIndex = 28;
+            this.checkBox_AllOut.Text = "全部平倉";
+            this.checkBox_AllOut.UseVisualStyleBackColor = true;
+            this.checkBox_AllOut.CheckedChanged += new System.EventHandler(this.checkBox_AllOut_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
@@ -809,7 +822,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V1.12.7  # # # # #     逐層反轉機制，程式修正";
+            this.Text = " # # # # # 自動下單機V2.1.1  # # # # #     逐層反轉機制，增加手動全部平倉功能。";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -906,6 +919,7 @@
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label21;
         public System.Windows.Forms.TextBox textBox_ContinueLoseTimes;
+        private System.Windows.Forms.CheckBox checkBox_AllOut;
     }
 }
 

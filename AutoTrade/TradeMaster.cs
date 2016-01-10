@@ -80,6 +80,14 @@ namespace AutoTrade
         /// </summary>      
         /// 
 
+        Boolean isAllOut = false;//是否全部平倉
+
+        public Boolean IsAllOut
+        {
+            get { return isAllOut; }
+            set { isAllOut = value; }
+        }
+
 
         Boolean isWinReverse = false;//獲利後，買賣方向是否反轉
 
@@ -707,6 +715,7 @@ namespace AutoTrade
 
                 allTradeOutputFile.writeLine(outputLine);
 
+                parentForm.textBox_TradePrice.Text = Convert.ToString(matchPrice);
 
                 if (!isStopTodayTrade && enableTrade)
                 {
@@ -748,7 +757,24 @@ namespace AutoTrade
 
             dealQty = Convert.ToInt32(Deal_Qty.Trim());//已成交量
 
-            if (stage == Stage_Order_New_Start)//新倉
+            if (isAllOut)
+            {   //手動全部平倉
+
+                this.isAllOut = false;
+
+                prevStopPrice = stopPrice = 0;
+
+                isStartOrder = false;//此次交易結束，準備下一次交易           
+
+                isWinReverse = true;
+
+                orderNewPriceList.Clear();
+
+                dealOut();//處理交易結束後，寫紀錄檔，以及相關參數
+
+            }
+
+            else if (stage == Stage_Order_New_Start)//新倉
             {
                 stage = Stage_Order_New_Success;
 
@@ -1066,7 +1092,7 @@ namespace AutoTrade
 
             parentForm.textBox_NowTradeType.Text = Convert.ToString(nowTradeType);
 
-            parentForm.textBox_TradePrice.Text = Convert.ToString(record.TradePrice);
+
 
             if (record.TradeMoment.Hour >= 13 && record.TradeMoment.Minute >= 44 && record.TradeMoment.Second >= 59 && hasWriteMaxAndMinPrice == false)
             {
@@ -1205,7 +1231,27 @@ namespace AutoTrade
 
                 if (nowTradeType == BS_Type_B)
                 {
+                    if (isAllOut)
+                    {//手動全部平倉
 
+                        int orderLots = 0;
+
+                        debugMsg("outStyle = Out_Win_Buy");
+
+                        outStyle = Out_Win_Buy;
+
+                        continueLoseTimes = 0;
+
+                        orderLots = orderNewPriceList.Count;
+
+                        evenPrice = record.TradePrice;
+
+                        orderDircetion = BS_Type_B;
+
+                        stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
+
+                        return;
+                    }
 
                     if (
                                (orderNewPriceList.Count > 1 && record.TradePrice <= stopPrice - reverseLine[orderNewPriceList.Count]) ||
@@ -1231,13 +1277,13 @@ namespace AutoTrade
 
                             int orderLots = 0;
 
-                            if (continueLoseTimes >= 2)//全部平倉
-                            {
-                                orderLots = orderNewPriceList.Count;
+                            //if (continueLoseTimes >= 2)//全部平倉
+                            //{
+                            //    orderLots = orderNewPriceList.Count;
 
-                                continueLoseTimes = 0;
-                            }
-                            else
+                            //    continueLoseTimes = 0;
+                            //}
+                            //else
                             {
                                 orderLots = Convert.ToInt32(lotArray[lotIndex]);
 
@@ -1289,13 +1335,29 @@ namespace AutoTrade
                 }
                 else if (nowTradeType == BS_Type_S)
                 {
+                    if (isAllOut)
+                    {//手動全部平倉
 
-                    //if (orderNewPriceList.Count > 1)
-                    //{
-                    //    stopPeriod = reverseLine[orderNewPriceList.Count - 1];
+                        int orderLots = 0;
 
-                    //    stopPrice = orderNewPriceList[orderNewPriceList.Count - 1] + Convert.ToInt16(stopPeriod);
-                    //}
+                        debugMsg("outStyle = Out_Win_Sell");
+
+                        outStyle = Out_Win_Sell;
+
+                        continueLoseTimes = 0;
+
+                        orderLots = orderNewPriceList.Count;
+                        
+                        evenPrice = record.TradePrice;
+
+                        orderDircetion = BS_Type_B;
+
+                        stage = this.dealOrderEven(tradeCode, Convert.ToString(evenPrice), Convert.ToString(orderLots), orderDircetion);
+
+                        return;
+                    }
+
+
 
                     if (
                                   (orderNewPriceList.Count > 1 && record.TradePrice >= stopPrice + reverseLine[orderNewPriceList.Count]) ||
@@ -1322,13 +1384,13 @@ namespace AutoTrade
 
                             int orderLots = 0;
 
-                            if (continueLoseTimes >= 2)//全部平倉
-                            {
-                                orderLots = orderNewPriceList.Count;
+                            //if (continueLoseTimes >= 2)//全部平倉
+                            //{
+                            //    orderLots = orderNewPriceList.Count;
 
-                                continueLoseTimes = 0;
-                            }
-                            else
+                            //    continueLoseTimes = 0;
+                            //}
+                            //else
                             {
                                 orderLots = Convert.ToInt32(lotArray[lotIndex]);
 
