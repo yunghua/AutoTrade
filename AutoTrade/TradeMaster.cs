@@ -1259,15 +1259,10 @@ namespace AutoTrade
                                )
                     {//反轉
 
-                        stopPrice = record.TradePrice;
-
-                        if (stopPrice > prevStopPrice)//反轉後繼續向上加碼
-                        {
-                            continueLoseTimes = 0;
-                        }
-
                         prevStopPrice = stopPrice;
 
+                        stopPrice = record.TradePrice;
+                      
                         orderDircetion = BS_Type_S;
 
                         evenPrice = record.TradePrice;
@@ -1327,6 +1322,8 @@ namespace AutoTrade
 
                             stopPrice = record.TradePrice;
 
+                            continueLoseTimes = 0;
+
                             return;
                         }
 
@@ -1347,7 +1344,7 @@ namespace AutoTrade
                         continueLoseTimes = 0;
 
                         orderLots = orderNewPriceList.Count;
-                        
+
                         evenPrice = record.TradePrice;
 
                         orderDircetion = BS_Type_B;
@@ -1366,15 +1363,10 @@ namespace AutoTrade
                     //反轉
                     {
 
-                        stopPrice = record.TradePrice;
-
-                        if (stopPrice < prevStopPrice)//反轉後繼續向下加碼
-                        {
-                            continueLoseTimes = 0;
-                        }
-
                         prevStopPrice = stopPrice;
 
+                        stopPrice = record.TradePrice;
+                        
                         orderDircetion = BS_Type_B;
 
                         evenPrice = record.TradePrice;
@@ -1413,7 +1405,7 @@ namespace AutoTrade
                             outStyle = Out_Win_Sell;
                         }
                     }
-                    else if ((record.TradePrice - orderNewPriceList[orderNewPriceList.Count - 1]) >= winLine[orderNewPriceList.Count])
+                    else if ((orderNewPriceList[orderNewPriceList.Count - 1] - record.TradePrice) >= winLine[orderNewPriceList.Count])
                     {
 
                         //賺了XX點，加碼
@@ -1434,6 +1426,8 @@ namespace AutoTrade
                             }
 
                             stopPrice = record.TradePrice;
+
+                            continueLoseTimes = 0;
 
                             return;
                         }

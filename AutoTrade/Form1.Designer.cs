@@ -37,6 +37,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.checkBox_AllOut = new System.Windows.Forms.CheckBox();
             this.axYuantaQuote1 = new AxYuantaQuoteLib.AxYuantaQuote();
             this.checkBox_enableTrade = new System.Windows.Forms.CheckBox();
             this.textBox_reverseLine = new System.Windows.Forms.TextBox();
@@ -109,7 +110,6 @@
             this.label20 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.textBox_ContinueLoseTimes = new System.Windows.Forms.TextBox();
-            this.checkBox_AllOut = new System.Windows.Forms.CheckBox();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axYuantaQuote1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -145,6 +145,17 @@
             this.groupBox3.TabIndex = 15;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Yuanta Quote API 連線資訊";
+            // 
+            // checkBox_AllOut
+            // 
+            this.checkBox_AllOut.AutoSize = true;
+            this.checkBox_AllOut.Location = new System.Drawing.Point(88, 139);
+            this.checkBox_AllOut.Name = "checkBox_AllOut";
+            this.checkBox_AllOut.Size = new System.Drawing.Size(92, 24);
+            this.checkBox_AllOut.TabIndex = 28;
+            this.checkBox_AllOut.Text = "全部平倉";
+            this.checkBox_AllOut.UseVisualStyleBackColor = true;
+            this.checkBox_AllOut.CheckedChanged += new System.EventHandler(this.checkBox_AllOut_CheckedChanged);
             // 
             // axYuantaQuote1
             // 
@@ -774,17 +785,6 @@
             this.textBox_ContinueLoseTimes.Size = new System.Drawing.Size(294, 29);
             this.textBox_ContinueLoseTimes.TabIndex = 55;
             // 
-            // checkBox_AllOut
-            // 
-            this.checkBox_AllOut.AutoSize = true;
-            this.checkBox_AllOut.Location = new System.Drawing.Point(88, 139);
-            this.checkBox_AllOut.Name = "checkBox_AllOut";
-            this.checkBox_AllOut.Size = new System.Drawing.Size(92, 24);
-            this.checkBox_AllOut.TabIndex = 28;
-            this.checkBox_AllOut.Text = "全部平倉";
-            this.checkBox_AllOut.UseVisualStyleBackColor = true;
-            this.checkBox_AllOut.CheckedChanged += new System.EventHandler(this.checkBox_AllOut_CheckedChanged);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
@@ -822,7 +822,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = " # # # # # 自動下單機V2.1.1  # # # # #     逐層反轉機制，增加手動全部平倉功能。";
+            this.Text = " # # # # # 自動下單機V2.1.2  # # # # #     放空加碼機制BUG修正。";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
